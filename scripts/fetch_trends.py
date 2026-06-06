@@ -6,7 +6,6 @@ import os
 from datetime import datetime, timezone, date
 from pytrends.request import TrendReq
 
-# Search terms matched to what people actually search on Google Trends
 CITIES = [
     {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",    "term": "New Jersey World Cup"},
     {"name": "Los Angeles",           "country": "USA", "flag": "US", "region": "West",    "term": "Los Angeles World Cup"},
@@ -26,15 +25,19 @@ CITIES = [
     {"name": "Kansas City",           "country": "USA", "flag": "US", "region": "Central", "term": "Kansas City World Cup"},
 ]
 
-TOURNAMENT_START = date(2026, 6, 11)
+# Tournament week windows - Sunday to Saturday to align with Google Trends weekly data
+WEEKS = [
+    {"label": "Week 1", "start": "2026-06-11", "end": "2026-06-17"},
+    {"label": "Week 2", "start": "2026-06-18", "end": "2026-06-24"},
+    {"label": "Week 3", "start": "2026-06-25", "end": "2026-07-01"},
+    {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
+]
 
 
-def get_cumulative_timeframe():
+def is_week_available(week):
+    """Only fetch a week if its start date has passed."""
     today = date.today()
-    if today < TOURNAMENT_START:
-        print("  Tournament has not started - using 90-day pre-tournament window")
-        return "today 3-m"
-    return TOURNAMENT_START.strftime("%Y-%m-%d") + " " + today.strftime("%Y-%m-%d")
+    return today >= date.fromisoformat(week["start"])
 
 
 def chunks(lst, n):
@@ -43,129 +46,152 @@ def chunks(lst, n):
 
 
 def fetch_batch_with_retry(pytrends, terms, timeframe, max_retries=3):
-    """Fetch with retries and validate we got real data, not zeros."""
     for attempt in range(max_retries):
         if attempt > 0:
             wait = 15 * attempt
-            print("    Retry " + str(attempt) + " after " + str(wait) + "s wait...")
+            print("    Retry " + str(attempt) + " after " + str(wait) + "s...")
             time.sleep(wait)
         try:
             pytrends.build_payload(terms, cat=0, timeframe=timeframe, geo="", gprop="")
             df = pytrends.interest_over_time()
-
             if df.empty:
                 print("    Empty dataframe on attempt " + str(attempt + 1))
                 continue
-
             result = {}
             for t in terms:
                 result[t] = int(round(df[t].mean())) if t in df.columns else 0
-
-            # Check we got real data - if all zeros or all ones, something went wrong
             values = list(result.values())
-            max_val = max(values) if values else 0
-            if max_val <= 1:
-                print("    Suspiciously low scores (max=" + str(max_val) + ") on attempt " + str(attempt + 1) + " - retrying")
+            if max(values) if values else 0 <= 1:
+                print("    Scores too low (max=" + str(max(values) if values else 0) + ") - retrying")
                 continue
-
             for t, v in result.items():
                 print("    " + t + " -> " + str(v))
             return result
-
         except Exception as e:
-            print("    Error on attempt " + str(attempt + 1) + ": " + str(e))
+            print("    Error: " + str(e))
             continue
-
-    # If all retries failed, return zeros
-    print("    All retries failed - returning zeros for this batch")
+    print("    All retries failed - returning zeros")
     return {t: 0 for t in terms}
 
 
+def fetch_timeframe(pytrends, all_terms, timeframe, label):
+    print("\n  [" + label + "] timeframe: " + timeframe)
+    term_batches = list(chunks(all_terms, 5))
+    batches = []
+    for i, batch in enumerate(term_batches):
+        print("  Batch " + str(i + 1) + "/" + str(len(term_batches)))
+        batches.append(fetch_batch_with_retry(pytrends, batch, timeframe))
+        if i < len(term_batches) - 1:
+            time.sleep(8)
+    return normalise_across_batches(batches, all_terms)
+
+
 def normalise_across_batches(batches, all_terms):
-    """
-    Google scores each batch independently with max=100.
-    To put all 16 cities on the same scale, find the global max across
-    all batches and scale everything relative to that.
-    """
-    # Find the single highest score across all batches
     global_max = 1
     for batch in batches:
         for term, score in batch.items():
             if term in all_terms and score > global_max:
                 global_max = score
-
-    print("\n  Global max score across all batches: " + str(global_max))
-
     normalised = {}
     for batch in batches:
         for term, score in batch.items():
             if term in all_terms:
                 normalised[term] = int(round(score / global_max * 100))
-
     return normalised
 
 
-def fetch_all():
-    pytrends = TrendReq(hl="en-US", tz=0, timeout=(15, 30), retries=3, backoff_factor=2)
-    all_terms = [c["term"] for c in CITIES]
-    # Batch size 5 = pytrends max, gives us 4 batches for 16 cities
-    term_batches = list(chunks(all_terms, 5))
-    cumul_tf = get_cumulative_timeframe()
-    weekly_b = []
-    cumul_b = []
-
-    for i, batch in enumerate(term_batches):
-        print("\n  === Batch " + str(i + 1) + "/" + str(len(term_batches)) + " ===")
-        print("  Terms: " + str(batch))
-
-        print("  -> Weekly (now 7-d)")
-        weekly_b.append(fetch_batch_with_retry(pytrends, batch, "now 7-d"))
-        time.sleep(8)
-
-        print("  -> Cumulative (" + cumul_tf + ")")
-        cumul_b.append(fetch_batch_with_retry(pytrends, batch, cumul_tf))
-        time.sleep(8)
-
-    ws = normalise_across_batches(weekly_b, all_terms)
-    cs = normalise_across_batches(cumul_b, all_terms)
-
-    results = []
-    for city in CITIES:
-        t = city["term"]
-        results.append({
-            "name":       city["name"],
-            "country":    city["country"],
-            "flag":       city["flag"],
-            "region":     city["region"],
-            "term":       t,
-            "weekScore":  ws.get(t, 0),
-            "cumulative": cs.get(t, 0),
-            "trendsUrl":  "https://trends.google.com/trends/explore?q=" + t.replace(" ", "+") + "&date=now+7-d",
-        })
-
-    return sorted(results, key=lambda x: x["weekScore"], reverse=True)
+def scores_to_points(normalised_scores, all_terms):
+    """
+    Convert normalised interest scores into weekly points.
+    1st = 16pts, 2nd = 15pts ... 16th = 1pt
+    (Using 16 cities so points run 16 down to 1)
+    """
+    ranked = sorted(all_terms, key=lambda t: normalised_scores.get(t, 0), reverse=True)
+    points = {}
+    total = len(all_terms)
+    for i, term in enumerate(ranked):
+        points[term] = total - i  # 16 for 1st, 15 for 2nd ... 1 for 16th
+    return points
 
 
 def main():
     print("Fetching Google Trends data for 16 World Cup host cities...")
-    data = fetch_all()
+    pytrends = TrendReq(hl="en-US", tz=0, timeout=(15, 30), retries=3, backoff_factor=2)
+    all_terms = [c["term"] for c in CITIES]
     now = datetime.now(timezone.utc)
+    today = date.today()
 
-    print("\n=== Final Scores ===")
-    for city in data:
-        print("  " + city["name"].ljust(25) + " week=" + str(city["weekScore"]).rjust(3) + "  cumul=" + str(city["cumulative"]).rjust(3))
+    # --- Fetch each discrete week that has started ---
+    week_data = {}
+    for week in WEEKS:
+        if not is_week_available(week):
+            print("\nSkipping " + week["label"] + " (not started yet)")
+            continue
+        print("\n=== " + week["label"] + " (" + week["start"] + " to " + week["end"] + ") ===")
+        tf = week["start"] + " " + week["end"]
+        scores = fetch_timeframe(pytrends, all_terms, tf, week["label"])
+        points = scores_to_points(scores, all_terms)
+        week_data[week["label"]] = {"scores": scores, "points": points}
+        time.sleep(10)
+
+    # --- Fetch last 7 days (rolling) ---
+    print("\n=== Last 7 days (rolling) ===")
+    last7_scores = fetch_timeframe(pytrends, all_terms, "now 7-d", "Last 7 days")
+    last7_points = scores_to_points(last7_scores, all_terms)
+
+    # --- Build results ---
+    results = []
+    for city in CITIES:
+        t = city["term"]
+
+        # Points per discrete week
+        week_points = {}
+        week_scores = {}
+        for week in WEEKS:
+            lbl = week["label"]
+            if lbl in week_data:
+                week_points[lbl] = week_data[lbl]["points"].get(t, 0)
+                week_scores[lbl] = week_data[lbl]["scores"].get(t, 0)
+            else:
+                week_points[lbl] = None  # not yet available
+                week_scores[lbl] = None
+
+        # To date = sum of all available discrete week points
+        to_date_points = sum(v for v in week_points.values() if v is not None)
+
+        results.append({
+            "name":          city["name"],
+            "country":       city["country"],
+            "flag":          city["flag"],
+            "region":        city["region"],
+            "term":          t,
+            "trendsUrl":     "https://trends.google.com/trends/explore?q=" + t.replace(" ", "+") + "&date=now+7-d",
+            "lastWeekScore": last7_scores.get(t, 0),
+            "lastWeekPts":   last7_points.get(t, 0),
+            "weekPoints":    week_points,
+            "weekScores":    week_scores,
+            "toDatePoints":  to_date_points,
+        })
+
+    # Default sort by to-date points (or last week if no weeks available yet)
+    results.sort(key=lambda x: (x["toDatePoints"], x["lastWeekPts"]), reverse=True)
+
+    print("\n=== Final Standings ===")
+    for city in results:
+        print("  " + city["name"].ljust(25) +
+              " last7pts=" + str(city["lastWeekPts"]).rjust(2) +
+              " toDate=" + str(city["toDatePoints"]).rjust(3))
 
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
         json.dump({
-            "updated":         now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "updatedDisplay":  now.strftime("%d %b %Y, %H:%Mz"),
-            "tournamentStart": TOURNAMENT_START.strftime("%Y-%m-%d"),
-            "cities":          data,
+            "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
+            "weeks":          WEEKS,
+            "cities":         results,
         }, f, ensure_ascii=False, indent=2)
 
     print("\nDone. Written to data/data.json")
-    print("Top city: " + data[0]["name"] + " (" + str(data[0]["weekScore"]) + ")")
 
 
 main()
