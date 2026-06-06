@@ -1,8 +1,12 @@
 {
-  "updated": "2026-06-06T20:58:06Z",
-  "updatedDisplay": "06 Jun 2026, 20:58z",
-  "metric": "Wikipedia stadium pageviews vs 12-month baseline (uplift index)",
+  "updated": "2026-06-06T21:12:51Z",
+  "updatedDisplay": "06 Jun 2026, 21:12z",
+  "metric": "Wikipedia uplift index: 2/3 stadium + 1/3 city vs 12-month baseline",
   "baselineWindow": "2025-06-01 to 2026-05-31",
+  "weights": {
+    "stadium": "2/3",
+    "city": "1/3"
+  },
   "weeks": [
     {
       "label": "Week 1",
@@ -33,10 +37,15 @@
       "region": "Central",
       "stadium": "Estadio Azteca",
       "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
-      "baselineTotal": 503626,
-      "baselineAvgWeekly": 9685.1,
-      "lastWeekViews": 27046,
-      "lastWeekUplift": 279.3,
+      "baselineStadiumAvgWeekly": 9685.1,
+      "baselineCityAvgWeekly": 36871.8,
+      "baselineStadiumTotal": 503626,
+      "baselineCityTotal": 1917331,
+      "lastWeekStadiumViews": 27046,
+      "lastWeekCityViews": 30129,
+      "lastWeekStadiumUplift": 279.3,
+      "lastWeekCityUplift": 81.7,
+      "lastWeekUplift": 213.4,
       "lastWeekPts": 10,
       "weekPoints": {
         "Week 1": null,
@@ -45,6 +54,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -59,10 +80,15 @@
       "region": "East",
       "stadium": "BMO Field",
       "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field",
-      "baselineTotal": 267524,
-      "baselineAvgWeekly": 5144.7,
-      "lastWeekViews": 11736,
-      "lastWeekUplift": 228.1,
+      "baselineStadiumAvgWeekly": 5144.7,
+      "baselineCityAvgWeekly": 42896.8,
+      "baselineStadiumTotal": 267524,
+      "baselineCityTotal": 2230636,
+      "lastWeekStadiumViews": 11736,
+      "lastWeekCityViews": 33341,
+      "lastWeekStadiumUplift": 228.1,
+      "lastWeekCityUplift": 77.7,
+      "lastWeekUplift": 178.0,
       "lastWeekPts": 9,
       "weekPoints": {
         "Week 1": null,
@@ -71,6 +97,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -85,10 +123,15 @@
       "region": "West",
       "stadium": "Estadio Akron",
       "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
-      "baselineTotal": 217282,
-      "baselineAvgWeekly": 4178.5,
-      "lastWeekViews": 8794,
-      "lastWeekUplift": 210.5,
+      "baselineStadiumAvgWeekly": 4178.5,
+      "baselineCityAvgWeekly": 13083.8,
+      "baselineStadiumTotal": 217282,
+      "baselineCityTotal": 680358,
+      "lastWeekStadiumViews": 8794,
+      "lastWeekCityViews": 10677,
+      "lastWeekStadiumUplift": 210.5,
+      "lastWeekCityUplift": 81.6,
+      "lastWeekUplift": 167.5,
       "lastWeekPts": 8,
       "weekPoints": {
         "Week 1": null,
@@ -97,6 +140,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -111,10 +166,15 @@
       "region": "Central",
       "stadium": "Estadio BBVA",
       "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
-      "baselineTotal": 213072,
-      "baselineAvgWeekly": 4097.5,
-      "lastWeekViews": 7829,
-      "lastWeekUplift": 191.1,
+      "baselineStadiumAvgWeekly": 4097.5,
+      "baselineCityAvgWeekly": 10495.2,
+      "baselineStadiumTotal": 213072,
+      "baselineCityTotal": 545751,
+      "lastWeekStadiumViews": 7829,
+      "lastWeekCityViews": 10817,
+      "lastWeekStadiumUplift": 191.1,
+      "lastWeekCityUplift": 103.1,
+      "lastWeekUplift": 161.8,
       "lastWeekPts": 7,
       "weekPoints": {
         "Week 1": null,
@@ -123,6 +183,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -137,10 +209,15 @@
       "region": "West",
       "stadium": "BC Place",
       "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place",
-      "baselineTotal": 275032,
-      "baselineAvgWeekly": 5289.1,
-      "lastWeekViews": 10071,
-      "lastWeekUplift": 190.4,
+      "baselineStadiumAvgWeekly": 5289.1,
+      "baselineCityAvgWeekly": 31388.4,
+      "baselineStadiumTotal": 275032,
+      "baselineCityTotal": 1632199,
+      "lastWeekStadiumViews": 10071,
+      "lastWeekCityViews": 25345,
+      "lastWeekStadiumUplift": 190.4,
+      "lastWeekCityUplift": 80.7,
+      "lastWeekUplift": 153.8,
       "lastWeekPts": 6,
       "weekPoints": {
         "Week 1": null,
@@ -149,6 +226,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -163,10 +252,15 @@
       "region": "Central",
       "stadium": "AT&T Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
-      "baselineTotal": 576797,
-      "baselineAvgWeekly": 11092.2,
-      "lastWeekViews": 19613,
-      "lastWeekUplift": 176.8,
+      "baselineStadiumAvgWeekly": 11092.2,
+      "baselineCityAvgWeekly": 27993.7,
+      "baselineStadiumTotal": 576797,
+      "baselineCityTotal": 1455672,
+      "lastWeekStadiumViews": 19613,
+      "lastWeekCityViews": 20591,
+      "lastWeekStadiumUplift": 176.8,
+      "lastWeekCityUplift": 73.6,
+      "lastWeekUplift": 142.4,
       "lastWeekPts": 5,
       "weekPoints": {
         "Week 1": null,
@@ -175,6 +269,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -189,10 +295,15 @@
       "region": "Central",
       "stadium": "NRG Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
-      "baselineTotal": 300102,
-      "baselineAvgWeekly": 5771.2,
-      "lastWeekViews": 8447,
-      "lastWeekUplift": 146.4,
+      "baselineStadiumAvgWeekly": 5771.2,
+      "baselineCityAvgWeekly": 30786.1,
+      "baselineStadiumTotal": 300102,
+      "baselineCityTotal": 1600875,
+      "lastWeekStadiumViews": 8447,
+      "lastWeekCityViews": 23806,
+      "lastWeekStadiumUplift": 146.4,
+      "lastWeekCityUplift": 77.3,
+      "lastWeekUplift": 123.4,
       "lastWeekPts": 4,
       "weekPoints": {
         "Week 1": null,
@@ -201,6 +312,18 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -215,10 +338,15 @@
       "region": "East",
       "stadium": "MetLife Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
-      "baselineTotal": 1208407,
-      "baselineAvgWeekly": 23238.6,
-      "lastWeekViews": 33125,
-      "lastWeekUplift": 142.5,
+      "baselineStadiumAvgWeekly": 23238.6,
+      "baselineCityAvgWeekly": 139192.3,
+      "baselineStadiumTotal": 1208407,
+      "baselineCityTotal": 7237998,
+      "lastWeekStadiumViews": 33125,
+      "lastWeekCityViews": 101070,
+      "lastWeekStadiumUplift": 142.5,
+      "lastWeekCityUplift": 72.6,
+      "lastWeekUplift": 119.2,
       "lastWeekPts": 3,
       "weekPoints": {
         "Week 1": null,
@@ -232,27 +360,13 @@
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Boston",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "stadium": "Gillette Stadium",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
-      "baselineTotal": 509466,
-      "baselineAvgWeekly": 9797.4,
-      "lastWeekViews": 12267,
-      "lastWeekUplift": 125.2,
-      "lastWeekPts": 2,
-      "weekPoints": {
+      "weekStadiumUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -267,10 +381,58 @@
       "region": "Central",
       "stadium": "Arrowhead Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
-      "baselineTotal": 357429,
-      "baselineAvgWeekly": 6873.6,
-      "lastWeekViews": 8262,
-      "lastWeekUplift": 120.2,
+      "baselineStadiumAvgWeekly": 6873.6,
+      "baselineCityAvgWeekly": 21869.5,
+      "baselineStadiumTotal": 357429,
+      "baselineCityTotal": 1137214,
+      "lastWeekStadiumViews": 8262,
+      "lastWeekCityViews": 19502,
+      "lastWeekStadiumUplift": 120.2,
+      "lastWeekCityUplift": 89.2,
+      "lastWeekUplift": 109.9,
+      "lastWeekPts": 2,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Boston",
+      "country": "USA",
+      "flag": "US",
+      "region": "East",
+      "stadium": "Gillette Stadium",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
+      "baselineStadiumAvgWeekly": 9797.4,
+      "baselineCityAvgWeekly": 38988.3,
+      "baselineStadiumTotal": 509466,
+      "baselineCityTotal": 2027393,
+      "lastWeekStadiumViews": 12267,
+      "lastWeekCityViews": 29737,
+      "lastWeekStadiumUplift": 125.2,
+      "lastWeekCityUplift": 76.3,
+      "lastWeekUplift": 108.9,
       "lastWeekPts": 1,
       "weekPoints": {
         "Week 1": null,
@@ -284,27 +446,13 @@
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Los Angeles",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "stadium": "SoFi Stadium",
-      "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
-      "baselineTotal": 833307,
-      "baselineAvgWeekly": 16025.1,
-      "lastWeekViews": 18651,
-      "lastWeekUplift": 116.4,
-      "lastWeekPts": 0,
-      "weekPoints": {
+      "weekStadiumUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -319,10 +467,15 @@
       "region": "Central",
       "stadium": "Mercedes-Benz Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
-      "baselineTotal": 534103,
-      "baselineAvgWeekly": 10271.2,
-      "lastWeekViews": 11163,
-      "lastWeekUplift": 108.7,
+      "baselineStadiumAvgWeekly": 10271.2,
+      "baselineCityAvgWeekly": 37197.6,
+      "baselineStadiumTotal": 534103,
+      "baselineCityTotal": 1934276,
+      "lastWeekStadiumViews": 11163,
+      "lastWeekCityViews": 28355,
+      "lastWeekStadiumUplift": 108.7,
+      "lastWeekCityUplift": 76.2,
+      "lastWeekUplift": 97.9,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -336,27 +489,13 @@
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Philadelphia",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "stadium": "Lincoln Financial Field",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
-      "baselineTotal": 338012,
-      "baselineAvgWeekly": 6500.2,
-      "lastWeekViews": 6253,
-      "lastWeekUplift": 96.2,
-      "lastWeekPts": 0,
-      "weekPoints": {
+      "weekStadiumUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -365,16 +504,21 @@
       "toDatePoints": 0
     },
     {
-      "name": "Seattle",
+      "name": "Los Angeles",
       "country": "USA",
       "flag": "US",
       "region": "West",
-      "stadium": "Lumen Field",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
-      "baselineTotal": 473084,
-      "baselineAvgWeekly": 9097.8,
-      "lastWeekViews": 8201,
-      "lastWeekUplift": 90.1,
+      "stadium": "SoFi Stadium",
+      "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
+      "baselineStadiumAvgWeekly": 16025.1,
+      "baselineCityAvgWeekly": 83458.6,
+      "baselineStadiumTotal": 833307,
+      "baselineCityTotal": 4339849,
+      "lastWeekStadiumViews": 18651,
+      "lastWeekCityViews": 0,
+      "lastWeekStadiumUplift": 116.4,
+      "lastWeekCityUplift": 0.0,
+      "lastWeekUplift": 77.6,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -388,27 +532,13 @@
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "San Francisco",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "stadium": "Levi's Stadium",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
-      "baselineTotal": 800816,
-      "baselineAvgWeekly": 15400.3,
-      "lastWeekViews": 8108,
-      "lastWeekUplift": 52.6,
-      "lastWeekPts": 0,
-      "weekPoints": {
+      "weekStadiumUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
@@ -423,10 +553,15 @@
       "region": "East",
       "stadium": "Hard Rock Stadium",
       "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
-      "baselineTotal": 699249,
-      "baselineAvgWeekly": 13447.1,
-      "lastWeekViews": 0,
-      "lastWeekUplift": 0.0,
+      "baselineStadiumAvgWeekly": 13447.1,
+      "baselineCityAvgWeekly": 33905.1,
+      "baselineStadiumTotal": 699249,
+      "baselineCityTotal": 1763065,
+      "lastWeekStadiumViews": 9406,
+      "lastWeekCityViews": 22646,
+      "lastWeekStadiumUplift": 69.9,
+      "lastWeekCityUplift": 66.8,
+      "lastWeekUplift": 68.9,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -435,6 +570,147 @@
         "Week 4": null
       },
       "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "San Francisco",
+      "country": "USA",
+      "flag": "US",
+      "region": "West",
+      "stadium": "Levi's Stadium",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
+      "baselineStadiumAvgWeekly": 15400.3,
+      "baselineCityAvgWeekly": 43390.9,
+      "baselineStadiumTotal": 800816,
+      "baselineCityTotal": 2256328,
+      "lastWeekStadiumViews": 8108,
+      "lastWeekCityViews": 33209,
+      "lastWeekStadiumUplift": 52.6,
+      "lastWeekCityUplift": 76.5,
+      "lastWeekUplift": 60.6,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Philadelphia",
+      "country": "USA",
+      "flag": "US",
+      "region": "East",
+      "stadium": "Lincoln Financial Field",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
+      "baselineStadiumAvgWeekly": 6500.2,
+      "baselineCityAvgWeekly": 39178.2,
+      "baselineStadiumTotal": 338012,
+      "baselineCityTotal": 2037269,
+      "lastWeekStadiumViews": 0,
+      "lastWeekCityViews": 30324,
+      "lastWeekStadiumUplift": 0.0,
+      "lastWeekCityUplift": 77.4,
+      "lastWeekUplift": 25.8,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Seattle",
+      "country": "USA",
+      "flag": "US",
+      "region": "West",
+      "stadium": "Lumen Field",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
+      "baselineStadiumAvgWeekly": 0.0,
+      "baselineCityAvgWeekly": 42211.4,
+      "baselineStadiumTotal": 0,
+      "baselineCityTotal": 2194995,
+      "lastWeekStadiumViews": 8201,
+      "lastWeekCityViews": 29173,
+      "lastWeekStadiumUplift": 0.0,
+      "lastWeekCityUplift": 69.1,
+      "lastWeekUplift": 23.0,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadiumUplift": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCityUplift": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
