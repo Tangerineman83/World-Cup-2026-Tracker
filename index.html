@@ -454,6 +454,7 @@
 <!-- ── SCRIPT ──────────────────────────────────────────────────────── -->
 <script>
   const COUNTRY_COLOR = { USA: '#B22234', MEX: '#006847', CAN: '#cc0000' };
+  const FLAG = { US: '🇺🇸', MX: '🇲🇽', CA: '🇨🇦' };
   const REGION_COLOR  = { East: '#60a5fa', West: '#34d399', Central: '#f59e0b' };
 
   let allCities = [];
@@ -536,7 +537,7 @@
         <!-- city -->
         <div>
           <div class="city-name-row">
-            <span class="city-flag">${city.flag}</span>
+            <span class="city-flag">${FLAG[city.flag] || city.flag}</span>
             <span class="city-name">${city.name}</span>
             <span class="region-tag" style="background:${rc}22;color:${rc}">${city.region}</span>
           </div>
