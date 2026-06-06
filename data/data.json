@@ -1,1 +1,25 @@
-
+{
+  "updated": "2026-06-06T08:00:00Z",
+  "updatedDisplay": "6 Jun 2026, 08:00z",
+  "tournamentStart": "2026-06-11",
+  "anchor": "FIFA World Cup 2026",
+  "_note": "This is seed data. Real scores will be written here by the GitHub Action each Saturday.",
+  "cities": [
+    {"name": "Mexico City",           "country": "MEX", "flag": "🇲🇽", "region": "Central", "term": "Mexico City World Cup 2026",           "weekScore": 95, "cumulative": 92, "trendsUrl": "https://trends.google.com/trends/explore?q=Mexico+City+World+Cup+2026&date=now+7-d"},
+    {"name": "New York / New Jersey", "country": "USA", "flag": "🇺🇸", "region": "East",    "term": "New York World Cup 2026",               "weekScore": 88, "cumulative": 85, "trendsUrl": "https://trends.google.com/trends/explore?q=New+York+World+Cup+2026&date=now+7-d"},
+    {"name": "Los Angeles",           "country": "USA", "flag": "🇺🇸", "region": "West",    "term": "Los Angeles World Cup 2026",             "weekScore": 84, "cumulative": 81, "trendsUrl": "https://trends.google.com/trends/explore?q=Los+Angeles+World+Cup+2026&date=now+7-d"},
+    {"name": "Guadalajara",           "country": "MEX", "flag": "🇲🇽", "region": "West",    "term": "Guadalajara World Cup 2026",             "weekScore": 79, "cumulative": 77, "trendsUrl": "https://trends.google.com/trends/explore?q=Guadalajara+World+Cup+2026&date=now+7-d"},
+    {"name": "Toronto",               "country": "CAN", "flag": "🇨🇦", "region": "East",    "term": "Toronto World Cup 2026",                 "weekScore": 74, "cumulative": 72, "trendsUrl": "https://trends.google.com/trends/explore?q=Toronto+World+Cup+2026&date=now+7-d"},
+    {"name": "Dallas",                "country": "USA", "flag": "🇺🇸", "region": "Central", "term": "Dallas World Cup 2026",                  "weekScore": 70, "cumulative": 74, "trendsUrl": "https://trends.google.com/trends/explore?q=Dallas+World+Cup+2026&date=now+7-d"},
+    {"name": "Monterrey",             "country": "MEX", "flag": "🇲🇽", "region": "Central", "term": "Monterrey World Cup 2026",               "weekScore": 68, "cumulative": 65, "trendsUrl": "https://trends.google.com/trends/explore?q=Monterrey+World+Cup+2026&date=now+7-d"},
+    {"name": "Miami",                 "country": "USA", "flag": "🇺🇸", "region": "East",    "term": "Miami World Cup 2026",                   "weekScore": 65, "cumulative": 63, "trendsUrl": "https://trends.google.com/trends/explore?q=Miami+World+Cup+2026&date=now+7-d"},
+    {"name": "Atlanta",               "country": "USA", "flag": "🇺🇸", "region": "Central", "term": "Atlanta World Cup 2026",                 "weekScore": 60, "cumulative": 58, "trendsUrl": "https://trends.google.com/trends/explore?q=Atlanta+World+Cup+2026&date=now+7-d"},
+    {"name": "Vancouver",             "country": "CAN", "flag": "🇨🇦", "region": "West",    "term": "Vancouver World Cup 2026",               "weekScore": 56, "cumulative": 54, "trendsUrl": "https://trends.google.com/trends/explore?q=Vancouver+World+Cup+2026&date=now+7-d"},
+    {"name": "Seattle",               "country": "USA", "flag": "🇺🇸", "region": "West",    "term": "Seattle World Cup 2026",                 "weekScore": 52, "cumulative": 55, "trendsUrl": "https://trends.google.com/trends/explore?q=Seattle+World+Cup+2026&date=now+7-d"},
+    {"name": "Houston",               "country": "USA", "flag": "🇺🇸", "region": "Central", "term": "Houston World Cup 2026",                 "weekScore": 50, "cumulative": 52, "trendsUrl": "https://trends.google.com/trends/explore?q=Houston+World+Cup+2026&date=now+7-d"},
+    {"name": "San Francisco",         "country": "USA", "flag": "🇺🇸", "region": "West",    "term": "San Francisco World Cup 2026",           "weekScore": 48, "cumulative": 50, "trendsUrl": "https://trends.google.com/trends/explore?q=San+Francisco+World+Cup+2026&date=now+7-d"},
+    {"name": "Boston",                "country": "USA", "flag": "🇺🇸", "region": "East",    "term": "Boston World Cup 2026",                  "weekScore": 45, "cumulative": 47, "trendsUrl": "https://trends.google.com/trends/explore?q=Boston+World+Cup+2026&date=now+7-d"},
+    {"name": "Philadelphia",          "country": "USA", "flag": "🇺🇸", "region": "East",    "term": "Philadelphia World Cup 2026",            "weekScore": 42, "cumulative": 44, "trendsUrl": "https://trends.google.com/trends/explore?q=Philadelphia+World+Cup+2026&date=now+7-d"},
+    {"name": "Kansas City",           "country": "USA", "flag": "🇺🇸", "region": "Central", "term": "Kansas City World Cup 2026",             "weekScore": 38, "cumulative": 40, "trendsUrl": "https://trends.google.com/trends/explore?q=Kansas+City+World+Cup+2026&date=now+7-d"}
+  ]
+}
