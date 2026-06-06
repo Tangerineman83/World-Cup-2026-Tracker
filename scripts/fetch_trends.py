@@ -187,16 +187,7 @@ def fetch_all():
         backoff_factor=2,
         requests_args={"headers": browser_headers},
     )
-    # Warm up the session with a real browser-like request before querying
-    import requests
-    session = requests.Session()
-    session.headers.update(browser_headers)
-    try:
-        session.get("https://trends.google.com", timeout=10)
-        print("  Session warmed up successfully")
-        time.sleep(3)
-    except Exception as e:
-        print("  Session warmup failed (non-fatal): " + str(e))
+
     all_terms = [c["term"] for c in CITIES]
     today = date.today()
 
