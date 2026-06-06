@@ -1,6 +1,6 @@
 {
-  "updated": "2026-06-06T20:34:59Z",
-  "updatedDisplay": "06 Jun 2026, 20:34z",
+  "updated": "2026-06-06T20:41:29Z",
+  "updatedDisplay": "06 Jun 2026, 20:41z",
   "metric": "Wikipedia pageviews (city + stadium articles combined)",
   "weeks": [
     {
@@ -31,9 +31,9 @@
       "flag": "US",
       "region": "East",
       "trendsUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
-      "lastWeekScore": 0,
+      "lastWeekScore": 100,
       "lastWeekPts": 10,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 152801,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -54,32 +54,9 @@
       "flag": "US",
       "region": "West",
       "trendsUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
-      "lastWeekScore": 0,
+      "lastWeekScore": 77,
       "lastWeekPts": 9,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Dallas",
-      "country": "USA",
-      "flag": "US",
-      "region": "Central",
-      "trendsUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 8,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 118283,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -100,101 +77,9 @@
       "flag": "MX",
       "region": "Central",
       "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
-      "lastWeekScore": 0,
-      "lastWeekPts": 7,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Miami",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "trendsUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 6,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Atlanta",
-      "country": "USA",
-      "flag": "US",
-      "region": "Central",
-      "trendsUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 5,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "San Francisco",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "trendsUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 4,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Seattle",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "trendsUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
-      "lastWeekScore": 0,
-      "lastWeekPts": 3,
-      "lastWeekRaw": 0,
+      "lastWeekScore": 42,
+      "lastWeekPts": 8,
+      "lastWeekRaw": 64168,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -215,9 +100,32 @@
       "flag": "CA",
       "region": "East",
       "trendsUrl": "https://en.wikipedia.org/wiki/BMO_Field",
-      "lastWeekScore": 0,
-      "lastWeekPts": 2,
-      "lastWeekRaw": 0,
+      "lastWeekScore": 34,
+      "lastWeekPts": 7,
+      "lastWeekRaw": 51363,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "San Francisco",
+      "country": "USA",
+      "flag": "US",
+      "region": "West",
+      "trendsUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
+      "lastWeekScore": 31,
+      "lastWeekPts": 6,
+      "lastWeekRaw": 47145,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -238,9 +146,9 @@
       "flag": "US",
       "region": "East",
       "trendsUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 1,
-      "lastWeekRaw": 0,
+      "lastWeekScore": 31,
+      "lastWeekPts": 5,
+      "lastWeekRaw": 47606,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -256,37 +164,60 @@
       "toDatePoints": 0
     },
     {
-      "name": "Guadalajara",
-      "country": "MEX",
-      "flag": "MX",
-      "region": "West",
-      "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
-      "lastWeekScore": 0,
-      "lastWeekPts": 0,
-      "lastWeekRaw": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Houston",
+      "name": "Dallas",
       "country": "USA",
       "flag": "US",
       "region": "Central",
-      "trendsUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
-      "lastWeekScore": 0,
-      "lastWeekPts": 0,
-      "lastWeekRaw": 0,
+      "trendsUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
+      "lastWeekScore": 30,
+      "lastWeekPts": 4,
+      "lastWeekRaw": 45313,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Atlanta",
+      "country": "USA",
+      "flag": "US",
+      "region": "Central",
+      "trendsUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
+      "lastWeekScore": 30,
+      "lastWeekPts": 3,
+      "lastWeekRaw": 45129,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Seattle",
+      "country": "USA",
+      "flag": "US",
+      "region": "West",
+      "trendsUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
+      "lastWeekScore": 28,
+      "lastWeekPts": 2,
+      "lastWeekRaw": 43018,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -307,9 +238,78 @@
       "flag": "US",
       "region": "East",
       "trendsUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
-      "lastWeekScore": 0,
+      "lastWeekScore": 27,
+      "lastWeekPts": 1,
+      "lastWeekRaw": 41804,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Miami",
+      "country": "USA",
+      "flag": "US",
+      "region": "East",
+      "trendsUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
+      "lastWeekScore": 24,
       "lastWeekPts": 0,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 36776,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Guadalajara",
+      "country": "MEX",
+      "flag": "MX",
+      "region": "West",
+      "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
+      "lastWeekScore": 14,
+      "lastWeekPts": 0,
+      "lastWeekRaw": 21735,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Houston",
+      "country": "USA",
+      "flag": "US",
+      "region": "Central",
+      "trendsUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
+      "lastWeekScore": 24,
+      "lastWeekPts": 0,
+      "lastWeekRaw": 36860,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -330,9 +330,9 @@
       "flag": "CA",
       "region": "West",
       "trendsUrl": "https://en.wikipedia.org/wiki/BC_Place",
-      "lastWeekScore": 0,
+      "lastWeekScore": 27,
       "lastWeekPts": 0,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 40531,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -353,9 +353,9 @@
       "flag": "MX",
       "region": "Central",
       "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
-      "lastWeekScore": 0,
+      "lastWeekScore": 14,
       "lastWeekPts": 0,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 21690,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -376,9 +376,9 @@
       "flag": "US",
       "region": "Central",
       "trendsUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
-      "lastWeekScore": 0,
+      "lastWeekScore": 20,
       "lastWeekPts": 0,
-      "lastWeekRaw": 0,
+      "lastWeekRaw": 31174,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
