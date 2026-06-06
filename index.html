@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026 — Host City Interest Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #080b14;
+      --surface:  #0d1120;
+      --border:   #1a1f2e;
+      --border2:  #111828;
+      --gold:     #f0c040;
+      --silver:   #9ca3af;
+      --bronze:   #b87333;
+      --text:     #e8eaf0;
+      --muted:    #6b7280;
+      --faint:    #2d3448;
+      --usa:      #B22234;
+      --mex:      #006847;
+      --can:      #cc0000;
+      --east:     #60a5fa;
+      --west:     #34d399;
+      --central:  #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #0d1322 0%, #111827 100%);
+      border-bottom: 2px solid var(--border);
+      padding: 28px 32px 22px;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    h1 {
+      font-size: clamp(22px, 5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -.01em;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+    h1 span { color: var(--gold); }
+    .subtitle {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 400;
+    }
+
+    /* ── CONTROLS ───────────────────────────────────────── */
+    .controls {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+    }
+    .controls-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #444;
+      margin-right: 6px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 4px;
+      transition: all .15s;
+      color: #888;
+    }
+    .tab-btn.active { background: var(--gold); color: var(--bg); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    /* ── META BAR ───────────────────────────────────────── */
+    .meta-bar {
+      max-width: 900px;
+      margin: 18px auto 4px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .updated-badge {
+      font-size: 10px;
+      color: #444;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .updated-badge strong { color: var(--muted); }
+
+    /* ── TABLE ──────────────────────────────────────────── */
+    .table-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px 48px;
+    }
+    .col-headers {
+      display: grid;
+      grid-template-columns: 40px 1fr 68px 68px 40px 160px;
+      gap: 0 10px;
+      padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2px;
+    }
+    .col-headers span {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #3a4258;
+    }
+    .col-headers .right { text-align: right; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 40px 1fr 68px 68px 40px 160px;
+      gap: 0 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border2);
+      align-items: center;
+      border-left: 3px solid transparent;
+      opacity: 0;
+      transform: translateX(-12px);
+      animation: rowIn .4s ease forwards;
+    }
+    .row.rank-1 { border-left-color: var(--gold);   background: rgba(240,192,64,.04); }
+    .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
+    .row.rank-3 { border-left-color: var(--bronze); background: rgba(184,115,51,.02); }
+
+    @keyframes rowIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes barGrow {
+      from { width: 0; }
+    }
+    .bar-fill { animation: barGrow .7s cubic-bezier(.16,1,.3,1) both; }
+
+    /* rank number */
+    .rank-num {
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+      color: var(--faint);
+    }
+    .rank-num.r1 { font-size: 20px; color: var(--gold); }
+    .rank-num.r2 { font-size: 18px; color: var(--silver); }
+    .rank-num.r3 { font-size: 17px; color: var(--bronze); }
+
+    /* city cell */
+    .city-name-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .city-flag { font-size: 17px; line-height: 1; }
+    .city-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+    }
+    .region-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 2px 5px;
+      border-radius: 2px;
+    }
+    .sparkline {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      margin-top: 5px;
+      height: 14px;
+    }
+    .spark-bar {
+      width: 5px;
+      min-height: 2px;
+      border-radius: 1px;
+      background: #1e2535;
+    }
+    .spark-bar.current { background: var(--gold); }
+
+    /* score cells */
+    .score {
+      text-align: right;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--faint);
+    }
+    .score.active { font-size: 22px; color: var(--text); }
+
+    /* trends link */
+    .trends-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #3a4258;
+      transition: color .15s;
+      white-space: nowrap;
+    }
+    .trends-link:hover { color: var(--gold); }
+    .trends-icon {
+      width: 14px;
+      height: 14px;
+      opacity: .5;
+      transition: opacity .15s;
+    }
+    .trends-link:hover .trends-icon { opacity: 1; }
+
+    /* bar cell */
+    .bar-cell { position: relative; }
+    .bar-track {
+      height: 7px;
+      background: #141928;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .country-label {
+      font-size: 9px;
+      color: #333;
+      margin-top: 3px;
+      text-align: right;
+      letter-spacing: .05em;
+    }
+
+    /* ── FOOTER NOTES ───────────────────────────────────── */
+    .notes {
+      max-width: 900px;
+      margin: 0 auto 0;
+      padding: 0 32px 48px;
+    }
+    .notes-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 22px 26px;
+    }
+    .notes-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .note-item-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 4px;
+    }
+    .note-item-body {
+      font-size: 12px;
+      color: #4a5568;
+      line-height: 1.6;
+      font-family: 'Barlow', sans-serif;
+    }
+    .legend-row {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .legend-dot { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .swatch { width: 18px; height: 5px; border-radius: 2px; }
+    .legend-label {
+      font-size: 10px;
+      color: #444;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .seed-warning {
+      margin-top: 14px;
+      font-size: 11px;
+      color: #2a3045;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: .04em;
+      text-align: center;
+    }
+
+    /* ── LOADING / ERROR ────────────────────────────────── */
+    .state-msg {
+      text-align: center;
+      padding: 60px 0;
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #444;
+    }
+
+    @media (max-width: 620px) {
+      .header, .controls, .meta-bar, .table-wrap, .notes { padding-left: 16px; padding-right: 16px; }
+      .col-headers, .row { grid-template-columns: 32px 1fr 52px 52px 0px 0px; }
+      .col-headers .hide-mobile, .row .hide-mobile { display: none; }
+      .score.active { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="eyebrow">⚽ Google Trends Intelligence</div>
+      <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
+      <p class="subtitle">Relative global search interest · Score 0–100 (Google Trends scale) · Updated every Saturday</p>
+    </div>
+    <div style="text-align:right">
+      <div id="updated-badge" class="updated-badge" style="margin-top:6px"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ── SORT CONTROLS ───────────────────────────────────────────────── -->
+<div class="controls">
+  <div class="controls-inner">
+    <span class="label">Sort by:</span>
+    <button class="tab-btn active" id="btn-weekly"     onclick="setSort('weekly')">This Week</button>
+    <button class="tab-btn"        id="btn-cumulative" onclick="setSort('cumulative')">Tournament Total</button>
+  </div>
+</div>
+
+<!-- ── META BAR ────────────────────────────────────────────────────── -->
+<div class="meta-bar">
+  <div></div>
+</div>
+
+<!-- ── TABLE ───────────────────────────────────────────────────────── -->
+<div class="table-wrap">
+  <div class="col-headers">
+    <span>#</span>
+    <span>City</span>
+    <span class="right">Week</span>
+    <span class="right">Cumul.</span>
+    <span class="hide-mobile"></span>
+    <span class="hide-mobile">Interest index</span>
+  </div>
+  <div id="table-body">
+    <div class="state-msg">Loading data…</div>
+  </div>
+</div>
+
+<!-- ── NOTES ───────────────────────────────────────────────────────── -->
+<div class="notes">
+  <div class="notes-box">
+    <div class="notes-title">Methodology &amp; Data Notes</div>
+    <div class="notes-grid">
+      <div>
+        <div class="note-item-title">Search terms</div>
+        <div class="note-item-body">"[City] World Cup 2026" — identical phrasing across all 16 cities for direct comparability.</div>
+      </div>
+      <div>
+        <div class="note-item-title">Scoring</div>
+        <div class="note-item-body">Google Trends returns relative interest 0–100. All 16 cities are normalised across batches using an anchor term so scores are truly comparable.</div>
+      </div>
+      <div>
+        <div class="note-item-title">Weekly score</div>
+        <div class="note-item-body">7-day rolling window. Reflects current tournament momentum and recent match activity.</div>
+      </div>
+      <div>
+        <div class="note-item-title">Cumulative total</div>
+        <div class="note-item-body">Average of weekly snapshots since tournament start (11 Jun 2026). Stored and averaged each Saturday by the GitHub Action.</div>
+      </div>
+      <div>
+        <div class="note-item-title">Data freshness</div>
+        <div class="note-item-body">Scores are fetched automatically every Saturday at 08:00 UTC via GitHub Actions and written to <code style="color:#f0c040;font-size:11px">data/data.json</code>.</div>
+      </div>
+      <div>
+        <div class="note-item-title">View on Google Trends</div>
+        <div class="note-item-body">Click the <strong style="color:var(--muted)">Trends ↗</strong> link on any row to open the live Google Trends chart for that city's search term.</div>
+      </div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-dot"><div class="dot" style="background:var(--east)"></div>  <span class="legend-label">East</span></div>
+      <div class="legend-dot"><div class="dot" style="background:var(--west)"></div>  <span class="legend-label">West</span></div>
+      <div class="legend-dot"><div class="dot" style="background:var(--central)"></div><span class="legend-label">Central</span></div>
+      <div class="legend-dot"><div class="swatch" style="background:var(--usa)"></div><span class="legend-label">USA</span></div>
+      <div class="legend-dot"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
+      <div class="legend-dot"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
+    </div>
+    <div id="seed-warning" class="seed-warning" style="display:none">
+      ⚠ Displaying seed data — live scores will appear after the first Saturday GitHub Actions run.
+    </div>
+  </div>
+</div>
+
+<!-- ── SCRIPT ──────────────────────────────────────────────────────── -->
+<script>
+  const COUNTRY_COLOR = { USA: '#B22234', MEX: '#006847', CAN: '#cc0000' };
+  const REGION_COLOR  = { East: '#60a5fa', West: '#34d399', Central: '#f59e0b' };
+
+  let allCities = [];
+  let sortMode  = 'weekly';
+
+  // ── Fetch data.json ───────────────────────────────────────────────
+  async function loadData() {
+    try {
+      const res  = await fetch('data/data.json?v=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+
+      allCities = json.cities || [];
+
+      // Updated badge
+      const badge = document.getElementById('updated-badge');
+      if (json.updatedDisplay) {
+        badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
+      }
+
+      // Seed warning
+      if (json._note) {
+        document.getElementById('seed-warning').style.display = 'block';
+      }
+
+      render();
+    } catch (err) {
+      document.getElementById('table-body').innerHTML =
+        '<div class="state-msg">Could not load data.json — ' + err.message + '</div>';
+    }
+  }
+
+  // ── Sort & render ─────────────────────────────────────────────────
+  function setSort(mode) {
+    sortMode = mode;
+    document.getElementById('btn-weekly').classList.toggle('active', mode === 'weekly');
+    document.getElementById('btn-cumulative').classList.toggle('active', mode === 'cumulative');
+    render();
+  }
+
+  function render() {
+    const cities = [...allCities].sort((a, b) =>
+      sortMode === 'weekly'
+        ? b.weekScore - a.weekScore
+        : b.cumulative - a.cumulative
+    );
+
+    const maxScore = Math.max(...cities.map(c =>
+      sortMode === 'weekly' ? c.weekScore : c.cumulative
+    ), 1);
+
+    const body = document.getElementById('table-body');
+    body.innerHTML = '';
+
+    cities.forEach((city, i) => {
+      const rank   = i + 1;
+      const score  = sortMode === 'weekly' ? city.weekScore : city.cumulative;
+      const pct    = (score / maxScore * 100).toFixed(1);
+      const cc     = COUNTRY_COLOR[city.country] || '#888';
+      const rc     = REGION_COLOR[city.region]   || '#888';
+      const delay  = i * 38;
+
+      const rankClass = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
+      const rowClass  = rank <= 3 ? `rank-${rank}` : '';
+
+      // Mini sparkline placeholder (4 bars; only last is gold since we don't
+      // store history in the JSON — extend fetch_trends.py to add weekHistory if desired)
+      const sparkHTML = [1,2,3,4].map((w, wi) => {
+        const h = wi === 3 ? Math.round(city.weekScore / 100 * 14) : Math.round(Math.random() * 10 + 2);
+        return `<div class="spark-bar ${wi===3?'current':''}" style="height:${h}px"></div>`;
+      }).join('');
+
+      const row = document.createElement('div');
+      row.className = 'row ' + rowClass;
+      row.style.animationDelay = delay + 'ms';
+      row.innerHTML = `
+        <!-- rank -->
+        <div class="rank-num ${rankClass}">${rank}</div>
+
+        <!-- city -->
+        <div>
+          <div class="city-name-row">
+            <span class="city-flag">${city.flag}</span>
+            <span class="city-name">${city.name}</span>
+            <span class="region-tag" style="background:${rc}22;color:${rc}">${city.region}</span>
+          </div>
+          <div class="sparkline">${sparkHTML}</div>
+        </div>
+
+        <!-- weekly score -->
+        <div class="score ${sortMode==='weekly'?'active':''}">${city.weekScore}</div>
+
+        <!-- cumulative score -->
+        <div class="score ${sortMode==='cumulative'?'active':''}">${city.cumulative}</div>
+
+        <!-- trends link -->
+        <div class="hide-mobile">
+          <a class="trends-link" href="${city.trendsUrl}" target="_blank" rel="noopener" title="Open in Google Trends">
+            <svg class="trends-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+            </svg>
+            Trends ↗
+          </a>
+        </div>
+
+        <!-- bar -->
+        <div class="bar-cell hide-mobile">
+          <div class="bar-track">
+            <div class="bar-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cc}99,${cc});border-radius:4px;animation-delay:${delay+80}ms"></div>
+          </div>
+          <div class="country-label">${city.country}</div>
+        </div>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  loadData();
+</script>
+</body>
+</html>
