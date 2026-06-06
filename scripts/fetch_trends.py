@@ -60,10 +60,6 @@ def fetch_batch_with_retry(pytrends, terms, timeframe, max_retries=3):
             result = {}
             for t in terms:
                 result[t] = int(round(df[t].mean())) if t in df.columns else 0
-            values = list(result.values())
-            if max(values) if values else 0 <= 1:
-                print("    Scores too low (max=" + str(max(values) if values else 0) + ") - retrying")
-                continue
             for t, v in result.items():
                 print("    " + t + " -> " + str(v))
             return result
@@ -103,14 +99,13 @@ def normalise_across_batches(batches, all_terms):
 def scores_to_points(normalised_scores, all_terms):
     """
     Convert normalised interest scores into weekly points.
-    1st = 16pts, 2nd = 15pts ... 16th = 1pt
-    (Using 16 cities so points run 16 down to 1)
+    1st = 10pts, 2nd = 9pts ... 10th = 1pt, 11th-16th = 0pts
     """
     ranked = sorted(all_terms, key=lambda t: normalised_scores.get(t, 0), reverse=True)
     points = {}
-    total = len(all_terms)
     for i, term in enumerate(ranked):
-        points[term] = total - i  # 16 for 1st, 15 for 2nd ... 1 for 16th
+        pts = max(0, 10 - i)  # 10,9,8,7,6,5,4,3,2,1,0,0,0,0,0,0
+        points[term] = pts
     return points
 
 
