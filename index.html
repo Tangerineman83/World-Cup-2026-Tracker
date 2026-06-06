@@ -150,7 +150,7 @@
 <header class="header">
   <div class="header-inner">
     <div>
-      <div class="eyebrow">&#9917; Google Trends Intelligence</div>
+      <div class="eyebrow">&#9917; Wikipedia Pageviews Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
       <p class="subtitle">Weekly interest points · 10pts for 1st, 9 for 2nd ... 6th-16th score 0 · Updated Saturdays</p>
     </div>
@@ -187,7 +187,7 @@
       <div><div class="note-h">Weekly points</div><div class="note-b">Cities ranked by interest index each week. 1st = 10pts, 2nd = 9pts, 3rd = 8pts ... top 10 score, bottom 6 score 0pts. Index is the input; points are the output.</div></div>
       <div><div class="note-h">To Date</div><div class="note-b">Sum of points from all completed discrete weeks. Reflects cumulative interest momentum across the tournament.</div></div>
       <div><div class="note-h">Week windows</div><div class="note-b">W1: Jun 11–17 · W2: Jun 18–24 · W3: Jun 25–Jul 1 · W4: Jul 2–8. Last Week = rolling 7-day window.</div></div>
-      <div><div class="note-h">Data refresh</div><div class="note-b">Fetched automatically every Saturday at 08:00 UTC via GitHub Actions. Click Trends &#8599; to verify any city's raw data.</div></div>
+      <div><div class="note-h">Data refresh</div><div class="note-b">Fetched automatically every Saturday at 08:00 UTC via GitHub Actions. Click Wiki &#8599; to open the stadium's Wikipedia article.</div></div>
     </div>
     <div class="legend-row">
       <div class="legend-item"><div class="dot" style="background:var(--east)"></div><span class="legend-label">East</span></div>
@@ -353,7 +353,7 @@ function render() {
           '<span class="city-name">' + city.name + '</span>' +
           '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
         '</div>' +
-        '<a class="trends-link" href="' + city.trendsUrl + '" target="_blank" rel="noopener">&#8599; Trends</a>' +
+        '<a class="trends-link" href="' + city.trendsUrl + '" target="_blank" rel="noopener">&#8599; Wiki</a>' +
       '</div>' +
       '<div class="pts-badge">' +
         '<div class="pts-num">' + (vd.avail ? vd.pts : '—') + '</div>' +
