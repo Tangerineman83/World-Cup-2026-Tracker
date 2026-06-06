@@ -201,19 +201,47 @@ def get_pageviews(article, start_date, end_date, retries=4):
 
 # ── Baseline ───────────────────────────────────────────────────────────────────
 
-def fetch_baselines():
-    """Fetch 12-month baselines for both stadium and city articles."""
+def fetch_baselines(existing=None, needs_refetch=None):
+    """
+    Fetch 12-month baselines for stadium and city articles.
+    If existing baselines are provided, only re-fetches articles flagged as zero.
+    Full fetch on first run; partial re-fetch on subsequent runs with failures.
+    """
+    if existing and needs_refetch:
+        print("\n=== Partial baseline re-fetch (fixing zero baselines) ===")
+        baselines = dict(existing)
+        for name, kind in needs_refetch:
+            city = next(c for c in CITIES if c["name"] == name)
+            print("  Re-fetching " + kind + " baseline for: " + name)
+            if kind == "stadium":
+                total = get_pageviews(city["stadium_article"], BASELINE_START, BASELINE_END)
+                time.sleep(1.5)
+                if total > 0:
+                    baselines[name]["stadium_avg_weekly"] = round(total / BASELINE_WEEKS, 1)
+                    baselines[name]["stadium_total"]      = total
+                    print("    -> " + str(baselines[name]["stadium_avg_weekly"]) + "/wk")
+                else:
+                    print("    -> Still returning 0 - will retry next run")
+            elif kind == "city":
+                total = get_pageviews(city["city_article"], BASELINE_START, BASELINE_END)
+                time.sleep(1.5)
+                if total > 0:
+                    baselines[name]["city_avg_weekly"] = round(total / BASELINE_WEEKS, 1)
+                    baselines[name]["city_total"]      = total
+                    print("    -> " + str(baselines[name]["city_avg_weekly"]) + "/wk")
+                else:
+                    print("    -> Still returning 0 - will retry next run")
+        return baselines
+
     print("\n=== Fetching 12-month baselines (Jun 2025 - May 2026) ===")
-    print("    (This only runs once - reused from data.json on future runs)")
+    print("    (Stored in data.json and reused on future runs)")
     baselines = {}
     for city in CITIES:
         print("  " + city["name"])
-
         stadium_total = get_pageviews(city["stadium_article"], BASELINE_START, BASELINE_END)
         time.sleep(1.5)
         city_total = get_pageviews(city["city_article"], BASELINE_START, BASELINE_END)
         time.sleep(1.5)
-
         baselines[city["name"]] = {
             "stadium_avg_weekly": round(stadium_total / BASELINE_WEEKS, 1),
             "city_avg_weekly":    round(city_total    / BASELINE_WEEKS, 1),
@@ -227,13 +255,19 @@ def fetch_baselines():
 
 
 def load_existing_baselines(existing_data):
-    """Reuse baselines stored from a previous run."""
+    """
+    Reuse baselines stored from a previous run.
+    Any city with a zero stadium or city baseline is flagged for re-fetch
+    by returning None, which triggers fetch_baselines() to run again.
+    Partial re-fetch: only re-fetches articles with zero baselines.
+    """
     if not existing_data:
         return None
     cities = existing_data.get("cities", [])
     if not cities or "baselineStadiumAvgWeekly" not in cities[0]:
         return None
     result = {}
+    needs_refetch = []
     for c in cities:
         result[c["name"]] = {
             "stadium_avg_weekly": c.get("baselineStadiumAvgWeekly", 0),
@@ -241,8 +275,18 @@ def load_existing_baselines(existing_data):
             "stadium_total":      c.get("baselineStadiumTotal",     0),
             "city_total":         c.get("baselineCityTotal",        0),
         }
-    print("  Baselines reused from previous run.")
-    return result
+        if c.get("baselineStadiumAvgWeekly", 0) == 0:
+            needs_refetch.append((c["name"], "stadium"))
+        if c.get("baselineCityAvgWeekly", 0) == 0:
+            needs_refetch.append((c["name"], "city"))
+
+    if needs_refetch:
+        print("  WARNING: Zero baselines found - will re-fetch:")
+        for name, kind in needs_refetch:
+            print("    -> " + name + " (" + kind + ")")
+        return result, needs_refetch
+    print("  All baselines valid - reusing from previous run.")
+    return result, []
 
 
 # ── Uplift calculation ─────────────────────────────────────────────────────────
@@ -288,8 +332,14 @@ def fetch_period(label, start_date, end_date, baselines):
 
         sv = get_pageviews(city["stadium_article"], start_date, end_date)
         time.sleep(1.5)
+        if sv == 0 and bl["stadium_avg_weekly"] > 0:
+            print("    WARNING: " + n + " stadium returned 0 views (baseline=" +
+                  str(bl["stadium_avg_weekly"]) + "/wk) - likely transient 429")
         cv = get_pageviews(city["city_article"], start_date, end_date)
         time.sleep(1.5)
+        if cv == 0 and bl["city_avg_weekly"] > 0:
+            print("    WARNING: " + n + " city returned 0 views (baseline=" +
+                  str(bl["city_avg_weekly"]) + "/wk) - likely transient 429")
 
         # Normalise to 7-day equivalent
         sv_weekly = sv / week_fraction
@@ -340,9 +390,17 @@ def main():
         except Exception:
             pass
 
-    baselines = load_existing_baselines(existing_data)
-    if not baselines:
+    loaded = load_existing_baselines(existing_data)
+    if loaded is None:
+        # No existing baselines at all - full fetch
         baselines = fetch_baselines()
+    else:
+        existing_baselines, needs_refetch = loaded
+        if needs_refetch:
+            # Partial re-fetch for zero baselines
+            baselines = fetch_baselines(existing=existing_baselines, needs_refetch=needs_refetch)
+        else:
+            baselines = existing_baselines
 
     # Discrete tournament weeks
     week_data = {}
