@@ -18,19 +18,20 @@
       --text:    #e8eaf0;
       --muted:   #6b7280;
       --faint:   #2d3448;
-      --usa:     #B22234;
-      --mex:     #006847;
-      --can:     #cc0000;
+      --usa:     #4f8ef7;
+      --mex:     #f59e0b;
+      --can:     #2dd4bf;
       --east:    #60a5fa;
       --west:    #34d399;
       --central: #f59e0b;
+      --uplift:  #22c55e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed','Arial Narrow',sans-serif; min-height: 100vh; }
 
     /* HEADER */
     .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 24px 32px 20px; }
-    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
     h1 { font-size: clamp(20px,4vw,34px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
     h1 span { color: var(--gold); }
@@ -38,9 +39,21 @@
     .updated-badge { font-size: 10px; color: #444; letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; text-align: right; }
     .updated-badge strong { color: var(--muted); }
 
+    /* EXPLAINER BANNER */
+    .explainer {
+      background: rgba(34,197,94,.06);
+      border-bottom: 1px solid rgba(34,197,94,.15);
+      padding: 12px 32px;
+    }
+    .explainer-inner {
+      max-width: 980px; margin: 0 auto;
+      font-size: 12px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.5;
+    }
+    .explainer-inner strong { color: #22c55e; }
+
     /* FILTER TABS */
     .controls { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; }
-    .controls-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: stretch; gap: 2px; overflow-x: auto; }
+    .controls-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: stretch; gap: 2px; overflow-x: auto; }
     .tab-btn {
       background: transparent; border: none; border-bottom: 3px solid transparent;
       cursor: pointer; font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
@@ -49,10 +62,10 @@
     }
     .tab-btn:hover:not(.active) { color: var(--muted); }
     .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .tab-separator { width: 1px; background: var(--border); margin: 8px 6px; flex-shrink: 0; }
+    .tab-separator { width: 1px; background: var(--border); margin: 8px 4px; flex-shrink: 0; }
 
     /* WEEK LABEL BAR */
-    .week-label-bar { max-width: 960px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .week-bar { max-width: 980px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .week-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
     .week-dates { font-size: 10px; color: #444; letter-spacing: .05em; }
     .week-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; letter-spacing: .07em; text-transform: uppercase; }
@@ -60,22 +73,21 @@
     .week-status.upcoming { background: rgba(100,116,139,.1); color: #475569; }
 
     /* TABLE */
-    .table-wrap { max-width: 960px; margin: 12px auto 0; padding: 0 32px 48px; }
-
+    .table-wrap { max-width: 980px; margin: 12px auto 0; padding: 0 32px 48px; }
     .col-headers {
       display: grid;
-      grid-template-columns: 40px 1fr 70px 70px 60px 140px;
+      grid-template-columns: 38px 1fr 90px 100px 44px 150px;
       gap: 0 10px; padding: 0 12px 10px;
       border-bottom: 1px solid var(--border); margin-bottom: 2px;
     }
     .col-headers span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #3a4258; }
-    .col-headers .right { text-align: right; }
-    .col-headers .center { text-align: center; }
+    .col-right { text-align: right; }
+    .col-center { text-align: center; }
 
     .row {
       display: grid;
-      grid-template-columns: 40px 1fr 70px 70px 60px 140px;
-      gap: 0 10px; padding: 10px 12px;
+      grid-template-columns: 38px 1fr 90px 100px 44px 150px;
+      gap: 0 10px; padding: 11px 12px;
       border-bottom: 1px solid var(--border2);
       align-items: center; border-left: 3px solid transparent;
       opacity: 0; transform: translateX(-10px);
@@ -84,46 +96,45 @@
     .row.rank-1 { border-left-color: var(--gold);   background: rgba(240,192,64,.04); }
     .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
     .row.rank-3 { border-left-color: var(--bronze); }
+    .row.unavailable { opacity: .3; }
 
     @keyframes rowIn { to { opacity:1; transform:translateX(0); } }
     @keyframes barGrow { from { width:0; } }
-    .bar-fill { animation: barGrow .7s cubic-bezier(.16,1,.3,1) both; }
+    .bar-fill { animation: barGrow .8s cubic-bezier(.16,1,.3,1) both; }
 
-    .rank-num { font-size: 15px; font-weight: 800; text-align: center; color: var(--faint); }
+    .rank-num { font-size: 15px; font-weight: 800; text-align: center; color: var(--faint); line-height: 1; }
     .rank-num.r1 { font-size: 20px; color: var(--gold); }
     .rank-num.r2 { font-size: 18px; color: var(--silver); }
     .rank-num.r3 { font-size: 17px; color: var(--bronze); }
 
+    /* City cell */
     .city-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
     .city-flag { font-size: 16px; line-height: 1; }
     .city-name { font-size: 14px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; }
     .region-tag { font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; }
-    .city-term { font-size: 10px; color: #333; margin-top: 3px; font-family: 'Barlow',sans-serif; }
+    .stadium-name { font-size: 10px; color: #3a4560; margin-top: 3px; font-family: 'Barlow',sans-serif; }
+    .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
+    .wiki-link:hover { color: var(--gold); }
 
-    .score { text-align: right; font-weight: 800; }
-    .score.primary { font-size: 22px; color: var(--text); }
-    .score.secondary { font-size: 14px; color: var(--faint); }
-    .score.na { font-size: 12px; color: #2a3045; font-weight: 400; }
-
-    /* Points badge - the big number */
-    .pts-badge { text-align: center; }
-    .pts-num { font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; }
+    /* Points badge */
+    .pts-badge { text-align: right; }
+    .pts-num { font-size: 22px; font-weight: 900; color: var(--gold); line-height: 1; }
+    .pts-num.zero { color: var(--faint); font-size: 16px; }
     .pts-label { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #444; margin-top: 1px; }
 
+    /* Uplift badge - the story */
+    .uplift-badge { text-align: right; }
+    .uplift-num { font-size: 20px; font-weight: 900; line-height: 1; }
+    .uplift-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
+    .uplift-baseline { font-size: 9px; color: #333; margin-top: 2px; font-family: 'Barlow',sans-serif; }
+
     /* Bar */
-    .bar-cell { position: relative; }
+    .bar-cell { }
     .bar-track { height: 7px; background: #141928; border-radius: 4px; overflow: hidden; }
-    .country-label { font-size: 9px; color: #333; margin-top: 3px; text-align: right; letter-spacing: .05em; }
-
-    /* Trends link */
-    .trends-link { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 4px; }
-    .trends-link:hover { color: var(--gold); }
-
-    /* Not yet available row overlay */
-    .row.unavailable { opacity: .35; }
+    .country-label { font-size: 9px; color: #2d3448; margin-top: 3px; text-align: right; letter-spacing: .05em; }
 
     /* Notes */
-    .notes { max-width: 960px; margin: 0 auto; padding: 0 32px 48px; }
+    .notes { max-width: 980px; margin: 0 auto; padding: 0 32px 48px; }
     .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; }
     .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
     .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
@@ -138,9 +149,11 @@
     .state-msg { text-align: center; padding: 60px 0; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #444; }
 
     @media (max-width: 640px) {
-      .header, .controls, .week-label-bar, .table-wrap, .notes { padding-left: 14px; padding-right: 14px; }
-      .col-headers, .row { grid-template-columns: 30px 1fr 54px 54px 46px 80px; gap: 0 6px; }
-      .pts-num { font-size: 20px; }
+      .header, .controls, .week-bar, .table-wrap, .notes, .explainer { padding-left: 14px; padding-right: 14px; }
+      .col-headers, .row { grid-template-columns: 30px 1fr 64px 72px 0px 0px; gap: 0 6px; }
+      .col-headers .hide-sm, .row .hide-sm { display: none; }
+      .pts-num { font-size: 18px; }
+      .uplift-num { font-size: 16px; }
       .city-name { font-size: 12px; }
     }
   </style>
@@ -152,28 +165,35 @@
     <div>
       <div class="eyebrow">&#9917; Wikipedia Pageviews Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Weekly interest points · 10pts for 1st, 9 for 2nd ... 6th-16th score 0 · Updated Saturdays</p>
+      <p class="subtitle">Stadium Wikipedia views vs 12-month baseline &middot; Uplift index &middot; Updated Saturdays</p>
     </div>
     <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
 </header>
 
-<div class="controls">
-  <div class="controls-inner" id="tab-row">
-    <!-- Tabs injected by JS -->
+<div class="explainer">
+  <div class="explainer-inner">
+    <strong>How to read this:</strong> The uplift index shows how much <em>more</em> attention each stadium is receiving compared to its normal weekly average.
+    <strong>100 = normal · 300 = 3&times; normal · 850 = 8.5&times; spike.</strong>
+    This removes the big-city bias — a smaller venue with a 10&times; spike ranks above a famous stadium with a 2&times; lift,
+    directly reflecting the <em>incremental</em> global interest the World Cup creates for each host city.
   </div>
 </div>
 
-<div class="week-label-bar" id="week-label-bar"></div>
+<div class="controls">
+  <div class="controls-inner" id="tab-row"></div>
+</div>
+
+<div class="week-bar" id="week-bar"></div>
 
 <div class="table-wrap">
   <div class="col-headers">
-    <span class="center">#</span>
-    <span>City</span>
-    <span class="right" id="col-pts-label">Points</span>
-    <span class="right" id="col-idx-label">Index</span>
-    <span class="center">Trends</span>
-    <span>Interest bar</span>
+    <span class="col-center">#</span>
+    <span>City &amp; Stadium</span>
+    <span class="col-right">Points</span>
+    <span class="col-right">Uplift</span>
+    <span class="col-center hide-sm"></span>
+    <span class="hide-sm">Interest bar</span>
   </div>
   <div id="table-body"><div class="state-msg">Loading...</div></div>
 </div>
@@ -182,12 +202,30 @@
   <div class="notes-box">
     <div class="notes-title">Methodology</div>
     <div class="notes-grid">
-      <div><div class="note-h">Search terms</div><div class="note-b">"[City] World Cup" — consistent phrasing across all 16 cities for direct comparability.</div></div>
-      <div><div class="note-h">Interest index</div><div class="note-b">Combined Wikipedia pageviews (city + stadium articles). Expressed as 0–100 index where the top city each period = 100.</div></div>
-      <div><div class="note-h">Weekly points</div><div class="note-b">Cities ranked by interest index each week. 1st = 10pts, 2nd = 9pts, 3rd = 8pts ... top 10 score, bottom 6 score 0pts. Index is the input; points are the output.</div></div>
-      <div><div class="note-h">To Date</div><div class="note-b">Sum of points from all completed discrete weeks. Reflects cumulative interest momentum across the tournament.</div></div>
-      <div><div class="note-h">Week windows</div><div class="note-b">W1: Jun 11–17 · W2: Jun 18–24 · W3: Jun 25–Jul 1 · W4: Jul 2–8. Last Week = rolling 7-day window.</div></div>
-      <div><div class="note-h">Data refresh</div><div class="note-b">Fetched automatically every Saturday at 08:00 UTC via GitHub Actions. Click Wiki &#8599; to open the stadium's Wikipedia article.</div></div>
+      <div>
+        <div class="note-h">Data source</div>
+        <div class="note-b">Wikipedia pageviews for each venue's stadium article — a clean, event-specific signal. Stadium pages spike almost exclusively due to sports events, not general city interest.</div>
+      </div>
+      <div>
+        <div class="note-h">Uplift index</div>
+        <div class="note-b">Views this week &divide; average weekly views (Jun 2025–May 2026) &times; 100. An index of 100 = normal baseline. 500 = 5&times; normal attention. The higher the uplift, the greater the incremental World Cup effect.</div>
+      </div>
+      <div>
+        <div class="note-h">Why uplift not raw views</div>
+        <div class="note-b">Raw views favour globally famous venues regardless of the World Cup. Uplift reveals which cities are experiencing the biggest <em>change</em> — the additional attention and potential economic activity directly attributable to hosting.</div>
+      </div>
+      <div>
+        <div class="note-h">Points system</div>
+        <div class="note-b">Cities ranked by uplift index each week. 1st = 10pts, 2nd = 9pts ... 10th = 1pt, 11th–16th = 0pts. "To Date" is the cumulative sum across all completed tournament weeks.</div>
+      </div>
+      <div>
+        <div class="note-h">Baseline window</div>
+        <div class="note-b">Jun 2025–May 2026 (52 weeks pre-tournament). Stored on first run and reused each week — no repeated API calls. Baselines shown per row as "Normal: X views/wk".</div>
+      </div>
+      <div>
+        <div class="note-h">Week windows</div>
+        <div class="note-b">W1: Jun 11–17 &middot; W2: Jun 18–24 &middot; W3: Jun 25–Jul 1 &middot; W4: Jul 2–8. Last Week = rolling 7-day window, refreshed every Saturday.</div>
+      </div>
     </div>
     <div class="legend-row">
       <div class="legend-item"><div class="dot" style="background:var(--east)"></div><span class="legend-label">East</span></div>
@@ -205,164 +243,169 @@ const COUNTRY_COLOR = { USA:'#4f8ef7', MEX:'#f59e0b', CAN:'#2dd4bf' };
 const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
 const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
 
-// Week definitions (must match fetch_trends.py)
 const WEEKS = [
-  { label:'Week 1', start:'2026-06-11', end:'2026-06-17', desc:'Jun 11–17' },
-  { label:'Week 2', start:'2026-06-18', end:'2026-06-24', desc:'Jun 18–24' },
-  { label:'Week 3', start:'2026-06-25', end:'2026-07-01', desc:'Jun 25–Jul 1' },
-  { label:'Week 4', start:'2026-07-02', end:'2026-07-08', desc:'Jul 2–8' },
+  { id:'w1', label:'Week 1', desc:'Jun 11–17',   start:'2026-06-11' },
+  { id:'w2', label:'Week 2', desc:'Jun 18–24',   start:'2026-06-18' },
+  { id:'w3', label:'Week 3', desc:'Jun 25–Jul 1',start:'2026-06-25' },
+  { id:'w4', label:'Week 4', desc:'Jul 2–8',     start:'2026-07-02' },
 ];
 
-let allCities = [];
-let activeView = 'todate'; // todate | lastweek | w1 | w2 | w3 | w4
-const today = new Date();
+let allCities  = [];
+let activeView = 'lastweek';
+const today    = new Date();
 
-function weekAvailable(week) {
-  return today >= new Date(week.start);
+function weekAvailable(w) { return today >= new Date(w.start); }
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n/1000).toFixed(1) + 'k';
+  return String(n);
+}
+
+function upliftColor(u) {
+  if (u >= 500) return '#f0c040';
+  if (u >= 300) return '#22c55e';
+  if (u >= 150) return '#60a5fa';
+  if (u >= 100) return '#6b7280';
+  return '#374151';
 }
 
 function buildTabs() {
   const row = document.getElementById('tab-row');
   row.innerHTML = '';
+  const sep = () => { const d=document.createElement('div'); d.className='tab-separator'; return d; };
 
-  const tabs = [
-    { id:'todate',   label:'To Date' },
+  const staticTabs = [
+    { id:'todate',   label:'To Date'   },
     { id:'lastweek', label:'Last Week' },
   ];
 
-  // Separator
-  const sep = () => { const d = document.createElement('div'); d.className='tab-separator'; return d; };
   row.appendChild(sep());
-
-  tabs.forEach(t => {
+  staticTabs.forEach(t => {
     const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (activeView === t.id ? ' active' : '');
+    btn.className = 'tab-btn' + (activeView===t.id?' active':'');
     btn.textContent = t.label;
     btn.onclick = () => setView(t.id);
     row.appendChild(btn);
   });
-
   row.appendChild(sep());
-
   WEEKS.forEach(w => {
     const avail = weekAvailable(w);
     const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (activeView === w.label.toLowerCase().replace(' ','') ? ' active' : '') + (avail ? '' : ' unavail');
+    btn.className = 'tab-btn' + (activeView===w.id?' active':'');
+    btn.style.opacity = avail ? '1' : '0.4';
     btn.textContent = w.label;
-    btn.style.opacity = avail ? '1' : '0.35';
-    btn.onclick = () => { if(avail) setView(w.label.toLowerCase().replace(' ','')); };
+    btn.onclick = () => { if (avail) setView(w.id); };
     row.appendChild(btn);
   });
-
   row.appendChild(sep());
 }
 
-function setView(v) {
-  activeView = v;
-  buildTabs();
-  render();
-}
+function setView(v) { activeView=v; buildTabs(); render(); }
 
 function getViewData(city) {
-  if (activeView === 'todate')   return { pts: city.toDatePoints,  idx: null,                   avail: true };
-  if (activeView === 'lastweek') return { pts: city.lastWeekPts,   idx: city.lastWeekScore,      avail: true };
-  // Discrete week
+  if (activeView === 'todate')   return { pts: city.toDatePoints,  uplift: null,                  avail: true };
+  if (activeView === 'lastweek') return { pts: city.lastWeekPts,   uplift: city.lastWeekUplift,   avail: true };
   const wmap = { w1:'Week 1', w2:'Week 2', w3:'Week 3', w4:'Week 4' };
-  const wlabel = wmap[activeView];
-  if (!wlabel) return { pts: 0, idx: 0, avail: false };
-  const pts = city.weekPoints && city.weekPoints[wlabel];
-  const idx = city.weekScores && city.weekScores[wlabel];
-  const avail = pts !== null && pts !== undefined;
-  return { pts: avail ? pts : 0, idx: avail ? idx : 0, avail };
+  const lbl  = wmap[activeView];
+  if (!lbl) return { pts:0, uplift:0, avail:false };
+  const pts    = city.weekPoints && city.weekPoints[lbl];
+  const uplift = city.weekUplift && city.weekUplift[lbl];
+  return { pts: pts ?? 0, uplift: uplift ?? 0, avail: pts !== null && pts !== undefined };
 }
 
-function getWeekLabelBar() {
-  const bar = document.getElementById('week-label-bar');
+function updateWeekBar() {
+  const bar = document.getElementById('week-bar');
   if (activeView === 'todate') {
-    const available = WEEKS.filter(weekAvailable);
-    if (available.length === 0) {
-      bar.innerHTML = '<span class="week-dates" style="color:#444">Awaiting tournament start — showing pre-tournament interest</span>';
-    } else {
-      bar.innerHTML = '<span class="week-label">To Date</span>' +
-        '<span class="week-dates">Sum of points from ' + available.length + ' completed week(s)</span>' +
-        '<span class="week-status live">Live</span>';
-    }
+    const done = WEEKS.filter(weekAvailable).length;
+    bar.innerHTML = '<span class="week-label">To Date</span>' +
+      '<span class="week-dates">Sum of points from ' + done + ' completed week(s)</span>' +
+      (done > 0 ? '<span class="week-status live">Live</span>' : '');
   } else if (activeView === 'lastweek') {
     bar.innerHTML = '<span class="week-label">Last 7 Days</span>' +
-      '<span class="week-dates">Rolling 7-day window · refreshed Saturdays</span>' +
+      '<span class="week-dates">Rolling window &middot; refreshed Saturdays</span>' +
       '<span class="week-status live">Rolling</span>';
   } else {
-    const wmap = { w1:WEEKS[0], w2:WEEKS[1], w3:WEEKS[2], w4:WEEKS[3] };
-    const w = wmap[activeView];
+    const w = WEEKS.find(x => x.id === activeView);
     if (w) {
       const avail = weekAvailable(w);
       bar.innerHTML = '<span class="week-label">' + w.label + '</span>' +
         '<span class="week-dates">' + w.desc + '</span>' +
-        '<span class="week-status ' + (avail?'live':'upcoming') + '">' + (avail?'Available':'Not yet') + '</span>';
+        '<span class="week-status ' + (avail?'live':'upcoming') + '">' +
+        (avail ? 'Available' : 'Not yet available') + '</span>' +
+        (!avail ? '<span class="week-dates" style="color:#2d3a55;margin-left:8px">&#128337; Data fetched automatically from ' + w.start + '</span>' : '');
     }
   }
 }
 
 function render() {
-  getWeekLabelBar();
+  updateWeekBar();
 
-  // Update column labels
-  const ptsLabel = activeView === 'todate' ? 'Total Pts' : 'Pts';
-  const idxLabel = activeView === 'todate' ? '—' : 'Index';
-  document.getElementById('col-pts-label').textContent = ptsLabel;
-  document.getElementById('col-idx-label').textContent = idxLabel;
-
-  const sorted = [...allCities].sort((a, b) => {
-    const da = getViewData(a);
-    const db = getViewData(b);
+  const sorted = [...allCities].sort((a,b) => {
+    const da = getViewData(a), db = getViewData(b);
     if (db.pts !== da.pts) return db.pts - da.pts;
-    return (db.idx || 0) - (da.idx || 0);
+    return (db.uplift||0) - (da.uplift||0);
   });
 
-  const maxPts = Math.max(...sorted.map(c => getViewData(c).pts), 1);
-
+  const maxUplift = Math.max(...sorted.map(c => getViewData(c).uplift || 0), 1);
   const body = document.getElementById('table-body');
   body.innerHTML = '';
 
   sorted.forEach((city, i) => {
     const rank  = i + 1;
     const vd    = getViewData(city);
-    const pct   = (vd.pts / maxPts * 100).toFixed(1);
+    const pct   = ((vd.uplift||0) / maxUplift * 100).toFixed(1);
     const cc    = COUNTRY_COLOR[city.country] || '#888';
     const rc    = REGION_COLOR[city.region]   || '#888';
     const delay = i * 35;
     const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
     const rowClass  = rank<=3 ? 'rank-'+rank : '';
-    const unavail   = !vd.avail ? ' unavailable' : '';
+    const ucol      = vd.uplift ? upliftColor(vd.uplift) : '#374151';
+
+    // Uplift display
+    let upliftHTML;
+    if (!vd.avail || vd.uplift === null) {
+      upliftHTML = '<div class="uplift-badge"><div class="uplift-num" style="color:var(--faint);font-size:13px">—</div></div>';
+    } else if (activeView === 'todate') {
+      upliftHTML = '<div class="uplift-badge"><div class="uplift-num" style="color:var(--faint);font-size:13px">—</div></div>';
+    } else {
+      const multiplier = (vd.uplift / 100).toFixed(1);
+      upliftHTML =
+        '<div class="uplift-badge">' +
+          '<div class="uplift-num" style="color:' + ucol + '">' + multiplier + '&times;</div>' +
+          '<div class="uplift-label">vs baseline</div>' +
+          '<div class="uplift-baseline">Normal: ' + fmt(city.baselineAvgWeekly) + '/wk</div>' +
+        '</div>';
+    }
+
+    // Points display
+    const ptsHTML =
+      '<div class="pts-badge">' +
+        '<div class="pts-num ' + (vd.pts===0?'zero':'') + '">' + (vd.avail ? vd.pts : '—') + '</div>' +
+        '<div class="pts-label">pts</div>' +
+      '</div>';
 
     const row = document.createElement('div');
-    row.className = 'row ' + rowClass + unavail;
+    row.className = 'row ' + rowClass + (!vd.avail?' unavailable':'');
     row.style.animationDelay = delay + 'ms';
-
-    const idxDisplay = activeView === 'todate'
-      ? '<span class="score na">—</span>'
-      : vd.idx !== null && vd.idx !== undefined
-        ? '<span class="score ' + (activeView!=='todate'?'secondary':'na') + '">' + vd.idx + '</span>'
-        : '<span class="score na">n/a</span>';
-
     row.innerHTML =
       '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
       '<div>' +
         '<div class="city-name-row">' +
-          '<span class="city-flag">' + (FLAG[city.flag] || city.flag) + '</span>' +
+          '<span class="city-flag">' + (FLAG[city.flag]||city.flag) + '</span>' +
           '<span class="city-name">' + city.name + '</span>' +
           '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
         '</div>' +
-        '<a class="trends-link" href="' + city.trendsUrl + '" target="_blank" rel="noopener">&#8599; Wiki</a>' +
+        '<div class="stadium-name">' + (city.stadium||'') + '</div>' +
+        '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
       '</div>' +
-      '<div class="pts-badge">' +
-        '<div class="pts-num">' + (vd.avail ? vd.pts : '—') + '</div>' +
-        '<div class="pts-label">pts</div>' +
-      '</div>' +
-      idxDisplay +
-      '<div></div>' + /* trends col spacer - link is in city cell */
-      '<div class="bar-cell">' +
-        '<div class="bar-track"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '99,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div></div>' +
+      ptsHTML +
+      upliftHTML +
+      '<div class="hide-sm"></div>' +
+      '<div class="hide-sm">' +
+        '<div class="bar-track">' +
+          '<div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '88,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div>' +
+        '</div>' +
         '<div class="country-label">' + city.country + '</div>' +
       '</div>';
 
@@ -381,7 +424,8 @@ async function loadData() {
     buildTabs();
     render();
   } catch(err) {
-    document.getElementById('table-body').innerHTML = '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
+    document.getElementById('table-body').innerHTML =
+      '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
   }
 }
 
