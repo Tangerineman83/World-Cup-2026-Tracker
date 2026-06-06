@@ -1,1 +1,37 @@
+name: Fetch Google Trends Data
+
+on:
+  schedule:
+    - cron: "0 8 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pytrends
+
+      - name: Fetch Google Trends data
+        run: python scripts/fetch_trends.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/data.json
+          git diff --cached --quiet || git commit -m "chore: update trends data $(date -u '+%Y-%m-%d')"
+          git push
 
