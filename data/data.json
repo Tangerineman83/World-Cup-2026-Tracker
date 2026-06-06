@@ -1,6 +1,6 @@
 {
-  "updated": "2026-06-06T17:58:23Z",
-  "updatedDisplay": "06 Jun 2026, 17:58z",
+  "updated": "2026-06-06T19:52:53Z",
+  "updatedDisplay": "06 Jun 2026, 19:52z",
   "weeks": [
     {
       "label": "Week 1",
@@ -25,13 +25,13 @@
   ],
   "cities": [
     {
-      "name": "Kansas City",
+      "name": "New York / New Jersey",
       "country": "USA",
       "flag": "US",
-      "region": "Central",
-      "term": "Kansas City World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Kansas+City+World+Cup&date=now+7-d",
-      "lastWeekScore": 100,
+      "region": "East",
+      "term": "New Jersey World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=New+Jersey+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 10,
       "weekPoints": {
         "Week 1": null,
@@ -48,13 +48,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Houston",
+      "name": "Los Angeles",
       "country": "USA",
       "flag": "US",
-      "region": "Central",
-      "term": "Houston World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Houston+World+Cup&date=now+7-d",
-      "lastWeekScore": 92,
+      "region": "West",
+      "term": "Los Angeles World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Los+Angeles+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 9,
       "weekPoints": {
         "Week 1": null,
@@ -77,7 +77,7 @@
       "region": "Central",
       "term": "Dallas World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Dallas+World+Cup&date=now+7-d",
-      "lastWeekScore": 90,
+      "lastWeekScore": 0,
       "lastWeekPts": 8,
       "weekPoints": {
         "Week 1": null,
@@ -94,13 +94,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Toronto",
-      "country": "CAN",
-      "flag": "CA",
-      "region": "East",
-      "term": "Toronto World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Toronto+World+Cup&date=now+7-d",
-      "lastWeekScore": 90,
+      "name": "Mexico City",
+      "country": "MEX",
+      "flag": "MX",
+      "region": "Central",
+      "term": "Mexico City World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Mexico+City+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 7,
       "weekPoints": {
         "Week 1": null,
@@ -117,13 +117,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Seattle",
+      "name": "Miami",
       "country": "USA",
       "flag": "US",
-      "region": "West",
-      "term": "Seattle World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Seattle+World+Cup&date=now+7-d",
-      "lastWeekScore": 84,
+      "region": "East",
+      "term": "Miami World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Miami+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 6,
       "weekPoints": {
         "Week 1": null,
@@ -146,7 +146,7 @@
       "region": "Central",
       "term": "Atlanta World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Atlanta+World+Cup&date=now+7-d",
-      "lastWeekScore": 73,
+      "lastWeekScore": 0,
       "lastWeekPts": 5,
       "weekPoints": {
         "Week 1": null,
@@ -163,13 +163,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Miami",
+      "name": "San Francisco",
       "country": "USA",
       "flag": "US",
-      "region": "East",
-      "term": "Miami World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Miami+World+Cup&date=now+7-d",
-      "lastWeekScore": 71,
+      "region": "West",
+      "term": "San Francisco World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=San+Francisco+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 4,
       "weekPoints": {
         "Week 1": null,
@@ -186,13 +186,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Vancouver",
-      "country": "CAN",
-      "flag": "CA",
+      "name": "Seattle",
+      "country": "USA",
+      "flag": "US",
       "region": "West",
-      "term": "Vancouver World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Vancouver+World+Cup&date=now+7-d",
-      "lastWeekScore": 69,
+      "term": "Seattle World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Seattle+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 3,
       "weekPoints": {
         "Week 1": null,
@@ -209,13 +209,13 @@
       "toDatePoints": 0
     },
     {
-      "name": "Los Angeles",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "term": "Los Angeles World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Los+Angeles+World+Cup&date=now+7-d",
-      "lastWeekScore": 61,
+      "name": "Toronto",
+      "country": "CAN",
+      "flag": "CA",
+      "region": "East",
+      "term": "Toronto World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Toronto+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 2,
       "weekPoints": {
         "Week 1": null,
@@ -238,77 +238,8 @@
       "region": "East",
       "term": "Boston World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Boston+World+Cup&date=now+7-d",
-      "lastWeekScore": 55,
+      "lastWeekScore": 0,
       "lastWeekPts": 1,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "New York / New Jersey",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "term": "New Jersey World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=New+Jersey+World+Cup&date=now+7-d",
-      "lastWeekScore": 47,
-      "lastWeekPts": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Mexico City",
-      "country": "MEX",
-      "flag": "MX",
-      "region": "Central",
-      "term": "Mexico City World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=Mexico+City+World+Cup&date=now+7-d",
-      "lastWeekScore": 33,
-      "lastWeekPts": 0,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekScores": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "San Francisco",
-      "country": "USA",
-      "flag": "US",
-      "region": "West",
-      "term": "San Francisco World Cup",
-      "trendsUrl": "https://trends.google.com/trends/explore?q=San+Francisco+World+Cup&date=now+7-d",
-      "lastWeekScore": 18,
-      "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
         "Week 2": null,
@@ -330,7 +261,30 @@
       "region": "West",
       "term": "Guadalajara World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Guadalajara+World+Cup&date=now+7-d",
-      "lastWeekScore": 12,
+      "lastWeekScore": 0,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Houston",
+      "country": "USA",
+      "flag": "US",
+      "region": "Central",
+      "term": "Houston World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Houston+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -353,7 +307,30 @@
       "region": "East",
       "term": "Philadelphia World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Philadelphia+World+Cup&date=now+7-d",
-      "lastWeekScore": 47,
+      "lastWeekScore": 0,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Vancouver",
+      "country": "CAN",
+      "flag": "CA",
+      "region": "West",
+      "term": "Vancouver World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Vancouver+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -376,7 +353,30 @@
       "region": "Central",
       "term": "Monterrey World Cup",
       "trendsUrl": "https://trends.google.com/trends/explore?q=Monterrey+World+Cup&date=now+7-d",
-      "lastWeekScore": 12,
+      "lastWeekScore": 0,
+      "lastWeekPts": 0,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekScores": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "toDatePoints": 0
+    },
+    {
+      "name": "Kansas City",
+      "country": "USA",
+      "flag": "US",
+      "region": "Central",
+      "term": "Kansas City World Cup",
+      "trendsUrl": "https://trends.google.com/trends/explore?q=Kansas+City+World+Cup&date=now+7-d",
+      "lastWeekScore": 0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
