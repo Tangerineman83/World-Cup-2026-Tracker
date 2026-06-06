@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """
-fetch_trends.py  —  Wikipedia Pageviews Edition
+fetch_trends.py  —  Wikipedia Pageviews Uplift Edition
 
-Fetches daily Wikipedia pageview counts for each host city's:
-  - City article       (destination/economic interest signal)
-  - Stadium article    (event-specific interest signal)
+Metric: Stadium Wikipedia article pageviews, indexed against a 12-month baseline.
 
-Combined score = city_views + stadium_views for the period.
-Scores are normalised so the top city = 100, then points awarded 10→0.
+For each tournament week (and the rolling last-7-days window):
+  uplift_index = (views_this_period / avg_weekly_views_last_12_months) * 100
 
-Wikimedia pageviews API is fully open, no authentication required,
-and works reliably from GitHub Actions.
+  100 = exactly normal interest
+  300 = 3x normal interest
+  850 = 8.5x spike (strong World Cup effect)
 
-API docs: https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews
+This removes the "big city / famous stadium" bias. A smaller venue showing
+a 10x spike ranks above a globally famous stadium showing only a 2x lift.
+Points are awarded on the uplift index: 1st = 10pts ... 10th = 1pt, rest = 0.
+
+Baseline is fetched once (June 2025 – May 2026) and stored in data.json
+alongside weekly scores so the site can show "Normal: X views/week".
 """
 
 import json
@@ -22,122 +26,106 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone, date, timedelta
 
-# ── City + Stadium Wikipedia article pairs ─────────────────────────────────────
-# Article titles must match the exact Wikipedia URL slug (spaces as underscores).
-# Stadium = the real/permanent name (not the temporary FIFA tournament name).
+# ── Stadium articles only ──────────────────────────────────────────────────────
+# City articles dropped - they reflect population size, not World Cup interest.
+# Stadium articles are a clean signal: spikes are almost entirely event-driven.
 
 CITIES = [
     {
-        "name":    "New York / New Jersey",
-        "country": "USA", "flag": "US", "region": "East",
-        "city_article":    "New_York_City",
-        "stadium_article": "MetLife_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
+        "name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",
+        "stadium": "MetLife Stadium",
+        "article": "MetLife_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
     },
     {
-        "name":    "Los Angeles",
-        "country": "USA", "flag": "US", "region": "West",
-        "city_article":    "Los_Angeles",
-        "stadium_article": "SoFi_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
+        "name": "Los Angeles", "country": "USA", "flag": "US", "region": "West",
+        "stadium": "SoFi Stadium",
+        "article": "SoFi_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
     },
     {
-        "name":    "Dallas",
-        "country": "USA", "flag": "US", "region": "Central",
-        "city_article":    "Dallas",
-        "stadium_article": "AT%26T_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
+        "name": "Dallas", "country": "USA", "flag": "US", "region": "Central",
+        "stadium": "AT&T Stadium",
+        "article": "AT%26T_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
     },
     {
-        "name":    "Mexico City",
-        "country": "MEX", "flag": "MX", "region": "Central",
-        "city_article":    "Mexico_City",
-        "stadium_article": "Estadio_Azteca",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
+        "name": "Mexico City", "country": "MEX", "flag": "MX", "region": "Central",
+        "stadium": "Estadio Azteca",
+        "article": "Estadio_Azteca",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
     },
     {
-        "name":    "Miami",
-        "country": "USA", "flag": "US", "region": "East",
-        "city_article":    "Miami",
-        "stadium_article": "Hard_Rock_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
+        "name": "Miami", "country": "USA", "flag": "US", "region": "East",
+        "stadium": "Hard Rock Stadium",
+        "article": "Hard_Rock_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
     },
     {
-        "name":    "Atlanta",
-        "country": "USA", "flag": "US", "region": "Central",
-        "city_article":    "Atlanta",
-        "stadium_article": "Mercedes-Benz_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
+        "name": "Atlanta", "country": "USA", "flag": "US", "region": "Central",
+        "stadium": "Mercedes-Benz Stadium",
+        "article": "Mercedes-Benz_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
     },
     {
-        "name":    "San Francisco",
-        "country": "USA", "flag": "US", "region": "West",
-        "city_article":    "San_Francisco",
-        "stadium_article": "Levi%27s_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
+        "name": "San Francisco", "country": "USA", "flag": "US", "region": "West",
+        "stadium": "Levi's Stadium",
+        "article": "Levi%27s_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
     },
     {
-        "name":    "Seattle",
-        "country": "USA", "flag": "US", "region": "West",
-        "city_article":    "Seattle",
-        "stadium_article": "Lumen_Field",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
+        "name": "Seattle", "country": "USA", "flag": "US", "region": "West",
+        "stadium": "Lumen Field",
+        "article": "Lumen_Field",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
     },
     {
-        "name":    "Toronto",
-        "country": "CAN", "flag": "CA", "region": "East",
-        "city_article":    "Toronto",
-        "stadium_article": "BMO_Field",
-        "trendsUrl": "https://en.wikipedia.org/wiki/BMO_Field",
+        "name": "Toronto", "country": "CAN", "flag": "CA", "region": "East",
+        "stadium": "BMO Field",
+        "article": "BMO_Field",
+        "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field",
     },
     {
-        "name":    "Boston",
-        "country": "USA", "flag": "US", "region": "East",
-        "city_article":    "Boston",
-        "stadium_article": "Gillette_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
+        "name": "Boston", "country": "USA", "flag": "US", "region": "East",
+        "stadium": "Gillette Stadium",
+        "article": "Gillette_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
     },
     {
-        "name":    "Guadalajara",
-        "country": "MEX", "flag": "MX", "region": "West",
-        "city_article":    "Guadalajara",
-        "stadium_article": "Estadio_Akron",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
+        "name": "Guadalajara", "country": "MEX", "flag": "MX", "region": "West",
+        "stadium": "Estadio Akron",
+        "article": "Estadio_Akron",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
     },
     {
-        "name":    "Houston",
-        "country": "USA", "flag": "US", "region": "Central",
-        "city_article":    "Houston",
-        "stadium_article": "NRG_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
+        "name": "Houston", "country": "USA", "flag": "US", "region": "Central",
+        "stadium": "NRG Stadium",
+        "article": "NRG_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
     },
     {
-        "name":    "Philadelphia",
-        "country": "USA", "flag": "US", "region": "East",
-        "city_article":    "Philadelphia",
-        "stadium_article": "Lincoln_Financial_Field",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
+        "name": "Philadelphia", "country": "USA", "flag": "US", "region": "East",
+        "stadium": "Lincoln Financial Field",
+        "article": "Lincoln_Financial_Field",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
     },
     {
-        "name":    "Vancouver",
-        "country": "CAN", "flag": "CA", "region": "West",
-        "city_article":    "Vancouver",
-        "stadium_article": "BC_Place",
-        "trendsUrl": "https://en.wikipedia.org/wiki/BC_Place",
+        "name": "Vancouver", "country": "CAN", "flag": "CA", "region": "West",
+        "stadium": "BC Place",
+        "article": "BC_Place",
+        "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place",
     },
     {
-        "name":    "Monterrey",
-        "country": "MEX", "flag": "MX", "region": "Central",
-        "city_article":    "Monterrey",
-        "stadium_article": "Estadio_BBVA",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
+        "name": "Monterrey", "country": "MEX", "flag": "MX", "region": "Central",
+        "stadium": "Estadio BBVA",
+        "article": "Estadio_BBVA",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
     },
     {
-        "name":    "Kansas City",
-        "country": "USA", "flag": "US", "region": "Central",
-        "city_article":    "Kansas_City,_Missouri",
-        "stadium_article": "Arrowhead_Stadium",
-        "trendsUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
+        "name": "Kansas City", "country": "USA", "flag": "US", "region": "Central",
+        "stadium": "Arrowhead Stadium",
+        "article": "Arrowhead_Stadium",
+        "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
     },
 ]
 
@@ -148,22 +136,24 @@ WEEKS = [
     {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
 ]
 
-WIKI_AGENT = "WC2026Tracker/1.0 (https://github.com; public research project)"
+# 12-month baseline window: June 2025 – May 2026 (pre-tournament)
+BASELINE_START = "2025-06-01"
+BASELINE_END   = "2026-05-31"
+BASELINE_WEEKS = 52
+
+WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
 
-# ── Wikipedia API helpers ──────────────────────────────────────────────────────
+# ── API helpers ────────────────────────────────────────────────────────────────
 
 def get_pageviews(article, start_date, end_date, retries=4):
-    """
-    Fetch total Wikipedia pageviews for an article between start_date and end_date.
-    Dates as 'YYYY-MM-DD' strings. Returns integer total, or 0 on failure.
-    Retries on 429 (rate limit) with exponential backoff.
-    """
+    """Fetch total pageviews for a Wikipedia article over a date range."""
     start = start_date.replace("-", "")
     end   = end_date.replace("-", "")
     url = (
         "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-        "en.wikipedia/all-access/all-agents/" + article + "/daily/" + start + "/" + end
+        "en.wikipedia/all-access/all-agents/" + article +
+        "/daily/" + start + "/" + end
     )
     for attempt in range(retries):
         try:
@@ -173,157 +163,224 @@ def get_pageviews(article, start_date, end_date, retries=4):
                 return sum(item["views"] for item in data.get("items", []))
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                wait = 5 * (2 ** attempt)  # 5, 10, 20, 40 seconds
-                print("    429 rate limit - waiting " + str(wait) + "s before retry...")
+                wait = 5 * (2 ** attempt)
+                print("    429 rate limit - waiting " + str(wait) + "s...")
                 time.sleep(wait)
-                continue
             elif e.code == 404:
-                print("    404 - article not found: " + article)
+                print("    404 not found: " + article)
                 return 0
             else:
-                print("    HTTP error " + str(e.code) + " for " + article)
+                print("    HTTP " + str(e.code) + ": " + article)
                 return 0
         except Exception as e:
-            print("    Error fetching " + article + ": " + str(e))
+            print("    Error (" + article + "): " + str(e))
             return 0
-    print("    All retries failed for: " + article)
+    print("    All retries failed: " + article)
     return 0
 
 
-def get_combined_views(city, start_date, end_date):
-    """Fetch city + stadium pageviews and return combined total."""
-    city_views    = get_pageviews(city["city_article"],    start_date, end_date)
-    stadium_views = get_pageviews(city["stadium_article"], start_date, end_date)
-    total = city_views + stadium_views
-    print(f"    {city['name']:<25} city={city_views:>7,}  stadium={stadium_views:>7,}  total={total:>8,}")
-    time.sleep(1.5)  # be polite to Wikimedia - prevents 429 rate limiting
-    return total
+# ── Baseline ───────────────────────────────────────────────────────────────────
 
-
-# ── Scoring helpers ────────────────────────────────────────────────────────────
-
-def normalise(raw_scores):
-    """Express all scores as 0-100 relative to the highest-scoring city."""
-    best = max(raw_scores.values()) if raw_scores else 0
-    if best == 0:
-        return {k: 0 for k in raw_scores}
-    return {k: min(100, int(round(v / best * 100))) for k, v in raw_scores.items()}
-
-
-def scores_to_points(normalised_scores):
-    """1st=10pts, 2nd=9pts ... 10th=1pt, 11th-16th=0pts.
-    If all scores are zero (fetch failed), everyone gets 0 - no points awarded."""
-    if not normalised_scores or max(normalised_scores.values()) == 0:
-        return {name: 0 for name in normalised_scores}
-    ranked = sorted(normalised_scores.items(), key=lambda x: x[1], reverse=True)
-    points = {}
-    for i, (name, _) in enumerate(ranked):
-        points[name] = max(0, 10 - i)
-    return points
-
-
-# ── Date helpers ───────────────────────────────────────────────────────────────
-
-def last_7_days():
-    today = date.today()
-    start = today - timedelta(days=7)
-    return start.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d")
-
-
-def week_available(week):
-    return date.today() >= date.fromisoformat(week["start"])
-
-
-# ── Main fetch ─────────────────────────────────────────────────────────────────
-
-def fetch_period(label, start_date, end_date):
-    """Fetch combined city+stadium views for all 16 cities over a date range."""
-    print(f"\n  [{label}] {start_date} to {end_date}")
-    raw = {}
+def fetch_baselines():
+    """
+    Fetch 12-month pageview totals for all stadiums (Jun 2025 - May 2026).
+    Returns dict of {name: avg_weekly_views}.
+    This is fetched once and stored in data.json so future runs can reuse it,
+    avoiding 52 weeks of API calls every Saturday.
+    """
+    print("\n=== Fetching 12-month baselines (Jun 2025 - May 2026) ===")
+    baselines = {}
     for city in CITIES:
-        raw[city["name"]] = get_combined_views(city, start_date, end_date)
-    norm   = normalise(raw)
-    points = scores_to_points(norm)
-    print(f"  Top 3: " + ", ".join(
-        f"{n}={norm[n]}" for n, _ in sorted(norm.items(), key=lambda x: x[1], reverse=True)[:3]
-    ))
-    return raw, norm, points
+        total = get_pageviews(city["article"], BASELINE_START, BASELINE_END)
+        avg_weekly = round(total / BASELINE_WEEKS, 1)
+        baselines[city["name"]] = {
+            "total":      total,
+            "avg_weekly": avg_weekly,
+        }
+        print("  " + city["name"].ljust(25) +
+              " total=" + str(total) + "  avg_weekly=" + str(avg_weekly))
+        time.sleep(1.5)
+    return baselines
 
 
-def fetch_all():
+def load_existing_baselines(existing_data):
+    """Reuse baselines from a previous run if they exist - avoids refetching."""
+    if not existing_data:
+        return None
+    cities = existing_data.get("cities", [])
+    if not cities or "baselineAvgWeekly" not in cities[0]:
+        return None
+    result = {}
+    for city in cities:
+        result[city["name"]] = {
+            "total":      city.get("baselineTotal", 0),
+            "avg_weekly": city.get("baselineAvgWeekly", 0),
+        }
+    print("  Reusing baselines from previous run.")
+    return result
+
+
+# ── Uplift scoring ─────────────────────────────────────────────────────────────
+
+def compute_uplift(views_this_week, avg_weekly_baseline):
+    """
+    Uplift index = (actual views / baseline avg) * 100
+    100 = normal, 200 = 2x normal, 500 = 5x spike etc.
+    Returns 0 if baseline is zero (avoids division error).
+    """
+    if avg_weekly_baseline <= 0:
+        return 0
+    return round(views_this_week / avg_weekly_baseline * 100, 1)
+
+
+def uplift_to_points(uplift_scores):
+    """1st=10pts ... 10th=1pt, 11th-16th=0pts. No points if all zero."""
+    if not uplift_scores or max(uplift_scores.values()) == 0:
+        return {name: 0 for name in uplift_scores}
+    ranked = sorted(uplift_scores.items(), key=lambda x: x[1], reverse=True)
+    return {name: max(0, 10 - i) for i, (name, _) in enumerate(ranked)}
+
+
+# ── Period fetch ───────────────────────────────────────────────────────────────
+
+def fetch_period(label, start_date, end_date, baselines):
+    """Fetch views for all stadiums, compute uplift index and points."""
+    days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
+    week_fraction = days / 7.0  # normalise to weekly equivalent
+
+    print("\n  [" + label + "] " + start_date + " to " + end_date +
+          " (" + str(days) + " days)")
+
+    raw_views  = {}
+    uplift_idx = {}
+
+    for city in CITIES:
+        views = get_pageviews(city["article"], start_date, end_date)
+        # Normalise to 7-day equivalent so short periods are comparable
+        weekly_equiv = views / week_fraction
+        uplift = compute_uplift(weekly_equiv, baselines[city["name"]]["avg_weekly"])
+        raw_views[city["name"]]  = views
+        uplift_idx[city["name"]] = uplift
+        print("  " + city["name"].ljust(25) +
+              " views=" + str(views) +
+              "  weekly_equiv=" + str(round(weekly_equiv)) +
+              "  uplift=" + str(uplift) + "x")
+        time.sleep(1.5)
+
+    points = uplift_to_points(uplift_idx)
+
+    top3 = sorted(uplift_idx.items(), key=lambda x: x[1], reverse=True)[:3]
+    print("  Top 3: " + " | ".join(n + " (" + str(v) + "x)" for n, v in top3))
+    return raw_views, uplift_idx, points
+
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+
+def main():
+    print("Wikipedia Pageviews Uplift Tracker")
+    print("Metric: stadium views vs 12-month baseline (uplift index)")
+
+    today = date.today()
+
+    # Load existing data to reuse baselines if available
+    existing_data = None
+    if os.path.exists("data/data.json"):
+        try:
+            with open("data/data.json") as f:
+                existing_data = json.load(f)
+            print("Loaded existing data.json")
+        except Exception:
+            pass
+
+    # Baselines: reuse if available, otherwise fetch
+    baselines = load_existing_baselines(existing_data)
+    if not baselines:
+        baselines = fetch_baselines()
+    else:
+        print("  Baselines reused from previous run - skipping 12-month fetch")
+
     # Discrete tournament weeks
     week_data = {}
     for week in WEEKS:
-        if not week_available(week):
-            print(f"\nSkipping {week['label']} (starts {week['start']})")
+        if today < date.fromisoformat(week["start"]):
+            print("\nSkipping " + week["label"] + " (starts " + week["start"] + ")")
             continue
-        print(f"\n=== {week['label']} ===")
-        raw, norm, pts = fetch_period(week["label"], week["start"], week["end"])
-        week_data[week["label"]] = {"raw": raw, "norm": norm, "points": pts}
+        print("\n=== " + week["label"] + " ===")
+        raw, uplift, pts = fetch_period(
+            week["label"], week["start"], week["end"], baselines
+        )
+        week_data[week["label"]] = {"raw": raw, "uplift": uplift, "points": pts}
 
     # Rolling last 7 days
     print("\n=== Last 7 Days (rolling) ===")
-    l7_start, l7_end = last_7_days()
-    l7_raw, l7_norm, l7_pts = fetch_period("Last 7 days", l7_start, l7_end)
+    l7_end   = today.strftime("%Y-%m-%d")
+    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
+    l7_raw, l7_uplift, l7_pts = fetch_period(
+        "Last 7 days", l7_start, l7_end, baselines
+    )
 
     # Build results
     results = []
     for city in CITIES:
         n = city["name"]
         week_points = {}
-        week_scores = {}
+        week_uplift = {}
         for week in WEEKS:
             lbl = week["label"]
             if lbl in week_data:
                 week_points[lbl] = week_data[lbl]["points"][n]
-                week_scores[lbl] = week_data[lbl]["norm"][n]
+                week_uplift[lbl] = week_data[lbl]["uplift"][n]
             else:
                 week_points[lbl] = None
-                week_scores[lbl] = None
+                week_uplift[lbl] = None
 
         to_date = sum(v for v in week_points.values() if v is not None)
 
         results.append({
-            "name":          n,
-            "country":       city["country"],
-            "flag":          city["flag"],
-            "region":        city["region"],
-            "trendsUrl":     city["trendsUrl"],
-            "lastWeekScore": l7_norm.get(n, 0),
-            "lastWeekPts":   l7_pts.get(n, 0),
-            "lastWeekRaw":   l7_raw.get(n, 0),
-            "weekPoints":    week_points,
-            "weekScores":    week_scores,
-            "toDatePoints":  to_date,
+            "name":              n,
+            "country":           city["country"],
+            "flag":              city["flag"],
+            "region":            city["region"],
+            "stadium":           city["stadium"],
+            "wikiUrl":           city["wikiUrl"],
+            # Baseline
+            "baselineTotal":     baselines[n]["total"],
+            "baselineAvgWeekly": baselines[n]["avg_weekly"],
+            # Last 7 days
+            "lastWeekViews":     l7_raw.get(n, 0),
+            "lastWeekUplift":    l7_uplift.get(n, 0),
+            "lastWeekPts":       l7_pts.get(n, 0),
+            # Discrete weeks
+            "weekPoints":        week_points,
+            "weekUplift":        week_uplift,
+            "toDatePoints":      to_date,
         })
 
-    results.sort(key=lambda x: (x["toDatePoints"], x["lastWeekPts"]), reverse=True)
+    results.sort(key=lambda x: (x["toDatePoints"], x["lastWeekUplift"]), reverse=True)
 
     print("\n=== Final Standings ===")
     for city in results:
-        print(f"  {city['name']:<25}  idx={city['lastWeekScore']:>3}  pts={city['lastWeekPts']:>2}  toDate={city['toDatePoints']:>3}")
+        print("  " + city["name"].ljust(25) +
+              "  baseline=" + str(city["baselineAvgWeekly"]) + "/wk" +
+              "  uplift=" + str(city["lastWeekUplift"]) + "x" +
+              "  pts=" + str(city["lastWeekPts"]) +
+              "  toDate=" + str(city["toDatePoints"]))
 
-    return results
-
-
-def main():
-    print("Fetching Wikipedia pageviews for 16 World Cup host cities...")
-    print("Metric: city article + stadium article daily pageviews (combined)")
-    data = fetch_all()
-    now  = datetime.now(timezone.utc)
-
+    now = datetime.now(timezone.utc)
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
         json.dump({
             "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":         "Wikipedia pageviews (city + stadium articles combined)",
+            "metric":         "Wikipedia stadium pageviews vs 12-month baseline (uplift index)",
+            "baselineWindow": BASELINE_START + " to " + BASELINE_END,
             "weeks":          WEEKS,
-            "cities":         data,
+            "cities":         results,
         }, f, ensure_ascii=False, indent=2)
 
     print("\nDone. Written to data/data.json")
-    print("Top city: " + data[0]["name"])
+    print("Top city: " + results[0]["name"] +
+          " (uplift: " + str(results[0]["lastWeekUplift"]) + "x)")
 
 
 main()
