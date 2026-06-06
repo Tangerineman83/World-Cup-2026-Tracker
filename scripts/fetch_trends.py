@@ -25,7 +25,6 @@ CITIES = [
     {"name": "Kansas City",           "country": "USA", "flag": "US", "region": "Central", "term": "Kansas City World Cup"},
 ]
 
-# Tournament week windows - Sunday to Saturday to align with Google Trends weekly data
 WEEKS = [
     {"label": "Week 1", "start": "2026-06-11", "end": "2026-06-17"},
     {"label": "Week 2", "start": "2026-06-18", "end": "2026-06-24"},
@@ -33,11 +32,13 @@ WEEKS = [
     {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
 ]
 
+# Included in every batch as a common reference for cross-batch normalisation.
+# This prevents any solo or lightly-contested term from being auto-scored 100.
+ANCHOR = "World Cup"
+
 
 def is_week_available(week):
-    """Only fetch a week if its start date has passed."""
-    today = date.today()
-    return today >= date.fromisoformat(week["start"])
+    return date.today() >= date.fromisoformat(week["start"])
 
 
 def chunks(lst, n):
@@ -71,75 +72,116 @@ def fetch_batch_with_retry(pytrends, terms, timeframe, max_retries=3):
 
 
 def fetch_timeframe(pytrends, all_terms, timeframe, label):
+    """
+    Fetch all 16 city terms in batches of 4, with the ANCHOR appended to every
+    batch as the 5th term. The anchor's score in each batch is used to rescale
+    all batches onto a common reference, so no city gets an artificially high
+    score just because it was alone or in a small batch.
+    """
     print("\n  [" + label + "] timeframe: " + timeframe)
-    term_batches = list(chunks(all_terms, 5))
+    term_batches = list(chunks(all_terms, 4))
     batches = []
     for i, batch in enumerate(term_batches):
-        print("  Batch " + str(i + 1) + "/" + str(len(term_batches)))
-        batches.append(fetch_batch_with_retry(pytrends, batch, timeframe))
+        batch_with_anchor = batch + [ANCHOR]
+        print("  Batch " + str(i + 1) + "/" + str(len(term_batches)) + ": " + str(batch))
+        result = fetch_batch_with_retry(pytrends, batch_with_anchor, timeframe)
+        batches.append(result)
         if i < len(term_batches) - 1:
             time.sleep(8)
-    return normalise_across_batches(batches, all_terms)
+    return normalise_with_anchor(batches, all_terms)
 
 
-def normalise_across_batches(batches, all_terms):
-    global_max = 1
-    for batch in batches:
-        for term, score in batch.items():
-            if term in all_terms and score > global_max:
-                global_max = score
-    normalised = {}
-    for batch in batches:
+def normalise_with_anchor(batches, all_terms):
+    """
+    Two-stage normalisation:
+
+    Stage 1 - Cross-batch alignment using anchor ("World Cup"):
+      Each batch is scaled relative to Batch 0 using the anchor's score.
+      This corrects for the fact that Google scores each batch independently,
+      so a city alone in a batch would otherwise get an artificially high score.
+
+    Stage 2 - Rescale to best city = 100:
+      After alignment, scores are expressed as % of the top-scoring city.
+      This gives an intuitive 0-100 index where 100 = most interested city
+      that week, regardless of how the raw anchor-relative scores were compressed.
+
+    The anchor ("World Cup") is intentionally a much higher-volume term than
+    any individual city, so city scores will naturally land in a compressed
+    range (e.g. 15-45) before Stage 2 rescaling. That compression is fine -
+    it reflects genuine relative interest levels. Stage 2 just re-expresses
+    those proportions on a 0-100 scale for readability.
+    """
+    # Stage 1: align batches using anchor
+    ref_anchor = batches[0].get(ANCHOR, 1) or 1
+    print("\n  Stage 1 - Anchor alignment (ref anchor score=" + str(ref_anchor) + "):")
+
+    anchor_relative = {}  # city scores as % of World Cup anchor
+    for i, batch in enumerate(batches):
+        batch_anchor = batch.get(ANCHOR, 1) or 1
+        scale = ref_anchor / batch_anchor
+        print("    Batch " + str(i + 1) + ": anchor=" + str(batch_anchor) + "  scale=" + str(round(scale, 3)))
         for term, score in batch.items():
             if term in all_terms:
-                normalised[term] = int(round(score / global_max * 100))
+                anchor_relative[term] = round(score * scale, 2)
+
+    print("  Raw anchor-relative scores (compressed range expected):")
+    for t, v in sorted(anchor_relative.items(), key=lambda x: x[1], reverse=True):
+        print("    " + t + ": " + str(v))
+
+    # Stage 2: rescale so best city = 100
+    best_city_score = max(anchor_relative.values()) if anchor_relative else 1
+    print("\n  Stage 2 - Rescale to best city (best=" + str(round(best_city_score, 2)) + "):")
+    normalised = {}
+    for term, score in anchor_relative.items():
+        normalised[term] = min(100, int(round(score / best_city_score * 100)))
+
+    print("  Final index scores (top city = 100):")
+    for t, v in sorted(normalised.items(), key=lambda x: x[1], reverse=True)[:5]:
+        print("    " + t + ": " + str(v))
+
     return normalised
 
 
 def scores_to_points(normalised_scores, all_terms):
     """
-    Convert normalised interest scores into weekly points.
-    1st = 10pts, 2nd = 9pts ... 10th = 1pt, 11th-16th = 0pts
+    1st = 10pts, 2nd = 9pts ... 10th = 1pt, 11th-16th = 0pts.
     """
     ranked = sorted(all_terms, key=lambda t: normalised_scores.get(t, 0), reverse=True)
     points = {}
     for i, term in enumerate(ranked):
-        pts = max(0, 10 - i)  # 10,9,8,7,6,5,4,3,2,1,0,0,0,0,0,0
-        points[term] = pts
+        points[term] = max(0, 10 - i)
     return points
 
 
-def main():
-    print("Fetching Google Trends data for 16 World Cup host cities...")
+def fetch_all():
     pytrends = TrendReq(hl="en-US", tz=0, timeout=(15, 30), retries=3, backoff_factor=2)
     all_terms = [c["term"] for c in CITIES]
-    now = datetime.now(timezone.utc)
     today = date.today()
 
-    # --- Fetch each discrete week that has started ---
+    # Discrete tournament weeks
     week_data = {}
     for week in WEEKS:
-        if not is_week_available(week):
+        if today < date.fromisoformat(week["start"]):
             print("\nSkipping " + week["label"] + " (not started yet)")
             continue
         print("\n=== " + week["label"] + " (" + week["start"] + " to " + week["end"] + ") ===")
         tf = week["start"] + " " + week["end"]
         scores = fetch_timeframe(pytrends, all_terms, tf, week["label"])
-        points = scores_to_points(scores, all_terms)
-        week_data[week["label"]] = {"scores": scores, "points": points}
+        week_data[week["label"]] = {
+            "scores": scores,
+            "points": scores_to_points(scores, all_terms)
+        }
         time.sleep(10)
 
-    # --- Fetch last 7 days (rolling) ---
-    print("\n=== Last 7 days (rolling) ===")
+    # Rolling last 7 days
+    print("\n=== Last 7 Days (rolling) ===")
     last7_scores = fetch_timeframe(pytrends, all_terms, "now 7-d", "Last 7 days")
     last7_points = scores_to_points(last7_scores, all_terms)
 
-    # --- Build results ---
+    # Build results
     results = []
     for city in CITIES:
         t = city["term"]
-
-        # Points per discrete week
         week_points = {}
         week_scores = {}
         for week in WEEKS:
@@ -148,11 +190,10 @@ def main():
                 week_points[lbl] = week_data[lbl]["points"].get(t, 0)
                 week_scores[lbl] = week_data[lbl]["scores"].get(t, 0)
             else:
-                week_points[lbl] = None  # not yet available
+                week_points[lbl] = None
                 week_scores[lbl] = None
 
-        # To date = sum of all available discrete week points
-        to_date_points = sum(v for v in week_points.values() if v is not None)
+        to_date = sum(v for v in week_points.values() if v is not None)
 
         results.append({
             "name":          city["name"],
@@ -165,17 +206,26 @@ def main():
             "lastWeekPts":   last7_points.get(t, 0),
             "weekPoints":    week_points,
             "weekScores":    week_scores,
-            "toDatePoints":  to_date_points,
+            "toDatePoints":  to_date,
         })
 
-    # Default sort by to-date points (or last week if no weeks available yet)
     results.sort(key=lambda x: (x["toDatePoints"], x["lastWeekPts"]), reverse=True)
 
     print("\n=== Final Standings ===")
     for city in results:
         print("  " + city["name"].ljust(25) +
-              " last7pts=" + str(city["lastWeekPts"]).rjust(2) +
-              " toDate=" + str(city["toDatePoints"]).rjust(3))
+              "  last7idx=" + str(city["lastWeekScore"]).rjust(3) +
+              "  last7pts=" + str(city["lastWeekPts"]).rjust(2) +
+              "  toDate=" + str(city["toDatePoints"]).rjust(3))
+
+    return results
+
+
+def main():
+    print("Fetching Google Trends for 16 World Cup host cities...")
+    print("Anchor term: '" + ANCHOR + "' (high-volume benchmark)")
+    data = fetch_all()
+    now = datetime.now(timezone.utc)
 
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
@@ -183,10 +233,11 @@ def main():
             "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
             "weeks":          WEEKS,
-            "cities":         results,
+            "cities":         data,
         }, f, ensure_ascii=False, indent=2)
 
     print("\nDone. Written to data/data.json")
+    print("Top city (last 7 days): " + data[0]["name"])
 
 
 main()
