@@ -95,7 +95,7 @@ def fetch_timeframe(pytrends, all_terms, timeframe, label):
         result = fetch_batch_with_retry(pytrends, batch_with_anchor, timeframe)
         batches.append(result)
         if i < len(term_batches) - 1:
-            time.sleep(12)
+            time.sleep(15)
     return normalise_with_anchor(batches, all_terms)
 
 
@@ -165,7 +165,40 @@ def scores_to_points(normalised_scores, all_terms):
 
 
 def fetch_all():
-    pytrends = TrendReq(hl="en-US", tz=0, timeout=(15, 30), retries=3, backoff_factor=2)
+    # Pass browser-like headers to avoid being blocked by Google's automated request detection.
+    # GitHub Actions IPs are well-known cloud IPs which Google Trends blocks by default.
+    requests_args = {
+        "headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/125.0.0.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br",
+            "DNT": "1",
+            "Connection": "keep-alive",
+        }
+    }
+    pytrends = TrendReq(
+        hl="en-US",
+        tz=0,
+        timeout=(15, 30),
+        retries=3,
+        backoff_factor=2,
+        requests_args=requests_args,
+    )
+    # Warm up the session with a real browser-like request before querying
+    import requests
+    session = requests.Session()
+    session.headers.update(requests_args["headers"])
+    try:
+        session.get("https://trends.google.com", timeout=10)
+        print("  Session warmed up successfully")
+        time.sleep(3)
+    except Exception as e:
+        print("  Session warmup failed (non-fatal): " + str(e))
     all_terms = [c["term"] for c in CITIES]
     today = date.today()
 
