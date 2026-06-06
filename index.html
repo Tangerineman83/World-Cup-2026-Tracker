@@ -355,10 +355,11 @@
     }
 
     @media (max-width: 620px) {
-      .header, .controls, .meta-bar, .table-wrap, .notes { padding-left: 16px; padding-right: 16px; }
-      .col-headers, .row { grid-template-columns: 32px 1fr 52px 52px 0px 0px; }
-      .col-headers .hide-mobile, .row .hide-mobile { display: none; }
-      .score.active { font-size: 18px; }
+      .header, .controls, .meta-bar, .table-wrap, .notes { padding-left: 12px; padding-right: 12px; }
+      .col-headers, .row { grid-template-columns: 28px 1fr 44px 44px 50px 80px; gap: 0 6px; }
+      .score.active { font-size: 16px; }
+      .city-name { font-size: 13px; }
+      .trends-link { font-size: 9px; }
     }
   </style>
 </head>
@@ -399,8 +400,8 @@
     <span>City</span>
     <span class="right">Week</span>
     <span class="right">Cumul.</span>
-    <span class="hide-mobile"></span>
-    <span class="hide-mobile">Interest index</span>
+    <span>Trends</span>
+    <span>Interest index</span>
   </div>
   <div id="table-body">
     <div class="state-msg">Loading data…</div>
@@ -414,11 +415,11 @@
     <div class="notes-grid">
       <div>
         <div class="note-item-title">Search terms</div>
-        <div class="note-item-body">"[City] World Cup 2026" — identical phrasing across all 16 cities for direct comparability.</div>
+        <div class="note-item-body">"[City] World Cup" — consistent phrasing across all 16 cities. Year suffix omitted to maintain sufficient search volume for meaningful comparison.</div>
       </div>
       <div>
         <div class="note-item-title">Scoring</div>
-        <div class="note-item-body">Google Trends returns relative interest 0–100. All 16 cities are normalised across batches using an anchor term so scores are truly comparable.</div>
+        <div class="note-item-body">Google Trends returns relative interest 0–100 within each batch. Scores are cross-normalised across batches by scaling to the highest-scoring city, so all 16 are on the same scale.</div>
       </div>
       <div>
         <div class="note-item-title">Weekly score</div>
@@ -445,9 +446,7 @@
       <div class="legend-dot"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
       <div class="legend-dot"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
     </div>
-    <div id="seed-warning" class="seed-warning" style="display:none">
-      ⚠ Displaying seed data — live scores will appear after the first Saturday GitHub Actions run.
-    </div>
+
   </div>
 </div>
 
@@ -475,10 +474,7 @@
         badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
       }
 
-      // Seed warning
-      if (json._note) {
-        document.getElementById('seed-warning').style.display = 'block';
-      }
+
 
       render();
     } catch (err) {
@@ -551,7 +547,7 @@
         <div class="score ${sortMode==='cumulative'?'active':''}">${city.cumulative}</div>
 
         <!-- trends link -->
-        <div class="hide-mobile">
+        <div>
           <a class="trends-link" href="${city.trendsUrl}" target="_blank" rel="noopener" title="Open in Google Trends">
             <svg class="trends-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
@@ -561,7 +557,7 @@
         </div>
 
         <!-- bar -->
-        <div class="bar-cell hide-mobile">
+        <div class="bar-cell">
           <div class="bar-track">
             <div class="bar-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cc}99,${cc});border-radius:4px;animation-delay:${delay+80}ms"></div>
           </div>
