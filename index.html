@@ -116,7 +116,7 @@
     .country-label { font-size: 9px; color: #333; margin-top: 3px; text-align: right; letter-spacing: .05em; }
 
     /* Trends link */
-    .trends-link { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3a55; transition: color .15s; margin-top: 4px; }
+    .trends-link { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 4px; }
     .trends-link:hover { color: var(--gold); }
 
     /* Not yet available row overlay */
@@ -152,7 +152,7 @@
     <div>
       <div class="eyebrow">&#9917; Google Trends Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Weekly interest points · 16pts for 1st, 15 for 2nd ... 1 for 16th · Updated Saturdays</p>
+      <p class="subtitle">Weekly interest points · 10pts for 1st, 9 for 2nd ... 6th-16th score 0 · Updated Saturdays</p>
     </div>
     <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
@@ -184,7 +184,7 @@
     <div class="notes-grid">
       <div><div class="note-h">Search terms</div><div class="note-b">"[City] World Cup" — consistent phrasing across all 16 cities for direct comparability.</div></div>
       <div><div class="note-h">Interest index</div><div class="note-b">Google Trends relative score 0–100 within each week window. Normalised so the highest-interest city = 100.</div></div>
-      <div><div class="note-h">Weekly points</div><div class="note-b">Cities ranked by interest index each week. 1st = 16pts, 2nd = 15pts ... 16th = 1pt. Index is the input; points are the output.</div></div>
+      <div><div class="note-h">Weekly points</div><div class="note-b">Cities ranked by interest index each week. 1st = 10pts, 2nd = 9pts, 3rd = 8pts ... top 10 score, bottom 6 score 0pts. Index is the input; points are the output.</div></div>
       <div><div class="note-h">To Date</div><div class="note-b">Sum of points from all completed discrete weeks. Reflects cumulative interest momentum across the tournament.</div></div>
       <div><div class="note-h">Week windows</div><div class="note-b">W1: Jun 11–17 · W2: Jun 18–24 · W3: Jun 25–Jul 1 · W4: Jul 2–8. Last Week = rolling 7-day window.</div></div>
       <div><div class="note-h">Data refresh</div><div class="note-b">Fetched automatically every Saturday at 08:00 UTC via GitHub Actions. Click Trends &#8599; to verify any city's raw data.</div></div>
@@ -201,7 +201,7 @@
 </div>
 
 <script>
-const COUNTRY_COLOR = { USA:'#B22234', MEX:'#006847', CAN:'#cc0000' };
+const COUNTRY_COLOR = { USA:'#4f8ef7', MEX:'#f59e0b', CAN:'#2dd4bf' };
 const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
 const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
 
