@@ -153,33 +153,41 @@ WIKI_AGENT = "WC2026Tracker/1.0 (https://github.com; public research project)"
 
 # ── Wikipedia API helpers ──────────────────────────────────────────────────────
 
-def get_pageviews(article, start_date, end_date):
+def get_pageviews(article, start_date, end_date, retries=4):
     """
     Fetch total Wikipedia pageviews for an article between start_date and end_date.
     Dates as 'YYYY-MM-DD' strings. Returns integer total, or 0 on failure.
+    Retries on 429 (rate limit) with exponential backoff.
     """
-    # API requires YYYYMMDD format
     start = start_date.replace("-", "")
     end   = end_date.replace("-", "")
     url = (
-        f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-        f"en.wikipedia/all-access/all-agents/{article}/daily/{start}/{end}"
+        "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
+        "en.wikipedia/all-access/all-agents/" + article + "/daily/" + start + "/" + end
     )
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read())
-            total = sum(item["views"] for item in data.get("items", []))
-            return total
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            print("    404 - article not found: " + article)
-        else:
-            print("    HTTP error " + str(e.code) + " for " + article)
-        return 0
-    except Exception as e:
-        print("    Error fetching " + article + ": " + str(e))
-        return 0
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = json.loads(r.read())
+                return sum(item["views"] for item in data.get("items", []))
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait = 5 * (2 ** attempt)  # 5, 10, 20, 40 seconds
+                print("    429 rate limit - waiting " + str(wait) + "s before retry...")
+                time.sleep(wait)
+                continue
+            elif e.code == 404:
+                print("    404 - article not found: " + article)
+                return 0
+            else:
+                print("    HTTP error " + str(e.code) + " for " + article)
+                return 0
+        except Exception as e:
+            print("    Error fetching " + article + ": " + str(e))
+            return 0
+    print("    All retries failed for: " + article)
+    return 0
 
 
 def get_combined_views(city, start_date, end_date):
@@ -188,7 +196,7 @@ def get_combined_views(city, start_date, end_date):
     stadium_views = get_pageviews(city["stadium_article"], start_date, end_date)
     total = city_views + stadium_views
     print(f"    {city['name']:<25} city={city_views:>7,}  stadium={stadium_views:>7,}  total={total:>8,}")
-    time.sleep(0.2)  # be polite to Wikimedia
+    time.sleep(1.5)  # be polite to Wikimedia - prevents 429 rate limiting
     return total
 
 
@@ -203,7 +211,10 @@ def normalise(raw_scores):
 
 
 def scores_to_points(normalised_scores):
-    """1st=10pts, 2nd=9pts ... 10th=1pt, 11th-16th=0pts."""
+    """1st=10pts, 2nd=9pts ... 10th=1pt, 11th-16th=0pts.
+    If all scores are zero (fetch failed), everyone gets 0 - no points awarded."""
+    if not normalised_scores or max(normalised_scores.values()) == 0:
+        return {name: 0 for name in normalised_scores}
     ranked = sorted(normalised_scores.items(), key=lambda x: x[1], reverse=True)
     points = {}
     for i, (name, _) in enumerate(ranked):
