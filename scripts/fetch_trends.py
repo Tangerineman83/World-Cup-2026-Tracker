@@ -6,8 +6,9 @@ import os
 from datetime import datetime, timezone, date
 from pytrends.request import TrendReq
 
+# Search terms matched to what people actually search on Google Trends
 CITIES = [
-    {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",    "term": "New York World Cup"},
+    {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",    "term": "New Jersey World Cup"},
     {"name": "Los Angeles",           "country": "USA", "flag": "US", "region": "West",    "term": "Los Angeles World Cup"},
     {"name": "Dallas",                "country": "USA", "flag": "US", "region": "Central", "term": "Dallas World Cup"},
     {"name": "Mexico City",           "country": "MEX", "flag": "MX", "region": "Central", "term": "Mexico City World Cup"},
@@ -41,62 +42,92 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 
-def fetch_batch(pytrends, terms, timeframe):
-    print("    Terms: " + str(terms))
-    print("    Timeframe: " + timeframe)
-    pytrends.build_payload(terms, cat=0, timeframe=timeframe, geo="", gprop="")
-    df = pytrends.interest_over_time()
-    if df.empty:
-        print("    Warning: empty dataframe returned")
-        return {t: 0 for t in terms}
-    result = {}
-    for t in terms:
-        result[t] = int(round(df[t].mean())) if t in df.columns else 0
-        print("    " + t + " -> " + str(result[t]))
-    return result
+def fetch_batch_with_retry(pytrends, terms, timeframe, max_retries=3):
+    """Fetch with retries and validate we got real data, not zeros."""
+    for attempt in range(max_retries):
+        if attempt > 0:
+            wait = 15 * attempt
+            print("    Retry " + str(attempt) + " after " + str(wait) + "s wait...")
+            time.sleep(wait)
+        try:
+            pytrends.build_payload(terms, cat=0, timeframe=timeframe, geo="", gprop="")
+            df = pytrends.interest_over_time()
+
+            if df.empty:
+                print("    Empty dataframe on attempt " + str(attempt + 1))
+                continue
+
+            result = {}
+            for t in terms:
+                result[t] = int(round(df[t].mean())) if t in df.columns else 0
+
+            # Check we got real data - if all zeros or all ones, something went wrong
+            values = list(result.values())
+            max_val = max(values) if values else 0
+            if max_val <= 1:
+                print("    Suspiciously low scores (max=" + str(max_val) + ") on attempt " + str(attempt + 1) + " - retrying")
+                continue
+
+            for t, v in result.items():
+                print("    " + t + " -> " + str(v))
+            return result
+
+        except Exception as e:
+            print("    Error on attempt " + str(attempt + 1) + ": " + str(e))
+            continue
+
+    # If all retries failed, return zeros
+    print("    All retries failed - returning zeros for this batch")
+    return {t: 0 for t in terms}
 
 
-def normalise_cross_batch(batches, all_terms):
+def normalise_across_batches(batches, all_terms):
     """
-    Each batch is normalised internally by Google (max=100).
-    To compare across batches we find the highest-scoring term in each batch
-    and scale the other batches relative to the first batch's max.
+    Google scores each batch independently with max=100.
+    To put all 16 cities on the same scale, find the global max across
+    all batches and scale everything relative to that.
     """
-    # Find max score in each batch (excluding isPartial column artifacts)
-    batch_maxes = []
+    # Find the single highest score across all batches
+    global_max = 1
     for batch in batches:
-        vals = [v for k, v in batch.items() if k in all_terms]
-        batch_maxes.append(max(vals) if vals else 1)
+        for term, score in batch.items():
+            if term in all_terms and score > global_max:
+                global_max = score
 
-    ref_max = batch_maxes[0] or 1
+    print("\n  Global max score across all batches: " + str(global_max))
+
     normalised = {}
-    for batch, bmax in zip(batches, batch_maxes):
-        scale = ref_max / (bmax or 1)
+    for batch in batches:
         for term, score in batch.items():
             if term in all_terms:
-                normalised[term] = min(100, int(round(score * scale)))
+                normalised[term] = int(round(score / global_max * 100))
+
     return normalised
 
 
 def fetch_all():
-    pytrends = TrendReq(hl="en-US", tz=0, timeout=(10, 25), retries=2, backoff_factor=2)
+    pytrends = TrendReq(hl="en-US", tz=0, timeout=(15, 30), retries=3, backoff_factor=2)
     all_terms = [c["term"] for c in CITIES]
+    # Batch size 5 = pytrends max, gives us 4 batches for 16 cities
     term_batches = list(chunks(all_terms, 5))
     cumul_tf = get_cumulative_timeframe()
     weekly_b = []
     cumul_b = []
 
     for i, batch in enumerate(term_batches):
-        print("\n  Batch " + str(i + 1) + "/" + str(len(term_batches)))
-        print("  -> Weekly fetch")
-        weekly_b.append(fetch_batch(pytrends, batch, "now 7-d"))
-        time.sleep(6)
-        print("  -> Cumulative fetch")
-        cumul_b.append(fetch_batch(pytrends, batch, cumul_tf))
-        time.sleep(6)
+        print("\n  === Batch " + str(i + 1) + "/" + str(len(term_batches)) + " ===")
+        print("  Terms: " + str(batch))
 
-    ws = normalise_cross_batch(weekly_b, all_terms)
-    cs = normalise_cross_batch(cumul_b, all_terms)
+        print("  -> Weekly (now 7-d)")
+        weekly_b.append(fetch_batch_with_retry(pytrends, batch, "now 7-d"))
+        time.sleep(8)
+
+        print("  -> Cumulative (" + cumul_tf + ")")
+        cumul_b.append(fetch_batch_with_retry(pytrends, batch, cumul_tf))
+        time.sleep(8)
+
+    ws = normalise_across_batches(weekly_b, all_terms)
+    cs = normalise_across_batches(cumul_b, all_terms)
 
     results = []
     for city in CITIES:
@@ -120,9 +151,9 @@ def main():
     data = fetch_all()
     now = datetime.now(timezone.utc)
 
-    print("\nScores:")
+    print("\n=== Final Scores ===")
     for city in data:
-        print("  " + city["name"] + ": week=" + str(city["weekScore"]) + " cumul=" + str(city["cumulative"]))
+        print("  " + city["name"].ljust(25) + " week=" + str(city["weekScore"]).rjust(3) + "  cumul=" + str(city["cumulative"]).rjust(3))
 
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
@@ -130,11 +161,11 @@ def main():
             "updated":         now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay":  now.strftime("%d %b %Y, %H:%Mz"),
             "tournamentStart": TOURNAMENT_START.strftime("%Y-%m-%d"),
-            "anchor":          "none - direct city comparison",
             "cities":          data,
         }, f, ensure_ascii=False, indent=2)
 
-    print("\nDone - top city: " + data[0]["name"] + " (" + str(data[0]["weekScore"]) + ")")
+    print("\nDone. Written to data/data.json")
+    print("Top city: " + data[0]["name"] + " (" + str(data[0]["weekScore"]) + ")")
 
 
 main()
