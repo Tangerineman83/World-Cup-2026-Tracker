@@ -63,6 +63,14 @@ def fetch_batch_with_retry(pytrends, terms, timeframe, max_retries=3):
                 result[t] = int(round(df[t].mean())) if t in df.columns else 0
             for t, v in result.items():
                 print("    " + t + " -> " + str(v))
+
+            # Check city terms specifically (exclude anchor which may legitimately dominate)
+            city_vals = [v for t, v in result.items() if t != ANCHOR]
+            if city_vals and max(city_vals) == 0:
+                print("    All city scores are 0 - likely rate limited, retrying...")
+                time.sleep(30)
+                continue
+
             return result
         except Exception as e:
             print("    Error: " + str(e))
@@ -87,7 +95,7 @@ def fetch_timeframe(pytrends, all_terms, timeframe, label):
         result = fetch_batch_with_retry(pytrends, batch_with_anchor, timeframe)
         batches.append(result)
         if i < len(term_batches) - 1:
-            time.sleep(8)
+            time.sleep(12)
     return normalise_with_anchor(batches, all_terms)
 
 
@@ -129,7 +137,10 @@ def normalise_with_anchor(batches, all_terms):
         print("    " + t + ": " + str(v))
 
     # Stage 2: rescale so best city = 100
-    best_city_score = max(anchor_relative.values()) if anchor_relative else 1
+    best_city_score = max(anchor_relative.values()) if anchor_relative else 0
+    if best_city_score == 0:
+        print("  WARNING: all city scores are zero after alignment - returning zeros")
+        return {term: 0 for term in all_terms}
     print("\n  Stage 2 - Rescale to best city (best=" + str(round(best_city_score, 2)) + "):")
     normalised = {}
     for term, score in anchor_relative.items():
