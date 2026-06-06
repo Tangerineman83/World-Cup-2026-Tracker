@@ -127,6 +127,7 @@
     .uplift-num { font-size: 20px; font-weight: 900; line-height: 1; }
     .uplift-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
     .uplift-baseline { font-size: 9px; color: #333; margin-top: 2px; font-family: 'Barlow',sans-serif; }
+    .uplift-breakdown { font-size: 9px; color: #4a5568; margin-top: 2px; font-family: 'Barlow',sans-serif; letter-spacing: .02em; }
 
     /* Bar */
     .bar-cell { }
@@ -165,7 +166,7 @@
     <div>
       <div class="eyebrow">&#9917; Wikipedia Pageviews Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Stadium Wikipedia views vs 12-month baseline &middot; Uplift index &middot; Updated Saturdays</p>
+      <p class="subtitle">2/3 stadium + 1/3 city Wikipedia views vs 12-month baseline &middot; Uplift index &middot; Updated Saturdays</p>
     </div>
     <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
@@ -173,10 +174,10 @@
 
 <div class="explainer">
   <div class="explainer-inner">
-    <strong>How to read this:</strong> The uplift index shows how much <em>more</em> attention each stadium is receiving compared to its normal weekly average.
-    <strong>100 = normal · 300 = 3&times; normal · 850 = 8.5&times; spike.</strong>
-    This removes the big-city bias — a smaller venue with a 10&times; spike ranks above a famous stadium with a 2&times; lift,
-    directly reflecting the <em>incremental</em> global interest the World Cup creates for each host city.
+    <strong>How to read this:</strong> The uplift index shows how much <em>more</em> attention each host city is receiving vs its normal weekly average — combining stadium interest (2/3 weight) with city destination interest (1/3 weight).
+    <strong>100 = normal &middot; 300 = 3&times; normal &middot; 850 = 8.5&times; spike.</strong>
+    This removes the big-city bias: a smaller venue with a 10&times; spike ranks above a globally famous stadium at 2&times;,
+    directly reflecting the <em>incremental</em> economic attention the World Cup creates for each host city.
   </div>
 </div>
 
@@ -204,15 +205,15 @@
     <div class="notes-grid">
       <div>
         <div class="note-h">Data source</div>
-        <div class="note-b">Wikipedia pageviews for each venue's stadium article — a clean, event-specific signal. Stadium pages spike almost exclusively due to sports events, not general city interest.</div>
+        <div class="note-b">Two Wikipedia articles per city: the <strong style="color:var(--muted)">stadium article</strong> (event-specific signal, 2/3 weight) and the <strong style="color:var(--muted)">city article</strong> (destination/economic signal, 1/3 weight). Combined into a single weighted uplift index.</div>
       </div>
       <div>
         <div class="note-h">Uplift index</div>
-        <div class="note-b">Views this week &divide; average weekly views (Jun 2025–May 2026) &times; 100. An index of 100 = normal baseline. 500 = 5&times; normal attention. The higher the uplift, the greater the incremental World Cup effect.</div>
+        <div class="note-b">For each article: (views this period &divide; avg weekly baseline) &times; 100. Combined as (stadium &times; 2/3) + (city &times; 1/3). Index of 100 = normal. 500 = 5&times; spike. Stadium and city uplifts shown separately per row.</div>
       </div>
       <div>
         <div class="note-h">Why uplift not raw views</div>
-        <div class="note-b">Raw views favour globally famous venues regardless of the World Cup. Uplift reveals which cities are experiencing the biggest <em>change</em> — the additional attention and potential economic activity directly attributable to hosting.</div>
+        <div class="note-b">Raw views favour megacities regardless of the tournament. Uplift reveals incremental change — which cities are experiencing the biggest <em>additional</em> attention directly attributable to hosting. Kansas City at 10&times; tells a more compelling economic story than New York at 2&times;.</div>
       </div>
       <div>
         <div class="note-h">Points system</div>
@@ -370,11 +371,29 @@ function render() {
       upliftHTML = '<div class="uplift-badge"><div class="uplift-num" style="color:var(--faint);font-size:13px">—</div></div>';
     } else {
       const multiplier = (vd.uplift / 100).toFixed(1);
+      // Get component uplifts for this view
+      let stadiumU = null, cityU = null;
+      if (activeView === 'lastweek') {
+        stadiumU = city.lastWeekStadiumUplift;
+        cityU    = city.lastWeekCityUplift;
+      } else {
+        const wmap = { w1:'Week 1', w2:'Week 2', w3:'Week 3', w4:'Week 4' };
+        const lbl  = wmap[activeView];
+        if (lbl && city.weekStadiumUplift) stadiumU = city.weekStadiumUplift[lbl];
+        if (lbl && city.weekCityUplift)    cityU    = city.weekCityUplift[lbl];
+      }
+      const sLabel = stadiumU !== null && stadiumU !== undefined ? (stadiumU/100).toFixed(1) + '&times;' : '—';
+      const cLabel = cityU    !== null && cityU    !== undefined ? (cityU/100).toFixed(1)    + '&times;' : '—';
       upliftHTML =
         '<div class="uplift-badge">' +
           '<div class="uplift-num" style="color:' + ucol + '">' + multiplier + '&times;</div>' +
-          '<div class="uplift-label">vs baseline</div>' +
-          '<div class="uplift-baseline">Normal: ' + fmt(city.baselineAvgWeekly) + '/wk</div>' +
+          '<div class="uplift-label">combined</div>' +
+          '<div class="uplift-breakdown">' +
+            '<span title="Stadium (2/3 weight)">&#127967; ' + sLabel + '</span>' +
+            '<span style="color:#2d3448"> &middot; </span>' +
+            '<span title="City (1/3 weight)">&#127758; ' + cLabel + '</span>' +
+          '</div>' +
+          '<div class="uplift-baseline">Stadium baseline: ' + fmt(city.baselineStadiumAvgWeekly) + '/wk</div>' +
         '</div>';
     }
 
