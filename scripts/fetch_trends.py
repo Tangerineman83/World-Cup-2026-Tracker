@@ -167,19 +167,17 @@ def scores_to_points(normalised_scores, all_terms):
 def fetch_all():
     # Pass browser-like headers to avoid being blocked by Google's automated request detection.
     # GitHub Actions IPs are well-known cloud IPs which Google Trends blocks by default.
-    requests_args = {
-        "headers": {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/125.0.0.0 Safari/537.36"
-            ),
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Accept-Encoding": "gzip, deflate, br",
-            "DNT": "1",
-            "Connection": "keep-alive",
-        }
+    browser_headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/125.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "DNT": "1",
+        "Connection": "keep-alive",
     }
     pytrends = TrendReq(
         hl="en-US",
@@ -187,12 +185,12 @@ def fetch_all():
         timeout=(15, 30),
         retries=3,
         backoff_factor=2,
-        requests_args=requests_args,
+        requests_args={"headers": browser_headers},
     )
     # Warm up the session with a real browser-like request before querying
     import requests
     session = requests.Session()
-    session.headers.update(requests_args["headers"])
+    session.headers.update(browser_headers)
     try:
         session.get("https://trends.google.com", timeout=10)
         print("  Session warmed up successfully")
