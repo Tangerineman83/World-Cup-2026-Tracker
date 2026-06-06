@@ -7,25 +7,24 @@ from datetime import datetime, timezone, date
 from pytrends.request import TrendReq
 
 CITIES = [
-    {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",    "term": "New York World Cup 2026"},
-    {"name": "Los Angeles",           "country": "USA", "flag": "US", "region": "West",    "term": "Los Angeles World Cup 2026"},
-    {"name": "Dallas",                "country": "USA", "flag": "US", "region": "Central", "term": "Dallas World Cup 2026"},
-    {"name": "Mexico City",           "country": "MEX", "flag": "MX", "region": "Central", "term": "Mexico City World Cup 2026"},
-    {"name": "Miami",                 "country": "USA", "flag": "US", "region": "East",    "term": "Miami World Cup 2026"},
-    {"name": "Atlanta",               "country": "USA", "flag": "US", "region": "Central", "term": "Atlanta World Cup 2026"},
-    {"name": "San Francisco",         "country": "USA", "flag": "US", "region": "West",    "term": "San Francisco World Cup 2026"},
-    {"name": "Seattle",               "country": "USA", "flag": "US", "region": "West",    "term": "Seattle World Cup 2026"},
-    {"name": "Toronto",               "country": "CAN", "flag": "CA", "region": "East",    "term": "Toronto World Cup 2026"},
-    {"name": "Boston",                "country": "USA", "flag": "US", "region": "East",    "term": "Boston World Cup 2026"},
-    {"name": "Guadalajara",           "country": "MEX", "flag": "MX", "region": "West",    "term": "Guadalajara World Cup 2026"},
-    {"name": "Houston",               "country": "USA", "flag": "US", "region": "Central", "term": "Houston World Cup 2026"},
-    {"name": "Philadelphia",          "country": "USA", "flag": "US", "region": "East",    "term": "Philadelphia World Cup 2026"},
-    {"name": "Vancouver",             "country": "CAN", "flag": "CA", "region": "West",    "term": "Vancouver World Cup 2026"},
-    {"name": "Monterrey",             "country": "MEX", "flag": "MX", "region": "Central", "term": "Monterrey World Cup 2026"},
-    {"name": "Kansas City",           "country": "USA", "flag": "US", "region": "Central", "term": "Kansas City World Cup 2026"},
+    {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",    "term": "New York World Cup"},
+    {"name": "Los Angeles",           "country": "USA", "flag": "US", "region": "West",    "term": "Los Angeles World Cup"},
+    {"name": "Dallas",                "country": "USA", "flag": "US", "region": "Central", "term": "Dallas World Cup"},
+    {"name": "Mexico City",           "country": "MEX", "flag": "MX", "region": "Central", "term": "Mexico City World Cup"},
+    {"name": "Miami",                 "country": "USA", "flag": "US", "region": "East",    "term": "Miami World Cup"},
+    {"name": "Atlanta",               "country": "USA", "flag": "US", "region": "Central", "term": "Atlanta World Cup"},
+    {"name": "San Francisco",         "country": "USA", "flag": "US", "region": "West",    "term": "San Francisco World Cup"},
+    {"name": "Seattle",               "country": "USA", "flag": "US", "region": "West",    "term": "Seattle World Cup"},
+    {"name": "Toronto",               "country": "CAN", "flag": "CA", "region": "East",    "term": "Toronto World Cup"},
+    {"name": "Boston",                "country": "USA", "flag": "US", "region": "East",    "term": "Boston World Cup"},
+    {"name": "Guadalajara",           "country": "MEX", "flag": "MX", "region": "West",    "term": "Guadalajara World Cup"},
+    {"name": "Houston",               "country": "USA", "flag": "US", "region": "Central", "term": "Houston World Cup"},
+    {"name": "Philadelphia",          "country": "USA", "flag": "US", "region": "East",    "term": "Philadelphia World Cup"},
+    {"name": "Vancouver",             "country": "CAN", "flag": "CA", "region": "West",    "term": "Vancouver World Cup"},
+    {"name": "Monterrey",             "country": "MEX", "flag": "MX", "region": "Central", "term": "Monterrey World Cup"},
+    {"name": "Kansas City",           "country": "USA", "flag": "US", "region": "Central", "term": "Kansas City World Cup"},
 ]
 
-ANCHOR = "FIFA World Cup 2026"
 TOURNAMENT_START = date(2026, 6, 11)
 
 
@@ -43,45 +42,61 @@ def chunks(lst, n):
 
 
 def fetch_batch(pytrends, terms, timeframe):
+    print("    Terms: " + str(terms))
     print("    Timeframe: " + timeframe)
     pytrends.build_payload(terms, cat=0, timeframe=timeframe, geo="", gprop="")
     df = pytrends.interest_over_time()
     if df.empty:
-        print("    Warning: empty dataframe")
+        print("    Warning: empty dataframe returned")
         return {t: 0 for t in terms}
-    return {t: int(round(df[t].mean())) if t in df.columns else 0 for t in terms}
+    result = {}
+    for t in terms:
+        result[t] = int(round(df[t].mean())) if t in df.columns else 0
+        print("    " + t + " -> " + str(result[t]))
+    return result
 
 
-def normalise_batches(batches, anchor_term):
-    ref = batches[0].get(anchor_term, 1) or 1
-    normalised = {}
+def normalise_cross_batch(batches, all_terms):
+    """
+    Each batch is normalised internally by Google (max=100).
+    To compare across batches we find the highest-scoring term in each batch
+    and scale the other batches relative to the first batch's max.
+    """
+    # Find max score in each batch (excluding isPartial column artifacts)
+    batch_maxes = []
     for batch in batches:
-        scale = ref / (batch.get(anchor_term, 1) or 1)
+        vals = [v for k, v in batch.items() if k in all_terms]
+        batch_maxes.append(max(vals) if vals else 1)
+
+    ref_max = batch_maxes[0] or 1
+    normalised = {}
+    for batch, bmax in zip(batches, batch_maxes):
+        scale = ref_max / (bmax or 1)
         for term, score in batch.items():
-            if term != anchor_term:
+            if term in all_terms:
                 normalised[term] = min(100, int(round(score * scale)))
     return normalised
 
 
 def fetch_all():
     pytrends = TrendReq(hl="en-US", tz=0, timeout=(10, 25), retries=2, backoff_factor=2)
-    term_batches = list(chunks([c["term"] for c in CITIES], 4))
+    all_terms = [c["term"] for c in CITIES]
+    term_batches = list(chunks(all_terms, 5))
     cumul_tf = get_cumulative_timeframe()
     weekly_b = []
     cumul_b = []
 
     for i, batch in enumerate(term_batches):
-        bwa = batch + [ANCHOR]
-        print("\n  Batch " + str(i + 1) + "/" + str(len(term_batches)) + ": " + str(batch))
-        print("  -> Weekly")
-        weekly_b.append(fetch_batch(pytrends, bwa, "now 7-d"))
-        time.sleep(5)
-        print("  -> Cumulative")
-        cumul_b.append(fetch_batch(pytrends, bwa, cumul_tf))
-        time.sleep(5)
+        print("\n  Batch " + str(i + 1) + "/" + str(len(term_batches)))
+        print("  -> Weekly fetch")
+        weekly_b.append(fetch_batch(pytrends, batch, "now 7-d"))
+        time.sleep(6)
+        print("  -> Cumulative fetch")
+        cumul_b.append(fetch_batch(pytrends, batch, cumul_tf))
+        time.sleep(6)
 
-    ws = normalise_batches(weekly_b, ANCHOR)
-    cs = normalise_batches(cumul_b, ANCHOR)
+    ws = normalise_cross_batch(weekly_b, all_terms)
+    cs = normalise_cross_batch(cumul_b, all_terms)
 
     results = []
     for city in CITIES:
@@ -105,13 +120,17 @@ def main():
     data = fetch_all()
     now = datetime.now(timezone.utc)
 
+    print("\nScores:")
+    for city in data:
+        print("  " + city["name"] + ": week=" + str(city["weekScore"]) + " cumul=" + str(city["cumulative"]))
+
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
         json.dump({
             "updated":         now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay":  now.strftime("%d %b %Y, %H:%Mz"),
             "tournamentStart": TOURNAMENT_START.strftime("%Y-%m-%d"),
-            "anchor":          ANCHOR,
+            "anchor":          "none - direct city comparison",
             "cities":          data,
         }, f, ensure_ascii=False, indent=2)
 
