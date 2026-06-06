@@ -8,567 +8,384 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:       #080b14;
-      --surface:  #0d1120;
-      --border:   #1a1f2e;
-      --border2:  #111828;
-      --gold:     #f0c040;
-      --silver:   #9ca3af;
-      --bronze:   #b87333;
-      --text:     #e8eaf0;
-      --muted:    #6b7280;
-      --faint:    #2d3448;
-      --usa:      #B22234;
-      --mex:      #006847;
-      --can:      #cc0000;
-      --east:     #60a5fa;
-      --west:     #34d399;
-      --central:  #f59e0b;
+      --bg:      #080b14;
+      --surface: #0d1120;
+      --border:  #1a1f2e;
+      --border2: #111828;
+      --gold:    #f0c040;
+      --silver:  #9ca3af;
+      --bronze:  #b87333;
+      --text:    #e8eaf0;
+      --muted:   #6b7280;
+      --faint:   #2d3448;
+      --usa:     #B22234;
+      --mex:     #006847;
+      --can:     #cc0000;
+      --east:    #60a5fa;
+      --west:    #34d399;
+      --central: #f59e0b;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed','Arial Narrow',sans-serif; min-height: 100vh; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── HEADER ─────────────────────────────────────────── */
-    .header {
-      background: linear-gradient(135deg, #0d1322 0%, #111827 100%);
-      border-bottom: 2px solid var(--border);
-      padding: 28px 32px 22px;
-    }
-    .header-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 6px;
-    }
-    h1 {
-      font-size: clamp(22px, 5vw, 36px);
-      font-weight: 900;
-      letter-spacing: -.01em;
-      line-height: 1.1;
-      text-transform: uppercase;
-    }
+    /* HEADER */
+    .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 24px 32px 20px; }
+    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+    h1 { font-size: clamp(20px,4vw,34px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
     h1 span { color: var(--gold); }
-    .subtitle {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--muted);
-      font-family: 'Barlow', sans-serif;
-      font-weight: 400;
-    }
-
-    /* ── CONTROLS ───────────────────────────────────────── */
-    .controls {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 32px;
-    }
-    .controls-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: #444;
-      margin-right: 6px;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 7px 16px;
-      border-radius: 4px;
-      transition: all .15s;
-      color: #888;
-    }
-    .tab-btn.active { background: var(--gold); color: var(--bg); }
-    .tab-btn:hover:not(.active) { color: var(--text); }
-
-    /* ── META BAR ───────────────────────────────────────── */
-    .meta-bar {
-      max-width: 900px;
-      margin: 18px auto 4px;
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .updated-badge {
-      font-size: 10px;
-      color: #444;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
+    .subtitle { margin-top: 8px; font-size: 13px; color: var(--muted); font-family: 'Barlow',sans-serif; }
+    .updated-badge { font-size: 10px; color: #444; letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; text-align: right; }
     .updated-badge strong { color: var(--muted); }
 
-    /* ── TABLE ──────────────────────────────────────────── */
-    .table-wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 32px 48px;
+    /* FILTER TABS */
+    .controls { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; }
+    .controls-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: stretch; gap: 2px; overflow-x: auto; }
+    .tab-btn {
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      cursor: pointer; font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 14px 16px 11px; white-space: nowrap; color: #555; transition: all .15s;
     }
+    .tab-btn:hover:not(.active) { color: var(--muted); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-separator { width: 1px; background: var(--border); margin: 8px 6px; flex-shrink: 0; }
+
+    /* WEEK LABEL BAR */
+    .week-label-bar { max-width: 960px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .week-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+    .week-dates { font-size: 10px; color: #444; letter-spacing: .05em; }
+    .week-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; letter-spacing: .07em; text-transform: uppercase; }
+    .week-status.live { background: rgba(34,197,94,.15); color: #22c55e; }
+    .week-status.upcoming { background: rgba(100,116,139,.1); color: #475569; }
+
+    /* TABLE */
+    .table-wrap { max-width: 960px; margin: 12px auto 0; padding: 0 32px 48px; }
+
     .col-headers {
       display: grid;
-      grid-template-columns: 40px 1fr 68px 68px 40px 160px;
-      gap: 0 10px;
-      padding: 0 12px 10px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2px;
+      grid-template-columns: 40px 1fr 70px 70px 60px 140px;
+      gap: 0 10px; padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border); margin-bottom: 2px;
     }
-    .col-headers span {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: #3a4258;
-    }
+    .col-headers span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #3a4258; }
     .col-headers .right { text-align: right; }
+    .col-headers .center { text-align: center; }
 
     .row {
       display: grid;
-      grid-template-columns: 40px 1fr 68px 68px 40px 160px;
-      gap: 0 10px;
-      padding: 10px 12px;
+      grid-template-columns: 40px 1fr 70px 70px 60px 140px;
+      gap: 0 10px; padding: 10px 12px;
       border-bottom: 1px solid var(--border2);
-      align-items: center;
-      border-left: 3px solid transparent;
-      opacity: 0;
-      transform: translateX(-12px);
+      align-items: center; border-left: 3px solid transparent;
+      opacity: 0; transform: translateX(-10px);
       animation: rowIn .4s ease forwards;
     }
     .row.rank-1 { border-left-color: var(--gold);   background: rgba(240,192,64,.04); }
     .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
-    .row.rank-3 { border-left-color: var(--bronze); background: rgba(184,115,51,.02); }
+    .row.rank-3 { border-left-color: var(--bronze); }
 
-    @keyframes rowIn {
-      to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes barGrow {
-      from { width: 0; }
-    }
+    @keyframes rowIn { to { opacity:1; transform:translateX(0); } }
+    @keyframes barGrow { from { width:0; } }
     .bar-fill { animation: barGrow .7s cubic-bezier(.16,1,.3,1) both; }
 
-    /* rank number */
-    .rank-num {
-      font-size: 15px;
-      font-weight: 800;
-      text-align: center;
-      color: var(--faint);
-    }
+    .rank-num { font-size: 15px; font-weight: 800; text-align: center; color: var(--faint); }
     .rank-num.r1 { font-size: 20px; color: var(--gold); }
     .rank-num.r2 { font-size: 18px; color: var(--silver); }
     .rank-num.r3 { font-size: 17px; color: var(--bronze); }
 
-    /* city cell */
-    .city-name-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-    .city-flag { font-size: 17px; line-height: 1; }
-    .city-name {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -.01em;
-      text-transform: uppercase;
-    }
-    .region-tag {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      padding: 2px 5px;
-      border-radius: 2px;
-    }
-    .sparkline {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      margin-top: 5px;
-      height: 14px;
-    }
-    .spark-bar {
-      width: 5px;
-      min-height: 2px;
-      border-radius: 1px;
-      background: #1e2535;
-    }
-    .spark-bar.current { background: var(--gold); }
+    .city-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .city-flag { font-size: 16px; line-height: 1; }
+    .city-name { font-size: 14px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; }
+    .region-tag { font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; }
+    .city-term { font-size: 10px; color: #333; margin-top: 3px; font-family: 'Barlow',sans-serif; }
 
-    /* score cells */
-    .score {
-      text-align: right;
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--faint);
-    }
-    .score.active { font-size: 22px; color: var(--text); }
+    .score { text-align: right; font-weight: 800; }
+    .score.primary { font-size: 22px; color: var(--text); }
+    .score.secondary { font-size: 14px; color: var(--faint); }
+    .score.na { font-size: 12px; color: #2a3045; font-weight: 400; }
 
-    /* trends link */
-    .trends-link {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      text-decoration: none;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-      color: #3a4258;
-      transition: color .15s;
-      white-space: nowrap;
-    }
-    .trends-link:hover { color: var(--gold); }
-    .trends-icon {
-      width: 14px;
-      height: 14px;
-      opacity: .5;
-      transition: opacity .15s;
-    }
-    .trends-link:hover .trends-icon { opacity: 1; }
+    /* Points badge - the big number */
+    .pts-badge { text-align: center; }
+    .pts-num { font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; }
+    .pts-label { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #444; margin-top: 1px; }
 
-    /* bar cell */
+    /* Bar */
     .bar-cell { position: relative; }
-    .bar-track {
-      height: 7px;
-      background: #141928;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .country-label {
-      font-size: 9px;
-      color: #333;
-      margin-top: 3px;
-      text-align: right;
-      letter-spacing: .05em;
-    }
+    .bar-track { height: 7px; background: #141928; border-radius: 4px; overflow: hidden; }
+    .country-label { font-size: 9px; color: #333; margin-top: 3px; text-align: right; letter-spacing: .05em; }
 
-    /* ── FOOTER NOTES ───────────────────────────────────── */
-    .notes {
-      max-width: 900px;
-      margin: 0 auto 0;
-      padding: 0 32px 48px;
-    }
-    .notes-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 22px 26px;
-    }
-    .notes-title {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 14px;
-    }
-    .notes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-    .note-item-title {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 4px;
-    }
-    .note-item-body {
-      font-size: 12px;
-      color: #4a5568;
-      line-height: 1.6;
-      font-family: 'Barlow', sans-serif;
-    }
-    .legend-row {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .legend-dot { display: flex; align-items: center; gap: 5px; }
+    /* Trends link */
+    .trends-link { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3a55; transition: color .15s; margin-top: 4px; }
+    .trends-link:hover { color: var(--gold); }
+
+    /* Not yet available row overlay */
+    .row.unavailable { opacity: .35; }
+
+    /* Notes */
+    .notes { max-width: 960px; margin: 0 auto; padding: 0 32px 48px; }
+    .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; }
+    .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
+    .note-h { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px; }
+    .note-b { font-size: 12px; color: #4a5568; line-height: 1.6; font-family: 'Barlow',sans-serif; }
+    .legend-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
     .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .swatch { width: 18px; height: 5px; border-radius: 2px; }
-    .legend-label {
-      font-size: 10px;
-      color: #444;
-      font-weight: 700;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-    }
+    .swatch { width: 16px; height: 5px; border-radius: 2px; }
+    .legend-label { font-size: 10px; color: #444; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
 
-    .seed-warning {
-      margin-top: 14px;
-      font-size: 11px;
-      color: #2a3045;
-      font-family: 'Barlow', sans-serif;
-      letter-spacing: .04em;
-      text-align: center;
-    }
+    .state-msg { text-align: center; padding: 60px 0; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #444; }
 
-    /* ── LOADING / ERROR ────────────────────────────────── */
-    .state-msg {
-      text-align: center;
-      padding: 60px 0;
-      font-size: 13px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: #444;
-    }
-
-    @media (max-width: 620px) {
-      .header, .controls, .meta-bar, .table-wrap, .notes { padding-left: 12px; padding-right: 12px; }
-      .col-headers, .row { grid-template-columns: 28px 1fr 44px 44px 50px 80px; gap: 0 6px; }
-      .score.active { font-size: 16px; }
-      .city-name { font-size: 13px; }
-      .trends-link { font-size: 9px; }
+    @media (max-width: 640px) {
+      .header, .controls, .week-label-bar, .table-wrap, .notes { padding-left: 14px; padding-right: 14px; }
+      .col-headers, .row { grid-template-columns: 30px 1fr 54px 54px 46px 80px; gap: 0 6px; }
+      .pts-num { font-size: 20px; }
+      .city-name { font-size: 12px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── HEADER ──────────────────────────────────────────────────────── -->
 <header class="header">
   <div class="header-inner">
     <div>
-      <div class="eyebrow">⚽ Google Trends Intelligence</div>
+      <div class="eyebrow">&#9917; Google Trends Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Relative global search interest · Score 0–100 (Google Trends scale) · Updated every Saturday</p>
+      <p class="subtitle">Weekly interest points · 16pts for 1st, 15 for 2nd ... 1 for 16th · Updated Saturdays</p>
     </div>
-    <div style="text-align:right">
-      <div id="updated-badge" class="updated-badge" style="margin-top:6px"></div>
-    </div>
+    <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
 </header>
 
-<!-- ── SORT CONTROLS ───────────────────────────────────────────────── -->
 <div class="controls">
-  <div class="controls-inner">
-    <span class="label">Sort by:</span>
-    <button class="tab-btn active" id="btn-weekly"     onclick="setSort('weekly')">This Week</button>
-    <button class="tab-btn"        id="btn-cumulative" onclick="setSort('cumulative')">Tournament Total</button>
+  <div class="controls-inner" id="tab-row">
+    <!-- Tabs injected by JS -->
   </div>
 </div>
 
-<!-- ── META BAR ────────────────────────────────────────────────────── -->
-<div class="meta-bar">
-  <div></div>
-</div>
+<div class="week-label-bar" id="week-label-bar"></div>
 
-<!-- ── TABLE ───────────────────────────────────────────────────────── -->
 <div class="table-wrap">
   <div class="col-headers">
-    <span>#</span>
+    <span class="center">#</span>
     <span>City</span>
-    <span class="right">Week</span>
-    <span class="right">Cumul.</span>
-    <span>Trends</span>
-    <span>Interest index</span>
+    <span class="right" id="col-pts-label">Points</span>
+    <span class="right" id="col-idx-label">Index</span>
+    <span class="center">Trends</span>
+    <span>Interest bar</span>
   </div>
-  <div id="table-body">
-    <div class="state-msg">Loading data…</div>
-  </div>
+  <div id="table-body"><div class="state-msg">Loading...</div></div>
 </div>
 
-<!-- ── NOTES ───────────────────────────────────────────────────────── -->
 <div class="notes">
   <div class="notes-box">
-    <div class="notes-title">Methodology &amp; Data Notes</div>
+    <div class="notes-title">Methodology</div>
     <div class="notes-grid">
-      <div>
-        <div class="note-item-title">Search terms</div>
-        <div class="note-item-body">"[City] World Cup" — consistent phrasing across all 16 cities. Year suffix omitted to maintain sufficient search volume for meaningful comparison.</div>
-      </div>
-      <div>
-        <div class="note-item-title">Scoring</div>
-        <div class="note-item-body">Google Trends returns relative interest 0–100 within each batch. Scores are cross-normalised across batches by scaling to the highest-scoring city, so all 16 are on the same scale.</div>
-      </div>
-      <div>
-        <div class="note-item-title">Weekly score</div>
-        <div class="note-item-body">7-day rolling window. Reflects current tournament momentum and recent match activity.</div>
-      </div>
-      <div>
-        <div class="note-item-title">Cumulative total</div>
-        <div class="note-item-body">Average of weekly snapshots since tournament start (11 Jun 2026). Stored and averaged each Saturday by the GitHub Action.</div>
-      </div>
-      <div>
-        <div class="note-item-title">Data freshness</div>
-        <div class="note-item-body">Scores are fetched automatically every Saturday at 08:00 UTC via GitHub Actions and written to <code style="color:#f0c040;font-size:11px">data/data.json</code>.</div>
-      </div>
-      <div>
-        <div class="note-item-title">View on Google Trends</div>
-        <div class="note-item-body">Click the <strong style="color:var(--muted)">Trends ↗</strong> link on any row to open the live Google Trends chart for that city's search term.</div>
-      </div>
+      <div><div class="note-h">Search terms</div><div class="note-b">"[City] World Cup" — consistent phrasing across all 16 cities for direct comparability.</div></div>
+      <div><div class="note-h">Interest index</div><div class="note-b">Google Trends relative score 0–100 within each week window. Normalised so the highest-interest city = 100.</div></div>
+      <div><div class="note-h">Weekly points</div><div class="note-b">Cities ranked by interest index each week. 1st = 16pts, 2nd = 15pts ... 16th = 1pt. Index is the input; points are the output.</div></div>
+      <div><div class="note-h">To Date</div><div class="note-b">Sum of points from all completed discrete weeks. Reflects cumulative interest momentum across the tournament.</div></div>
+      <div><div class="note-h">Week windows</div><div class="note-b">W1: Jun 11–17 · W2: Jun 18–24 · W3: Jun 25–Jul 1 · W4: Jul 2–8. Last Week = rolling 7-day window.</div></div>
+      <div><div class="note-h">Data refresh</div><div class="note-b">Fetched automatically every Saturday at 08:00 UTC via GitHub Actions. Click Trends &#8599; to verify any city's raw data.</div></div>
     </div>
     <div class="legend-row">
-      <div class="legend-dot"><div class="dot" style="background:var(--east)"></div>  <span class="legend-label">East</span></div>
-      <div class="legend-dot"><div class="dot" style="background:var(--west)"></div>  <span class="legend-label">West</span></div>
-      <div class="legend-dot"><div class="dot" style="background:var(--central)"></div><span class="legend-label">Central</span></div>
-      <div class="legend-dot"><div class="swatch" style="background:var(--usa)"></div><span class="legend-label">USA</span></div>
-      <div class="legend-dot"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
-      <div class="legend-dot"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
+      <div class="legend-item"><div class="dot" style="background:var(--east)"></div><span class="legend-label">East</span></div>
+      <div class="legend-item"><div class="dot" style="background:var(--west)"></div><span class="legend-label">West</span></div>
+      <div class="legend-item"><div class="dot" style="background:var(--central)"></div><span class="legend-label">Central</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--usa)"></div><span class="legend-label">USA</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
     </div>
-
   </div>
 </div>
 
-<!-- ── SCRIPT ──────────────────────────────────────────────────────── -->
 <script>
-  const COUNTRY_COLOR = { USA: '#B22234', MEX: '#006847', CAN: '#cc0000' };
-  const FLAG = { US: '🇺🇸', MX: '🇲🇽', CA: '🇨🇦' };
-  const REGION_COLOR  = { East: '#60a5fa', West: '#34d399', Central: '#f59e0b' };
+const COUNTRY_COLOR = { USA:'#B22234', MEX:'#006847', CAN:'#cc0000' };
+const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
+const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
 
-  let allCities = [];
-  let sortMode  = 'weekly';
+// Week definitions (must match fetch_trends.py)
+const WEEKS = [
+  { label:'Week 1', start:'2026-06-11', end:'2026-06-17', desc:'Jun 11–17' },
+  { label:'Week 2', start:'2026-06-18', end:'2026-06-24', desc:'Jun 18–24' },
+  { label:'Week 3', start:'2026-06-25', end:'2026-07-01', desc:'Jun 25–Jul 1' },
+  { label:'Week 4', start:'2026-07-02', end:'2026-07-08', desc:'Jul 2–8' },
+];
 
-  // ── Fetch data.json ───────────────────────────────────────────────
-  async function loadData() {
-    try {
-      const res  = await fetch('data/data.json?v=' + Date.now());
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const json = await res.json();
+let allCities = [];
+let activeView = 'todate'; // todate | lastweek | w1 | w2 | w3 | w4
+const today = new Date();
 
-      allCities = json.cities || [];
+function weekAvailable(week) {
+  return today >= new Date(week.start);
+}
 
-      // Updated badge
-      const badge = document.getElementById('updated-badge');
-      if (json.updatedDisplay) {
-        badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
-      }
+function buildTabs() {
+  const row = document.getElementById('tab-row');
+  row.innerHTML = '';
 
+  const tabs = [
+    { id:'todate',   label:'To Date' },
+    { id:'lastweek', label:'Last Week' },
+  ];
 
+  // Separator
+  const sep = () => { const d = document.createElement('div'); d.className='tab-separator'; return d; };
+  row.appendChild(sep());
 
-      render();
-    } catch (err) {
-      document.getElementById('table-body').innerHTML =
-        '<div class="state-msg">Could not load data.json — ' + err.message + '</div>';
+  tabs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (activeView === t.id ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => setView(t.id);
+    row.appendChild(btn);
+  });
+
+  row.appendChild(sep());
+
+  WEEKS.forEach(w => {
+    const avail = weekAvailable(w);
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (activeView === w.label.toLowerCase().replace(' ','') ? ' active' : '') + (avail ? '' : ' unavail');
+    btn.textContent = w.label;
+    btn.style.opacity = avail ? '1' : '0.35';
+    btn.onclick = () => { if(avail) setView(w.label.toLowerCase().replace(' ','')); };
+    row.appendChild(btn);
+  });
+
+  row.appendChild(sep());
+}
+
+function setView(v) {
+  activeView = v;
+  buildTabs();
+  render();
+}
+
+function getViewData(city) {
+  if (activeView === 'todate')   return { pts: city.toDatePoints,  idx: null,                   avail: true };
+  if (activeView === 'lastweek') return { pts: city.lastWeekPts,   idx: city.lastWeekScore,      avail: true };
+  // Discrete week
+  const wmap = { w1:'Week 1', w2:'Week 2', w3:'Week 3', w4:'Week 4' };
+  const wlabel = wmap[activeView];
+  if (!wlabel) return { pts: 0, idx: 0, avail: false };
+  const pts = city.weekPoints && city.weekPoints[wlabel];
+  const idx = city.weekScores && city.weekScores[wlabel];
+  const avail = pts !== null && pts !== undefined;
+  return { pts: avail ? pts : 0, idx: avail ? idx : 0, avail };
+}
+
+function getWeekLabelBar() {
+  const bar = document.getElementById('week-label-bar');
+  if (activeView === 'todate') {
+    const available = WEEKS.filter(weekAvailable);
+    if (available.length === 0) {
+      bar.innerHTML = '<span class="week-dates" style="color:#444">Awaiting tournament start — showing pre-tournament interest</span>';
+    } else {
+      bar.innerHTML = '<span class="week-label">To Date</span>' +
+        '<span class="week-dates">Sum of points from ' + available.length + ' completed week(s)</span>' +
+        '<span class="week-status live">Live</span>';
+    }
+  } else if (activeView === 'lastweek') {
+    bar.innerHTML = '<span class="week-label">Last 7 Days</span>' +
+      '<span class="week-dates">Rolling 7-day window · refreshed Saturdays</span>' +
+      '<span class="week-status live">Rolling</span>';
+  } else {
+    const wmap = { w1:WEEKS[0], w2:WEEKS[1], w3:WEEKS[2], w4:WEEKS[3] };
+    const w = wmap[activeView];
+    if (w) {
+      const avail = weekAvailable(w);
+      bar.innerHTML = '<span class="week-label">' + w.label + '</span>' +
+        '<span class="week-dates">' + w.desc + '</span>' +
+        '<span class="week-status ' + (avail?'live':'upcoming') + '">' + (avail?'Available':'Not yet') + '</span>';
     }
   }
+}
 
-  // ── Sort & render ─────────────────────────────────────────────────
-  function setSort(mode) {
-    sortMode = mode;
-    document.getElementById('btn-weekly').classList.toggle('active', mode === 'weekly');
-    document.getElementById('btn-cumulative').classList.toggle('active', mode === 'cumulative');
+function render() {
+  getWeekLabelBar();
+
+  // Update column labels
+  const ptsLabel = activeView === 'todate' ? 'Total Pts' : 'Pts';
+  const idxLabel = activeView === 'todate' ? '—' : 'Index';
+  document.getElementById('col-pts-label').textContent = ptsLabel;
+  document.getElementById('col-idx-label').textContent = idxLabel;
+
+  const sorted = [...allCities].sort((a, b) => {
+    const da = getViewData(a);
+    const db = getViewData(b);
+    if (db.pts !== da.pts) return db.pts - da.pts;
+    return (db.idx || 0) - (da.idx || 0);
+  });
+
+  const maxPts = Math.max(...sorted.map(c => getViewData(c).pts), 1);
+
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+
+  sorted.forEach((city, i) => {
+    const rank  = i + 1;
+    const vd    = getViewData(city);
+    const pct   = (vd.pts / maxPts * 100).toFixed(1);
+    const cc    = COUNTRY_COLOR[city.country] || '#888';
+    const rc    = REGION_COLOR[city.region]   || '#888';
+    const delay = i * 35;
+    const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+    const rowClass  = rank<=3 ? 'rank-'+rank : '';
+    const unavail   = !vd.avail ? ' unavailable' : '';
+
+    const row = document.createElement('div');
+    row.className = 'row ' + rowClass + unavail;
+    row.style.animationDelay = delay + 'ms';
+
+    const idxDisplay = activeView === 'todate'
+      ? '<span class="score na">—</span>'
+      : vd.idx !== null && vd.idx !== undefined
+        ? '<span class="score ' + (activeView!=='todate'?'secondary':'na') + '">' + vd.idx + '</span>'
+        : '<span class="score na">n/a</span>';
+
+    row.innerHTML =
+      '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
+      '<div>' +
+        '<div class="city-name-row">' +
+          '<span class="city-flag">' + (FLAG[city.flag] || city.flag) + '</span>' +
+          '<span class="city-name">' + city.name + '</span>' +
+          '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
+        '</div>' +
+        '<a class="trends-link" href="' + city.trendsUrl + '" target="_blank" rel="noopener">&#8599; Trends</a>' +
+      '</div>' +
+      '<div class="pts-badge">' +
+        '<div class="pts-num">' + (vd.avail ? vd.pts : '—') + '</div>' +
+        '<div class="pts-label">pts</div>' +
+      '</div>' +
+      idxDisplay +
+      '<div></div>' + /* trends col spacer - link is in city cell */
+      '<div class="bar-cell">' +
+        '<div class="bar-track"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '99,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div></div>' +
+        '<div class="country-label">' + city.country + '</div>' +
+      '</div>';
+
+    body.appendChild(row);
+  });
+}
+
+async function loadData() {
+  try {
+    const res  = await fetch('data/data.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    allCities  = json.cities || [];
+    const badge = document.getElementById('updated-badge');
+    if (json.updatedDisplay) badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
+    buildTabs();
     render();
+  } catch(err) {
+    document.getElementById('table-body').innerHTML = '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
   }
+}
 
-  function render() {
-    const cities = [...allCities].sort((a, b) =>
-      sortMode === 'weekly'
-        ? b.weekScore - a.weekScore
-        : b.cumulative - a.cumulative
-    );
-
-    const maxScore = Math.max(...cities.map(c =>
-      sortMode === 'weekly' ? c.weekScore : c.cumulative
-    ), 1);
-
-    const body = document.getElementById('table-body');
-    body.innerHTML = '';
-
-    cities.forEach((city, i) => {
-      const rank   = i + 1;
-      const score  = sortMode === 'weekly' ? city.weekScore : city.cumulative;
-      const pct    = (score / maxScore * 100).toFixed(1);
-      const cc     = COUNTRY_COLOR[city.country] || '#888';
-      const rc     = REGION_COLOR[city.region]   || '#888';
-      const delay  = i * 38;
-
-      const rankClass = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
-      const rowClass  = rank <= 3 ? `rank-${rank}` : '';
-
-      // Mini sparkline placeholder (4 bars; only last is gold since we don't
-      // store history in the JSON — extend fetch_trends.py to add weekHistory if desired)
-      const sparkHTML = [1,2,3,4].map((w, wi) => {
-        const h = wi === 3 ? Math.round(city.weekScore / 100 * 14) : Math.round(Math.random() * 10 + 2);
-        return `<div class="spark-bar ${wi===3?'current':''}" style="height:${h}px"></div>`;
-      }).join('');
-
-      const row = document.createElement('div');
-      row.className = 'row ' + rowClass;
-      row.style.animationDelay = delay + 'ms';
-      row.innerHTML = `
-        <!-- rank -->
-        <div class="rank-num ${rankClass}">${rank}</div>
-
-        <!-- city -->
-        <div>
-          <div class="city-name-row">
-            <span class="city-flag">${FLAG[city.flag] || city.flag}</span>
-            <span class="city-name">${city.name}</span>
-            <span class="region-tag" style="background:${rc}22;color:${rc}">${city.region}</span>
-          </div>
-          <div class="sparkline">${sparkHTML}</div>
-        </div>
-
-        <!-- weekly score -->
-        <div class="score ${sortMode==='weekly'?'active':''}">${city.weekScore}</div>
-
-        <!-- cumulative score -->
-        <div class="score ${sortMode==='cumulative'?'active':''}">${city.cumulative}</div>
-
-        <!-- trends link -->
-        <div>
-          <a class="trends-link" href="${city.trendsUrl}" target="_blank" rel="noopener" title="Open in Google Trends">
-            <svg class="trends-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-            </svg>
-            Trends ↗
-          </a>
-        </div>
-
-        <!-- bar -->
-        <div class="bar-cell">
-          <div class="bar-track">
-            <div class="bar-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,${cc}99,${cc});border-radius:4px;animation-delay:${delay+80}ms"></div>
-          </div>
-          <div class="country-label">${city.country}</div>
-        </div>
-      `;
-      body.appendChild(row);
-    });
-  }
-
-  loadData();
+loadData();
 </script>
 </body>
 </html>
