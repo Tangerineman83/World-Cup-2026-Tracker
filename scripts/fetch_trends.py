@@ -97,6 +97,34 @@ WIKIVOYAGE_LOW_CONF = 150     # avg views/week below this = flag as low confiden
 
 WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
+# Full 2026 World Cup schedule — free public domain JSON, no API key required
+# Source: https://github.com/openfootball/worldcup.json
+SCHEDULE_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
+
+# Maps ground strings in the schedule JSON to our 16 city names
+GROUND_MAP = {
+    "Mexico City":                           "Mexico City",
+    "Guadalajara (Zapopan)":                "Guadalajara",
+    "Monterrey (Guadalupe)":                "Monterrey",
+    "Atlanta":                              "Atlanta",
+    "Boston (Foxborough)":                  "Boston",
+    "Dallas (Arlington)":                   "Dallas",
+    "Houston":                              "Houston",
+    "Kansas City":                          "Kansas City",
+    "Los Angeles (Inglewood)":              "Los Angeles",
+    "Miami (Miami Gardens)":               "Miami",
+    "New York/New Jersey (East Rutherford)":"New York / New Jersey",
+    "Philadelphia":                         "Philadelphia",
+    "San Francisco Bay Area (Santa Clara)": "San Francisco",
+    "Seattle":                              "Seattle",
+    "Toronto":                              "Toronto",
+    "Vancouver":                            "Vancouver",
+}
+
+GROUP_ROUNDS    = {"Matchday " + str(i) for i in range(1, 18)}
+KNOCKOUT_ROUNDS = {"Round of 32", "Round of 16", "Quarter-final",
+                   "Semi-final", "Match for third place", "Final"}
+
 
 # ── API ────────────────────────────────────────────────────────────────────────
 
@@ -177,6 +205,64 @@ def git_commit(message):
 
 
 # ── Baseline ───────────────────────────────────────────────────────────────────
+
+def fetch_match_counts():
+    """
+    Fetch the 2026 World Cup schedule from openfootball (public domain, no API key)
+    and return match counts per city split by group stage and knockout.
+    Falls back to hardcoded totals if the fetch fails.
+    """
+    # Hardcoded fallback (correct as of schedule published June 2026)
+    fallback = {
+        "New York / New Jersey": {"group": 5, "knockout": 3, "total": 8},
+        "Los Angeles":           {"group": 5, "knockout": 3, "total": 8},
+        "Dallas":                {"group": 5, "knockout": 4, "total": 9},
+        "Mexico City":           {"group": 3, "knockout": 2, "total": 5},
+        "Miami":                 {"group": 4, "knockout": 3, "total": 7},
+        "Atlanta":               {"group": 5, "knockout": 3, "total": 8},
+        "San Francisco":         {"group": 5, "knockout": 1, "total": 6},
+        "Seattle":               {"group": 4, "knockout": 2, "total": 6},
+        "Toronto":               {"group": 5, "knockout": 1, "total": 6},
+        "Boston":                {"group": 5, "knockout": 2, "total": 7},
+        "Guadalajara":           {"group": 4, "knockout": 0, "total": 4},
+        "Houston":               {"group": 5, "knockout": 2, "total": 7},
+        "Philadelphia":          {"group": 5, "knockout": 1, "total": 6},
+        "Vancouver":             {"group": 5, "knockout": 2, "total": 7},
+        "Monterrey":             {"group": 3, "knockout": 1, "total": 4},
+        "Kansas City":           {"group": 4, "knockout": 2, "total": 6},
+    }
+    try:
+        req = urllib.request.Request(SCHEDULE_URL, headers={"User-Agent": WIKI_AGENT})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read())
+        matches = data.get("matches", [])
+        counts  = {city: {"group": 0, "knockout": 0, "total": 0, "played": 0}
+                   for city in GROUND_MAP.values()}
+        today_str = date.today().strftime("%Y-%m-%d")
+        for m in matches:
+            city = GROUND_MAP.get(m.get("ground", ""))
+            if not city:
+                continue
+            rnd = m.get("round", "")
+            if rnd in GROUP_ROUNDS:
+                counts[city]["group"]    += 1
+            elif rnd in KNOCKOUT_ROUNDS:
+                counts[city]["knockout"] += 1
+            else:
+                continue
+            counts[city]["total"] += 1
+            # Count played matches (score present or date has passed)
+            if m.get("date", "9999") <= today_str:
+                score1 = m.get("score1")
+                score2 = m.get("score2")
+                if score1 is not None and score2 is not None:
+                    counts[city]["played"] += 1
+        print("  Schedule fetched: " + str(sum(c["total"] for c in counts.values())) + " matches mapped")
+        return counts
+    except Exception as e:
+        print("  Schedule fetch failed (" + str(e) + ") - using hardcoded fallback")
+        return {k: dict(v, played=0) for k, v in fallback.items()}
+
 
 def baseline_dates(start_date, end_date, year):
     """Return equivalent window in a prior year (same calendar dates)."""
@@ -384,6 +470,10 @@ def main():
     else:
         baselines = fetch_baselines(l7_start, l7_end, cached_bl or {})
 
+    # Fetch match schedule counts
+    print("\nFetching match schedule from openfootball...")
+    match_counts = fetch_match_counts()
+
     # Fetch current week
     current = fetch_current_week(l7_start, l7_end, baselines)
 
@@ -392,6 +482,7 @@ def main():
     for city in CITIES:
         n  = city["name"]
         bl = baselines.get(n, {})
+        mc = match_counts.get(n, {"group": 0, "knockout": 0, "total": 0, "played": 0})
         results.append({
             "name":    n, "country": city["country"],
             "flag":    city["flag"], "region":  city["region"],
@@ -403,6 +494,10 @@ def main():
             "lastWeekStadium":   current["stadium"][n],
             "lastWeekVoyage":    current["voyage"][n],
             "lastWeekPts":       current["points"][n],
+            "matchesGroup":      mc["group"],
+            "matchesKnockout":   mc["knockout"],
+            "matchesTotal":      mc["total"],
+            "matchesPlayed":     mc["played"],
         })
 
     results.sort(key=lambda x: x["lastWeekCombined"], reverse=True)
@@ -419,7 +514,7 @@ def main():
         json.dump({
             "updated":          now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay":   now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":           "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023)",
+            "metric":           "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | Match counts from openfootball/worldcup.json",
             "baselineYears":    BASELINE_YEARS,
             "baselineWindow":   l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")",
             "baselines":        baselines,
