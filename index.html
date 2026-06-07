@@ -179,7 +179,7 @@
     <div>
       <div class="eyebrow">&#9917; Wikipedia &amp; Wikivoyage Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Economic interest index vs 12-month baseline &middot; Stadium 50% · Wikivoyage 30% · City Wikipedia 20% &middot; Updated Saturdays</p>
+      <p class="subtitle">Economic interest index vs 2019/2022/2023 same-period baseline &middot; Stadium 50% · Wikivoyage 30% · City Wikipedia 20% &middot; Updated Saturdays</p>
     </div>
     <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
@@ -226,7 +226,7 @@
       </div>
       <div>
         <div class="note-h">Economic Interest index</div>
-        <div class="note-b">Weekly views &divide; 12-month average weekly baseline &times; 100. Expressed as a multiplier: 1.0x = normal, 5.0x = 5&times; usual attention. Wikivoyage clamped 1.0x&ndash;10.0x to smooth noise from smaller sample sizes.</div>
+        <div class="note-b">Views this period &divide; average views in the same calendar window across 2019, 2022 and 2023 &times; 100. These three years are fully clean baselines with no major football events in the Jun&ndash;Jul window. Wikivoyage clamped 1.0x&ndash;10.0x to smooth noise from smaller sample sizes.</div>
       </div>
       <div>
         <div class="note-h">Why uplift not raw views</div>
@@ -238,7 +238,7 @@
       </div>
       <div>
         <div class="note-h">Baseline</div>
-        <div class="note-b">Jun 2025 &ndash; May 2026 (52 weeks pre-tournament). Fetched once, stored and reused each Saturday. <span style="color:#6b4c00;background:rgba(245,158,11,.1);padding:1px 4px;border-radius:2px;font-size:10px;">~ low conf</span> flags baselines below 150 views/week where the multiplier is less reliable.</div>
+        <div class="note-b">2019, 2022, 2023 — same calendar window as each tournament week (e.g. Jun 11&ndash;17 in those years). Stored in data.json and reused each Saturday. <span style="color:#6b4c00;background:rgba(245,158,11,.1);padding:1px 4px;border-radius:2px;font-size:10px;">~ low conf</span> flags Wikivoyage baselines below 150 views/week.</div>
       </div>
       <div>
         <div class="note-h">Week windows</div>
