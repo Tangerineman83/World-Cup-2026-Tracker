@@ -47,7 +47,7 @@
     .table-wrap { max-width: 960px; margin: 20px auto 0; padding: 0 32px 48px; }
     .col-headers {
       display: grid;
-      grid-template-columns: 38px 1fr 56px 56px 140px 64px 130px;
+      grid-template-columns: 38px 1fr 68px 160px 68px 130px;
       gap: 0 10px; padding: 0 12px 10px;
       border-bottom: 1px solid var(--border); margin-bottom: 2px;
     }
@@ -56,7 +56,7 @@
 
     .row {
       display: grid;
-      grid-template-columns: 38px 1fr 56px 56px 140px 64px 130px;
+      grid-template-columns: 38px 1fr 68px 160px 68px 130px;
       gap: 0 10px; padding: 11px 12px;
       border-bottom: 1px solid var(--border2);
       align-items: center; border-left: 3px solid transparent;
@@ -84,13 +84,13 @@
     .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
     .wiki-link:hover { color: var(--gold); }
 
-    /* Match count columns */
+    /* Match column */
     .match-badge { text-align: right; }
-    .match-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
-    .match-num.zero { color: var(--faint); font-size: 14px; }
-    .match-num.played { color: var(--gold); }
-    .match-sub { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #333; margin-top: 2px; }
-    .match-progress { font-size: 9px; color: #22c55e; margin-top: 1px; font-family: "Barlow",sans-serif; }
+    .match-played { font-size: 20px; font-weight: 900; line-height: 1; color: var(--gold); }
+    .match-played.zero { color: var(--faint); font-size: 16px; }
+    .match-divider { font-size: 11px; color: #3a4258; font-weight: 700; margin: 0 1px; }
+    .match-total { font-size: 14px; font-weight: 700; color: #3a4258; }
+    .match-label { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3448; margin-top: 2px; }
 
     /* Economic Interest — primary column */
     .econ-badge { text-align: right; }
@@ -126,7 +126,7 @@
 
     @media (max-width: 640px) {
       .header, .table-wrap, .notes, .explainer { padding-left: 14px; padding-right: 14px; }
-      .col-headers, .row { grid-template-columns: 30px 1fr 100px 44px 0px; gap: 0 6px; }
+      .col-headers, .row { grid-template-columns: 30px 1fr 52px 80px 38px; gap: 0 6px; }
       .col-headers .hide-sm, .row .hide-sm { display: none; }
       .econ-num { font-size: 18px; }
       .city-name { font-size: 12px; }
@@ -160,8 +160,7 @@
   <div class="col-headers">
     <span></span>
     <span>City &amp; Stadium</span>
-    <span class="col-right" title="Group stage matches scheduled at this venue">Grp</span>
-    <span class="col-right" title="Knockout matches scheduled at this venue">K/O</span>
+    <span class="col-right" title="Matches played / total scheduled at this venue">Matches</span>
     <span class="col-right">Economic Interest</span>
     <span class="col-right">Points</span>
     <span class="hide-sm">Interest bar</span>
@@ -175,7 +174,7 @@
     <div class="notes-grid">
       <div>
         <div class="note-h">Match columns</div>
-        <div class="note-b"><strong style="color:var(--muted)">Grp</strong> = group stage matches at this venue &middot; <strong style="color:var(--muted)">K/O</strong> = knockout matches. Numbers turn gold once matches are played. Schedule from openfootball/worldcup.json (public domain).</div>
+        <div class="note-b"><strong style="color:var(--gold)">Played / Total</strong> — official World Cup matches played at this venue out of total scheduled (e.g. 2&thinsp;/&thinsp;7). Updates nightly as the tournament progresses. Source: openfootball/worldcup.json (public domain, no API key).</div>
       </div>
       <div>
         <div class="note-h">Two signals</div>
@@ -260,23 +259,14 @@ function render(cities) {
     const row = document.createElement('div');
     row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
     row.style.animationDelay = delay + 'ms';
-    // Match count cells
-    const grpPlayed  = Math.min(city.matchesPlayed || 0, city.matchesGroup    || 0);
-    const koPlayed   = Math.max(0, (city.matchesPlayed || 0) - grpPlayed);
-    const grpTotal   = city.matchesGroup    || 0;
-    const koTotal    = city.matchesKnockout || 0;
-
-    const grpDisplay = grpTotal > 0
-      ? '<div class="match-num' + (grpPlayed > 0 ? ' played' : '') + '">' + grpTotal + '</div>' +
-        '<div class="match-sub">group</div>' +
-        (grpPlayed > 0 ? '<div class="match-progress">' + grpPlayed + ' played</div>' : '')
-      : '<div class="match-num zero">—</div><div class="match-sub">group</div>';
-
-    const koDisplay  = koTotal > 0
-      ? '<div class="match-num' + (koPlayed > 0 ? ' played' : '') + '">' + koTotal + '</div>' +
-        '<div class="match-sub">k/o</div>' +
-        (koPlayed > 0 ? '<div class="match-progress">' + koPlayed + ' played</div>' : '')
-      : '<div class="match-num zero">—</div><div class="match-sub">k/o</div>';
+    // Match column: played / total
+    const played = city.matchesPlayed || 0;
+    const total  = city.matchesTotal  || 0;
+    const matchDisplay =
+      '<div class="match-played' + (played === 0 ? ' zero' : '') + '">' + played + '</div>' +
+      '<div class="match-divider">/</div>' +
+      '<div class="match-total">' + total + '</div>' +
+      '<div class="match-label">played</div>';
 
     row.innerHTML =
       '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
@@ -289,8 +279,7 @@ function render(cities) {
         '<div class="stadium-name">' + (city.stadium || '') + '</div>' +
         '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
       '</div>' +
-      '<div class="match-badge">' + grpDisplay + '</div>' +
-      '<div class="match-badge">' + koDisplay  + '</div>' +
+      '<div class="match-badge">' + matchDisplay + '</div>' +
       '<div class="econ-badge">' +
         '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;</div>' +
         '<div class="econ-label">vs baseline</div>' +
