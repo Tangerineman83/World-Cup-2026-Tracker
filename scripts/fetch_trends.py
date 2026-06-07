@@ -5,7 +5,8 @@ fetch_trends.py  —  Wikipedia + Wikivoyage Uplift Tracker (Last Week only)
 Fetches rolling last-7-days Wikipedia pageviews for all 16 World Cup host cities.
 Compares against same 7-day window averaged across 2019, 2022, 2023 (clean baseline years).
 
-Combined uplift = (stadium_wikipedia * 0.50) + (wikivoyage * 0.30) + (city_wikipedia * 0.20)
+Combined uplift = (stadium_wikipedia * 0.50) + (wikivoyage * 0.50)
+Stadium floored at 1.0x to prevent transient fetch failures collapsing rankings.
 Wikivoyage clamped to [1.0x, 10.0x] to smooth noise from smaller sample sizes.
 
 Weekly discrete periods (W1-W4) removed until tournament begins.
@@ -85,10 +86,9 @@ CITIES = [
 BASELINE_YEARS       = [2019, 2022, 2023]
 BASELINE_DESCRIPTION = "Same 7-day window averaged across 2019, 2022, 2023"
 
-# Weights
+# Weights: 50% stadium + 50% Wikivoyage (city Wikipedia removed)
 STADIUM_WEIGHT    = 0.50
-WIKIVOYAGE_WEIGHT = 0.30
-CITY_WIKI_WEIGHT  = 0.20
+WIKIVOYAGE_WEIGHT = 0.50
 
 # Wikivoyage noise controls
 WIKIVOYAGE_FLOOR    = 100.0   # 1.0x minimum
@@ -147,8 +147,10 @@ def clamp_wikivoyage(raw, low_conf=False):
     cap = 500.0 if low_conf else WIKIVOYAGE_CAP
     return round(max(WIKIVOYAGE_FLOOR, min(cap, raw)), 1)
 
-def combined(su, vu, cu):
-    return round(su * STADIUM_WEIGHT + vu * WIKIVOYAGE_WEIGHT + cu * CITY_WIKI_WEIGHT, 1)
+def combined(su, vu):
+    """50% stadium (floored at 1.0x) + 50% Wikivoyage."""
+    su_floored = max(100.0, su)  # 1.0x floor — fetch failures never collapse ranking
+    return round(su_floored * STADIUM_WEIGHT + vu * WIKIVOYAGE_WEIGHT, 1)
 
 def to_points(scores):
     if not scores or max(scores.values()) == 0:
@@ -211,26 +213,22 @@ def fetch_baselines(l7_start, l7_end, existing_baselines):
         for year in BASELINE_YEARS:
             bs, be = baseline_dates(l7_start, l7_end, year)
             sv = wiki(city["stadium_article"],       bs, be); time.sleep(1.0)
-            cv = wiki(city["city_article"],           bs, be); time.sleep(1.0)
-            vv = voyage(city["wikivoyage_article"],   bs, be); time.sleep(1.0)
-            s_total += sv; c_total += cv; v_total += vv
+            vv = voyage(city["wikivoyage_article"],  bs, be); time.sleep(1.0)
+            s_total += sv; v_total += vv
 
         s_avg = round((s_total / n_years) / wf, 1)
-        c_avg = round((c_total / n_years) / wf, 1)
         v_avg = round((v_total / n_years) / wf, 1)
         v_low = v_avg < WIKIVOYAGE_LOW_CONF
 
         baselines[n] = {
             "stadium_avg_weekly":    s_avg,
-            "city_avg_weekly":       c_avg,
             "wikivoyage_avg_weekly": v_avg,
             "stadium_total":         s_total,
-            "city_total":            c_total,
             "wikivoyage_total":      v_total,
             "wikivoyage_low_conf":   v_low,
         }
-        print("    stadium=" + str(s_avg) + "/wk  city=" + str(c_avg) +
-              "/wk  voyage=" + str(v_avg) + "/wk" + (" [LOW CONF]" if v_low else ""))
+        print("    stadium=" + str(s_avg) + "/wk  voyage=" + str(v_avg) +
+              "/wk" + (" [LOW CONF]" if v_low else ""))
 
         # Save and commit after every city
         save_baselines_progress(baselines, l7_start, l7_end)
@@ -290,51 +288,79 @@ def load_baselines(existing_data, l7_start, l7_end):
 
 # ── Current week fetch ─────────────────────────────────────────────────────────
 
+def fetch_article_with_zero_retry(fetch_fn, article, start, end, label, baseline_avg):
+    """
+    Fetch an article with an extra retry if zero views are returned
+    but a non-zero baseline exists (indicates a transient 429, not genuine zero traffic).
+    """
+    views = fetch_fn(article, start, end)
+    time.sleep(1.5)
+    if views == 0 and baseline_avg > 0:
+        print("    Zero views for " + label + " (baseline=" + str(baseline_avg) +
+              "/wk) — retrying in 20s...")
+        time.sleep(20)
+        views = fetch_fn(article, start, end)
+        time.sleep(1.5)
+        if views == 0:
+            print("    Still zero after retry — applying 1.0x floor")
+        else:
+            print("    Retry succeeded: " + str(views) + " views")
+    return views
+
+
 def fetch_current_week(l7_start, l7_end, baselines):
-    """Fetch actual last-7-days views and compute uplift + points."""
+    """
+    Fetch last-7-days views for stadium + Wikivoyage only (city Wikipedia removed).
+    Applies a 1.0x floor to stadium uplift to prevent transient fetch failures
+    from collapsing a city's ranking. Retries zero returns once before flooring.
+    """
     days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
     wf   = days / 7.0
 
     print("\n=== Fetching last 7 days (" + l7_start + " to " + l7_end + ") ===")
+    print("    Signals: stadium Wikipedia (50%) + Wikivoyage (50%)")
 
-    stadium_u = {}; city_u = {}; voyage_u = {}; combined_u = {}
+    stadium_u = {}; voyage_u = {}; combined_u = {}
 
     for city in CITIES:
         n  = city["name"]
         bl = baselines.get(n, {})
+        s_base = bl.get("stadium_avg_weekly", 0)
+        v_base = bl.get("wikivoyage_avg_weekly", 0)
 
-        sv = wiki(city["stadium_article"],     l7_start, l7_end); time.sleep(1.5)
-        cv = wiki(city["city_article"],         l7_start, l7_end); time.sleep(1.5)
-        vv = voyage(city["wikivoyage_article"], l7_start, l7_end); time.sleep(1.5)
+        # Stadium — with zero-retry
+        sv = fetch_article_with_zero_retry(
+            wiki, city["stadium_article"], l7_start, l7_end, n + " stadium", s_base)
 
-        if sv == 0 and bl.get("stadium_avg_weekly", 0) > 0:
-            print("    WARNING: " + n + " stadium=0")
-        if cv == 0 and bl.get("city_avg_weekly", 0) > 0:
-            print("    WARNING: " + n + " city=0")
+        # Wikivoyage — with zero-retry
+        vv = fetch_article_with_zero_retry(
+            voyage, city["wikivoyage_article"], l7_start, l7_end, n + " wikivoyage", v_base)
 
-        su     = uplift(sv, bl.get("stadium_avg_weekly",    0), wf)
-        cu     = uplift(cv, bl.get("city_avg_weekly",       0), wf)
-        vu_raw = uplift(vv, bl.get("wikivoyage_avg_weekly", 0), wf)
+        su     = uplift(sv, s_base, wf)
+        vu_raw = uplift(vv, v_base, wf)
         vu     = clamp_wikivoyage(vu_raw, bl.get("wikivoyage_low_conf", False))
-        wu     = combined(su, vu, cu)
+        wu     = combined(su, vu)  # stadium floor applied inside combined()
 
-        stadium_u[n] = su; city_u[n] = cu; voyage_u[n] = vu; combined_u[n] = wu
+        stadium_u[n]  = su
+        voyage_u[n]   = vu
+        combined_u[n] = wu
 
-        print("  " + n.ljust(25) + " stadium=" + str(su) + "x"
-              + "  voyage=" + str(vu) + "x"
-              + "  city=" + str(cu) + "x"
-              + "  combined=" + str(wu) + "x")
+        su_display = max(100.0, su)  # show floored value in logs
+        print("  " + n.ljust(25) +
+              " stadium=" + str(round(su_display/100, 2)) + "x" +
+              ("(floored)" if su < 100 else "") +
+              "  voyage=" + str(round(vu/100, 2)) + "x" +
+              "  combined=" + str(round(wu/100, 2)) + "x")
 
     pts = to_points(combined_u)
-    return {"stadium": stadium_u, "city": city_u,
-            "voyage": voyage_u, "combined": combined_u, "points": pts}
+    return {"stadium": stadium_u, "voyage": voyage_u, "combined": combined_u, "points": pts}
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
     print("Wikipedia + Wikivoyage Uplift Tracker — Last 7 Days")
-    print("Weights: stadium=50%  wikivoyage=30%  city=20%")
+    print("Weights: stadium=50%  wikivoyage=50%  (city Wikipedia removed)")
     print("Baseline: same window in " + str(BASELINE_YEARS))
 
     today    = date.today()
@@ -371,12 +397,10 @@ def main():
             "flag":    city["flag"], "region":  city["region"],
             "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
             "baselineStadiumAvgWeekly":  bl.get("stadium_avg_weekly",    0),
-            "baselineCityAvgWeekly":     bl.get("city_avg_weekly",       0),
             "baselineVoyageAvgWeekly":   bl.get("wikivoyage_avg_weekly", 0),
             "wikivoyageLowConf":         bl.get("wikivoyage_low_conf",   False),
             "lastWeekCombined":  current["combined"][n],
             "lastWeekStadium":   current["stadium"][n],
-            "lastWeekCity":      current["city"][n],
             "lastWeekVoyage":    current["voyage"][n],
             "lastWeekPts":       current["points"][n],
         })
@@ -395,7 +419,7 @@ def main():
         json.dump({
             "updated":          now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay":   now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":           "50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs same-period baseline",
+            "metric":           "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023)",
             "baselineYears":    BASELINE_YEARS,
             "baselineWindow":   l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")",
             "baselines":        baselines,
