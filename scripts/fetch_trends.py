@@ -352,28 +352,66 @@ def fetch_baselines():
     print("    Years: " + str(BASELINE_YEARS))
     print("    (Stored in data.json and reused on future runs)")
 
+    # Load any partially-completed baselines from a previous interrupted run
     period_baselines = {}
+    if os.path.exists("data/data.json"):
+        try:
+            with open("data/data.json") as f:
+                existing = json.load(f)
+            saved = existing.get("periodBaselines", {})
+            if saved:
+                period_baselines = saved
+                print("  Resuming from partial baseline save (" +
+                      str(len(period_baselines)) + " periods already fetched)")
+        except Exception:
+            pass
 
-    # One baseline set per discrete tournament week
+    def save_progress(pb):
+        """Write periodBaselines to data.json immediately so progress survives a crash."""
+        os.makedirs("data", exist_ok=True)
+        try:
+            existing_data = {}
+            if os.path.exists("data/data.json"):
+                with open("data/data.json") as f:
+                    existing_data = json.load(f)
+        except Exception:
+            existing_data = {}
+        existing_data["periodBaselines"] = pb
+        existing_data["baselineYears"]   = BASELINE_YEARS
+        existing_data["baselineMethod"]  = BASELINE_DESCRIPTION
+        existing_data["_baselineInProgress"] = True
+        with open("data/data.json", "w") as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=2)
+
+    # One baseline set per discrete tournament week — skip already-fetched periods
     for week in WEEKS:
+        if week["label"] in period_baselines:
+            print("  Skipping " + week["label"] + " (already fetched)")
+            continue
         print("\n  " + week["label"] + " (" + week["start"] + " to " + week["end"] + ")")
         period_baselines[week["label"]] = fetch_baseline_for_period(
             week["start"], week["end"]
         )
+        save_progress(period_baselines)
+        print("  Progress saved (" + str(len(period_baselines)) + "/" +
+              str(len(WEEKS) + 1) + " periods complete)")
 
-    # Last-7-days baseline: use equivalent 7-day window starting Jun 11
-    # (tournament start date) so the baseline is always the same seasonal anchor.
-    # Once the tournament is underway we use the actual current 7-day window.
-    today = date.today()
-    tournament_start = date(2026, 6, 11)
-    if today >= tournament_start:
-        l7_end   = today.strftime("%Y-%m-%d")
-        l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
+    # Last-7-days baseline
+    if "last7" not in period_baselines:
+        today = date.today()
+        tournament_start = date(2026, 6, 11)
+        if today >= tournament_start:
+            l7_end   = today.strftime("%Y-%m-%d")
+            l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
+        else:
+            l7_end   = "2026-06-17"
+            l7_start = "2026-06-11"
+        print("\n  Last 7 days baseline window: " + l7_start + " to " + l7_end)
+        period_baselines["last7"] = fetch_baseline_for_period(l7_start, l7_end)
+        save_progress(period_baselines)
+        print("  All baseline periods complete.")
     else:
-        l7_end   = "2026-06-17"
-        l7_start = "2026-06-11"
-    print("\n  Last 7 days baseline window: " + l7_start + " to " + l7_end)
-    period_baselines["last7"] = fetch_baseline_for_period(l7_start, l7_end)
+        print("  Skipping last7 (already fetched)")
 
     return period_baselines
 
@@ -390,6 +428,11 @@ def load_baselines(existing_data):
     if not pb:
         print("  No period baselines found in data.json - full fetch required.")
         return None, True
+
+    # If a previous run was interrupted mid-baseline, resume it
+    if existing_data.get("_baselineInProgress"):
+        print("  Previous baseline fetch was interrupted - resuming...")
+        return pb, True  # triggers fetch_baselines() which will skip completed periods
 
     # Validate: check all expected periods are present and no zero values
     expected = [w["label"] for w in WEEKS] + ["last7"]
@@ -593,6 +636,17 @@ def main():
             "weeks":          WEEKS,
             "cities":         results,
         }, f, ensure_ascii=False, indent=2)
+
+    # Remove the in-progress flag now that we have a complete successful write
+    # (re-read and re-write to clean it up)
+    try:
+        with open("data/data.json") as f:
+            final = json.load(f)
+        final.pop("_baselineInProgress", None)
+        with open("data/data.json", "w") as f:
+            json.dump(final, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
     print("\nDone. Top city: " + results[0]["name"]
           + " (combined: " + str(results[0]["lastWeekCombined"]) + "x)")
