@@ -30,7 +30,7 @@
 
     /* HEADER */
     .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 24px 32px 20px; }
-    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
     h1 { font-size: clamp(20px,4vw,34px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
     h1 span { color: var(--gold); }
@@ -40,54 +40,11 @@
 
     /* EXPLAINER */
     .explainer { background: rgba(34,197,94,.06); border-bottom: 1px solid rgba(34,197,94,.15); padding: 12px 32px; }
-    .explainer-inner { max-width: 980px; margin: 0 auto; font-size: 12px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.5; }
+    .explainer-inner { max-width: 960px; margin: 0 auto; font-size: 12px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.6; }
     .explainer-inner strong { color: #22c55e; }
 
-    /* TABS */
-    .controls { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; }
-    .controls-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: stretch; overflow-x: auto; }
-    .tab-btn {
-      background: transparent; border: none; border-bottom: 3px solid transparent;
-      cursor: pointer; font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
-      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-      padding: 14px 16px 11px; white-space: nowrap; color: #555; transition: all .15s;
-    }
-    .tab-btn:hover:not(.active) { color: var(--muted); }
-    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .tab-btn.disabled { opacity: .35; cursor: default; }
-    .tab-separator { width: 1px; background: var(--border); margin: 8px 4px; flex-shrink: 0; }
-
-    /* WEEK BAR + UNAVAILABLE MESSAGE */
-    .week-bar { max-width: 980px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .week-label-text { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
-    .week-dates-text { font-size: 10px; color: #444; letter-spacing: .05em; }
-    .week-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; letter-spacing: .07em; text-transform: uppercase; }
-    .week-status.live { background: rgba(34,197,94,.15); color: #22c55e; }
-    .week-status.rolling { background: rgba(96,165,250,.15); color: #60a5fa; }
-    .week-status.upcoming { background: rgba(100,116,139,.1); color: #475569; }
-
-    /* UNAVAILABLE PANEL */
-    .unavail-panel {
-      max-width: 980px; margin: 16px auto 0; padding: 0 32px;
-    }
-    .unavail-box {
-      background: #0a0e1a; border: 1px solid var(--border);
-      border-left: 3px solid #2d3a55;
-      border-radius: 4px; padding: 18px 22px;
-      font-family: 'Barlow',sans-serif;
-    }
-    .unavail-title { font-size: 13px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
-    .unavail-body { font-size: 13px; color: #374151; line-height: 1.6; }
-    .unavail-body strong { color: #4a5568; }
-    .unavail-dates { margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; }
-    .unavail-date-item { font-size: 11px; }
-    .unavail-date-label { color: #2d3448; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
-    .unavail-date-val { color: #374151; margin-left: 4px; }
-
     /* TABLE */
-    .table-wrap { max-width: 980px; margin: 12px auto 0; padding: 0 32px 48px; }
-
-    /* Grid: rank | city | economic interest | points | bar */
+    .table-wrap { max-width: 960px; margin: 20px auto 0; padding: 0 32px 48px; }
     .col-headers {
       display: grid;
       grid-template-columns: 38px 1fr 160px 70px 150px;
@@ -96,7 +53,6 @@
     }
     .col-headers span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #3a4258; }
     .col-right { text-align: right; }
-    .col-center { text-align: center; }
 
     .row {
       display: grid;
@@ -111,7 +67,7 @@
     .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
     .row.rank-3 { border-left-color: var(--bronze); }
 
-    @keyframes rowIn { to { opacity:1; transform:translateX(0); } }
+    @keyframes rowIn  { to { opacity:1; transform:translateX(0); } }
     @keyframes barGrow { from { width:0; } }
     .bar-fill { animation: barGrow .8s cubic-bezier(.16,1,.3,1) both; }
 
@@ -120,7 +76,6 @@
     .rank-num.r2 { font-size: 18px; color: var(--silver); }
     .rank-num.r3 { font-size: 17px; color: var(--bronze); }
 
-    /* City cell */
     .city-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
     .city-flag { font-size: 16px; line-height: 1; }
     .city-name { font-size: 14px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; }
@@ -129,27 +84,25 @@
     .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
     .wiki-link:hover { color: var(--gold); }
 
-    /* Economic Interest cell — PRIMARY */
+    /* Economic Interest — primary column */
     .econ-badge { text-align: right; }
     .econ-num { font-size: 24px; font-weight: 900; line-height: 1; }
     .econ-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
     .econ-breakdown { font-size: 9px; color: #4a5568; margin-top: 3px; font-family: 'Barlow',sans-serif; }
     .econ-baseline { font-size: 9px; color: #2d3448; margin-top: 2px; font-family: 'Barlow',sans-serif; }
-    .low-conf { font-size: 8px; color: #6b4c00; background: rgba(245,158,11,.1); padding: 1px 4px; border-radius: 2px; margin-left: 4px; }
 
-    /* Points cell — SECONDARY */
+    /* Points — secondary */
     .pts-badge { text-align: right; }
     .pts-num { font-size: 18px; font-weight: 800; color: var(--faint); line-height: 1; }
     .pts-num.scoring { color: var(--gold); font-size: 20px; }
     .pts-label { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #333; margin-top: 1px; }
 
     /* Bar */
-    .bar-cell { }
     .bar-track { height: 7px; background: #141928; border-radius: 4px; overflow: hidden; }
     .country-label { font-size: 9px; color: #2d3448; margin-top: 3px; text-align: right; letter-spacing: .05em; }
 
     /* Notes */
-    .notes { max-width: 980px; margin: 0 auto; padding: 0 32px 48px; }
+    .notes { max-width: 960px; margin: 0 auto; padding: 0 32px 48px; }
     .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; }
     .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
     .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
@@ -164,7 +117,7 @@
     .state-msg { text-align: center; padding: 60px 0; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #444; }
 
     @media (max-width: 640px) {
-      .header,.controls,.week-bar,.unavail-panel,.table-wrap,.notes,.explainer { padding-left: 14px; padding-right: 14px; }
+      .header, .table-wrap, .notes, .explainer { padding-left: 14px; padding-right: 14px; }
       .col-headers, .row { grid-template-columns: 30px 1fr 100px 44px 0px; gap: 0 6px; }
       .col-headers .hide-sm, .row .hide-sm { display: none; }
       .econ-num { font-size: 18px; }
@@ -179,7 +132,7 @@
     <div>
       <div class="eyebrow">&#9917; Wikipedia &amp; Wikivoyage Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Economic interest index vs 2019/2022/2023 same-period baseline &middot; Stadium 50% · Wikivoyage 30% · City Wikipedia 20% &middot; Updated Saturdays</p>
+      <p class="subtitle">Rolling 7-day economic interest index &middot; vs 2019/2022/2023 same-period baseline &middot; Updated nightly</p>
     </div>
     <div><div id="updated-badge" class="updated-badge"></div></div>
   </div>
@@ -188,22 +141,16 @@
 <div class="explainer">
   <div class="explainer-inner">
     <strong>How to read this:</strong>
-    The <strong>Economic Interest</strong> index shows how much more global attention each host city is receiving vs its normal weekly average — combining stadium awareness, travel planning intent, and destination interest.
-    <strong>1.0x = normal &middot; 3.0x = triple normal interest &middot; 8.5x = major spike.</strong>
-    Smaller cities showing high multiples tell the most compelling economic story — the World Cup is creating attention that wouldn't otherwise exist.
+    The <strong>Economic Interest</strong> index shows how much more global attention each host city is receiving compared to the same period in clean prior years (2019, 2022, 2023).
+    <strong>1.0x = normal &middot; 3.0x = triple normal interest &middot; 8.0x = major spike.</strong>
+    Combining stadium awareness (50%), travel planning intent via Wikivoyage (30%), and destination interest (20%)
+    — smaller cities showing high multiples tell the most compelling economic story.
   </div>
 </div>
 
-<div class="controls">
-  <div class="controls-inner" id="tab-row"></div>
-</div>
-
-<div class="week-bar" id="week-bar"></div>
-<div id="unavail-panel"></div>
-
-<div class="table-wrap" id="table-wrap">
+<div class="table-wrap">
   <div class="col-headers">
-    <span class="col-center">#</span>
+    <span></span>
     <span>City &amp; Stadium</span>
     <span class="col-right">Economic Interest</span>
     <span class="col-right">Points</span>
@@ -219,30 +166,30 @@
       <div>
         <div class="note-h">Three signals</div>
         <div class="note-b">
-          <strong style="color:var(--muted)">Stadium Wikipedia (50%)</strong> — event-specific awareness, cleanest signal.<br>
-          <strong style="color:var(--muted)">City Wikivoyage (30%)</strong> — travel planning intent, highest economic relevance.<br>
+          <strong style="color:var(--muted)">Stadium Wikipedia (50%)</strong> — event-specific awareness.<br>
+          <strong style="color:var(--muted)">City Wikivoyage (30%)</strong> — travel planning intent.<br>
           <strong style="color:var(--muted)">City Wikipedia (20%)</strong> — general destination awareness.
         </div>
       </div>
       <div>
         <div class="note-h">Economic Interest index</div>
-        <div class="note-b">Views this period &divide; average views in the same calendar window across 2019, 2022 and 2023 &times; 100. These three years are fully clean baselines with no major football events in the Jun&ndash;Jul window. Wikivoyage clamped 1.0x&ndash;10.0x to smooth noise from smaller sample sizes.</div>
+        <div class="note-b">Views this 7-day window &divide; average views in the same calendar window in 2019, 2022 &amp; 2023. Index of 1.0x = normal. 5.0x = 5&times; typical interest. Wikivoyage clamped 1.0x&ndash;10.0x to smooth noise from smaller samples.</div>
       </div>
       <div>
-        <div class="note-h">Why uplift not raw views</div>
-        <div class="note-b">Raw views favour megacities regardless of the World Cup. Uplift reveals which cities are experiencing the biggest incremental change — the additional global attention directly created by hosting.</div>
+        <div class="note-h">Why prior-year same period</div>
+        <div class="note-b">Compares like-for-like — same calendar window controls for seasonal patterns. 2019, 2022 and 2023 are fully clean years with no major football events in these cities during June&ndash;July.</div>
       </div>
       <div>
         <div class="note-h">Points</div>
-        <div class="note-b">Cities ranked by Economic Interest index each week. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. First 4 Weeks = cumulative sum of W1&ndash;W4 points.</div>
+        <div class="note-b">Ranked by Economic Interest index. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. Reflects this week's relative performance.</div>
       </div>
       <div>
-        <div class="note-h">Baseline</div>
-        <div class="note-b">2019, 2022, 2023 — same calendar window as each tournament week (e.g. Jun 11&ndash;17 in those years). Stored in data.json and reused each Saturday. <span style="color:#6b4c00;background:rgba(245,158,11,.1);padding:1px 4px;border-radius:2px;font-size:10px;">~ low conf</span> flags Wikivoyage baselines below 150 views/week.</div>
+        <div class="note-h">Data refresh</div>
+        <div class="note-b">Updated automatically every night at 07:00 UTC (midnight Pacific). Baselines recalculated weekly as the 7-day window shifts, ensuring the comparison always reflects the same seasonal period.</div>
       </div>
       <div>
-        <div class="note-h">Week windows</div>
-        <div class="note-b">W1: Jun 11&ndash;17 &middot; W2: Jun 18&ndash;24 &middot; W3: Jun 25&ndash;Jul 1 &middot; W4: Jul 2&ndash;8.<br>Last Week = rolling 7-day window, refreshed every Saturday at 08:00 UTC.</div>
+        <div class="note-h">Why uplift not raw views</div>
+        <div class="note-b">Raw views favour megacities. Uplift reveals which cities are experiencing the biggest <em>incremental</em> change — additional attention directly attributable to the World Cup.</div>
       </div>
     </div>
     <div class="legend-row">
@@ -261,20 +208,6 @@ const COUNTRY_COLOR = { USA:'#4f8ef7', MEX:'#f59e0b', CAN:'#2dd4bf' };
 const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
 const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
 
-const WEEKS = [
-  { id:'w1', label:'Week 1', desc:'Jun 11–17',    start:'2026-06-11', end:'2026-06-17' },
-  { id:'w2', label:'Week 2', desc:'Jun 18–24',    start:'2026-06-18', end:'2026-06-24' },
-  { id:'w3', label:'Week 3', desc:'Jun 25–Jul 1', start:'2026-06-25', end:'2026-07-01' },
-  { id:'w4', label:'Week 4', desc:'Jul 2–8',      start:'2026-07-02', end:'2026-07-08' },
-];
-
-let allCities  = [];
-let activeView = 'lastweek';
-const today    = new Date();
-
-function weekAvailable(w) { return today >= new Date(w.start); }
-function anyWeekAvailable() { return WEEKS.some(weekAvailable); }
-
 function fmt(n) {
   if (!n && n !== 0) return '—';
   if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
@@ -291,214 +224,52 @@ function econColor(u) {
   return 'var(--faint)';
 }
 
-// ── Tab building ──────────────────────────────────────────────────────────────
-function buildTabs() {
-  const row = document.getElementById('tab-row');
-  row.innerHTML = '';
-  const sep = () => { const d=document.createElement('div'); d.className='tab-separator'; return d; };
-
-  // Order: Last Week | W1 W2 W3 W4 | First 4 Weeks
-  const tabs = [
-    { id:'lastweek', label:'Last Week', always: true },
-  ];
-  row.appendChild(sep());
-  tabs.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (activeView===t.id?' active':'');
-    btn.textContent = t.label;
-    btn.onclick = () => setView(t.id);
-    row.appendChild(btn);
-  });
-
-  row.appendChild(sep());
-  WEEKS.forEach(w => {
-    const avail = weekAvailable(w);
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (activeView===w.id?' active':'') + (avail?'':' disabled');
-    btn.textContent = w.label;
-    btn.title = avail ? w.desc : 'Available from ' + w.start;
-    btn.onclick = () => setView(w.id);  // always clickable — shows unavail message
-    row.appendChild(btn);
-  });
-
-  row.appendChild(sep());
-  const f4btn = document.createElement('button');
-  f4btn.className = 'tab-btn' + (activeView==='first4'?' active':'') + (anyWeekAvailable()?'':' disabled');
-  f4btn.textContent = 'First 4 Weeks';
-  f4btn.title = 'Cumulative points from W1–W4';
-  f4btn.onclick = () => setView('first4');
-  row.appendChild(f4btn);
-  row.appendChild(sep());
-}
-
-function setView(v) { activeView=v; buildTabs(); render(); }
-
-// ── Get data for current view ─────────────────────────────────────────────────
-function getViewData(city) {
-  if (activeView === 'lastweek') {
-    return { combined: city.lastWeekCombined, pts: city.lastWeekPts,
-             stadium: city.lastWeekStadium, city_u: city.lastWeekCity,
-             voyage: city.lastWeekVoyage, avail: true };
-  }
-  if (activeView === 'first4') {
-    return { combined: null, pts: city.first4Pts,
-             stadium: null, city_u: null, voyage: null,
-             avail: anyWeekAvailable() };
-  }
-  const wmap = { w1:'Week 1', w2:'Week 2', w3:'Week 3', w4:'Week 4' };
-  const lbl  = wmap[activeView];
-  if (!lbl) return { combined:0, pts:0, stadium:null, city_u:null, voyage:null, avail:false };
-  const pts      = city.weekPoints  && city.weekPoints[lbl];
-  const combined = city.weekCombined && city.weekCombined[lbl];
-  const avail    = pts !== null && pts !== undefined;
-  return {
-    combined: avail ? combined : null,
-    pts:      avail ? pts      : 0,
-    stadium:  avail && city.weekStadium  ? city.weekStadium[lbl]  : null,
-    city_u:   avail && city.weekCity     ? city.weekCity[lbl]     : null,
-    voyage:   avail && city.weekVoyage   ? city.weekVoyage[lbl]   : null,
-    avail,
-  };
-}
-
-// ── Week bar + unavailable panel ──────────────────────────────────────────────
-function updateWeekBar() {
-  const bar    = document.getElementById('week-bar');
-  const panel  = document.getElementById('unavail-panel');
-  panel.innerHTML = '';
-
-  if (activeView === 'lastweek') {
-    bar.innerHTML =
-      '<span class="week-label-text">Last 7 Days</span>' +
-      '<span class="week-dates-text">Rolling window &middot; refreshed Saturdays</span>' +
-      '<span class="week-status rolling">Rolling</span>';
-    return;
-  }
-
-  if (activeView === 'first4') {
-    const done = WEEKS.filter(weekAvailable).length;
-    if (done === 0) {
-      bar.innerHTML =
-        '<span class="week-label-text">First 4 Weeks</span>' +
-        '<span class="week-status upcoming">Not yet available</span>';
-      panel.innerHTML = unavailHTML(
-        'First 4 Weeks — Not Yet Available',
-        'This view shows the cumulative points total across all four tournament weeks (W1–W4). It will populate as each week completes.',
-        WEEKS
-      );
-    } else {
-      bar.innerHTML =
-        '<span class="week-label-text">First 4 Weeks</span>' +
-        '<span class="week-dates-text">Cumulative points from ' + done + ' of 4 weeks</span>' +
-        '<span class="week-status live">Live</span>';
-    }
-    return;
-  }
-
-  const w = WEEKS.find(x => x.id === activeView);
-  if (!w) return;
-  const avail = weekAvailable(w);
-  bar.innerHTML =
-    '<span class="week-label-text">' + w.label + '</span>' +
-    '<span class="week-dates-text">' + w.desc + '</span>' +
-    '<span class="week-status ' + (avail?'live':'upcoming') + '">' +
-    (avail ? 'Available' : 'Not yet available') + '</span>';
-
-  if (!avail) {
-    panel.innerHTML = unavailHTML(
-      w.label + ' — Not Yet Available',
-      'Data for this week will be fetched automatically on the first Saturday after ' + w.start + '.',
-      [w]
-    );
-  }
-}
-
-function unavailHTML(title, body, weeks) {
-  const dateRows = weeks.map(w =>
-    '<div class="unavail-date-item">' +
-      '<span class="unavail-date-label">' + w.label + '</span>' +
-      '<span class="unavail-date-val">' + w.desc + ' &nbsp;(' + w.start + ' &ndash; ' + w.end + ')</span>' +
-    '</div>'
-  ).join('');
-  return '<div class="unavail-panel"><div class="unavail-box">' +
-    '<div class="unavail-title">&#128337; ' + title + '</div>' +
-    '<div class="unavail-body">' + body +
-    '<div class="unavail-dates">' + dateRows + '</div>' +
-    '</div></div></div>';
-}
-
-// ── Render table ──────────────────────────────────────────────────────────────
-function render() {
-  updateWeekBar();
-
-  const sorted = [...allCities].sort((a,b) => {
-    const da = getViewData(a), db = getViewData(b);
-    if (db.pts !== da.pts) return db.pts - da.pts;
-    return (db.combined||0) - (da.combined||0);
-  });
-
-  const maxCombined = Math.max(...sorted.map(c => getViewData(c).combined || 0), 1);
+function render(cities) {
+  const maxCombined = Math.max(...cities.map(c => c.lastWeekCombined || 0), 1);
   const body = document.getElementById('table-body');
   body.innerHTML = '';
 
-  // Hide/show table header Economic Interest col depending on view
-  document.querySelector('.col-headers').style.display = 'grid';
-
-  sorted.forEach((city, i) => {
+  cities.forEach((city, i) => {
     const rank  = i + 1;
-    const vd    = getViewData(city);
-    const pct   = ((vd.combined||0) / maxCombined * 100).toFixed(1);
+    const wu    = city.lastWeekCombined || 0;
+    const pts   = city.lastWeekPts || 0;
+    const pct   = (wu / maxCombined * 100).toFixed(1);
     const cc    = COUNTRY_COLOR[city.country] || '#888';
     const rc    = REGION_COLOR[city.region]   || '#888';
+    const ecol  = econColor(wu);
     const delay = i * 35;
     const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
 
-    // Economic Interest cell
-    let econHTML;
-    if (activeView === 'first4') {
-      econHTML = '<div class="econ-badge"><div class="econ-num" style="color:var(--faint);font-size:13px">—</div><div class="econ-label">n/a for total</div></div>';
-    } else if (!vd.avail || vd.combined === null) {
-      econHTML = '<div class="econ-badge"><div class="econ-num" style="color:var(--faint);font-size:13px">—</div></div>';
-    } else {
-      const mult  = (vd.combined / 100).toFixed(1);
-      const ecol  = econColor(vd.combined);
-      const sLabel = vd.stadium !== null ? (vd.stadium/100).toFixed(1)+'x' : '—';
-      const vLabel = vd.voyage  !== null ? (vd.voyage/100).toFixed(1)+'x'  + (city.wikivoyageLowConf ? '~' : '') : '—';
-      const cLabel = vd.city_u  !== null ? (vd.city_u/100).toFixed(1)+'x'  : '—';
-      econHTML =
-        '<div class="econ-badge">' +
-          '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;' + '</div>' +
-          '<div class="econ-label">vs baseline</div>' +
-          '<div class="econ-breakdown">&#127967;' + sLabel + ' &middot; &#9973;' + vLabel + ' &middot; &#128218;' + cLabel + '</div>' +
-          '<div class="econ-baseline">Stadium baseline: ' + fmt(city.baselineStadiumAvgWeekly) + '/wk</div>' +
-        '</div>';
-    }
-
-    // Points cell
-    const hasPoints = vd.pts > 0;
-    const ptsHTML =
-      '<div class="pts-badge">' +
-        '<div class="pts-num ' + (hasPoints?'scoring':'') + '">' + (vd.avail ? vd.pts : '—') + '</div>' +
-        '<div class="pts-label">pts</div>' +
-      '</div>';
+    const mult   = (wu / 100).toFixed(1);
+    const sLabel = ((city.lastWeekStadium || 0) / 100).toFixed(1) + 'x';
+    const vLabel = ((city.lastWeekVoyage  || 0) / 100).toFixed(1) + 'x' + (city.wikivoyageLowConf ? '~' : '');
+    const cLabel = ((city.lastWeekCity    || 0) / 100).toFixed(1) + 'x';
 
     const row = document.createElement('div');
-    row.className = 'row ' + (rank<=3?'rank-'+rank:'');
+    row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
     row.style.animationDelay = delay + 'ms';
     row.innerHTML =
       '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
       '<div>' +
         '<div class="city-name-row">' +
-          '<span class="city-flag">' + (FLAG[city.flag]||city.flag) + '</span>' +
+          '<span class="city-flag">' + (FLAG[city.flag] || city.flag) + '</span>' +
           '<span class="city-name">' + city.name + '</span>' +
           '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
         '</div>' +
-        '<div class="stadium-name">' + (city.stadium||'') + '</div>' +
+        '<div class="stadium-name">' + (city.stadium || '') + '</div>' +
         '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
       '</div>' +
-      econHTML +
-      ptsHTML +
-      '<div class="bar-cell hide-sm">' +
+      '<div class="econ-badge">' +
+        '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;</div>' +
+        '<div class="econ-label">vs baseline</div>' +
+        '<div class="econ-breakdown">&#127967;' + sLabel + ' &middot; &#9973;' + vLabel + ' &middot; &#128218;' + cLabel + '</div>' +
+        '<div class="econ-baseline">Stadium baseline: ' + fmt(city.baselineStadiumAvgWeekly) + '/wk</div>' +
+      '</div>' +
+      '<div class="pts-badge">' +
+        '<div class="pts-num' + (pts > 0 ? ' scoring' : '') + '">' + pts + '</div>' +
+        '<div class="pts-label">pts</div>' +
+      '</div>' +
+      '<div class="hide-sm">' +
         '<div class="bar-track"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '88,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div></div>' +
         '<div class="country-label">' + city.country + '</div>' +
       '</div>';
@@ -507,17 +278,21 @@ function render() {
   });
 }
 
-// ── Load data ─────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
     const res  = await fetch('data/data.json?v=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    allCities  = json.cities || [];
+
     const badge = document.getElementById('updated-badge');
-    if (json.updatedDisplay) badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
-    buildTabs();
-    render();
+    if (json.updatedDisplay) {
+      badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
+    }
+
+    const cities = (json.cities || []).sort((a, b) =>
+      (b.lastWeekCombined || 0) - (a.lastWeekCombined || 0)
+    );
+    render(cities);
   } catch(err) {
     document.getElementById('table-body').innerHTML =
       '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
