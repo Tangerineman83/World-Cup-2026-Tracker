@@ -367,7 +367,12 @@ def fetch_baselines():
             pass
 
     def save_progress(pb):
-        """Write periodBaselines to data.json immediately so progress survives a crash."""
+        """
+        Write periodBaselines to data.json AND commit to the repo immediately.
+        This means progress is visible in the repo even if the run is cancelled,
+        and the next run can resume from the last saved period.
+        """
+        import subprocess
         os.makedirs("data", exist_ok=True)
         try:
             existing_data = {}
@@ -380,8 +385,18 @@ def fetch_baselines():
         existing_data["baselineYears"]   = BASELINE_YEARS
         existing_data["baselineMethod"]  = BASELINE_DESCRIPTION
         existing_data["_baselineInProgress"] = True
-        with open("data/data.json", "w") as f:
+        with open("data/data.json", "w", encoding="utf-8") as f:
             json.dump(existing_data, f, ensure_ascii=False, indent=2)
+        # Commit to repo so progress survives a cancelled run
+        try:
+            subprocess.run(["git", "add", "data/data.json"], check=True)
+            subprocess.run(["git", "commit", "-m",
+                "chore: baseline progress save (" + str(len(pb)) + "/" +
+                str(len(WEEKS) + 1) + " periods)"], check=True)
+            subprocess.run(["git", "push"], check=True)
+            print("    Committed to repo.")
+        except subprocess.CalledProcessError as e:
+            print("    Git commit failed (non-fatal): " + str(e))
 
     # One baseline set per discrete tournament week — skip already-fetched periods
     for week in WEEKS:
