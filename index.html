@@ -47,7 +47,7 @@
     .table-wrap { max-width: 960px; margin: 20px auto 0; padding: 0 32px 48px; }
     .col-headers {
       display: grid;
-      grid-template-columns: 38px 1fr 160px 70px 150px;
+      grid-template-columns: 38px 1fr 56px 56px 140px 64px 130px;
       gap: 0 10px; padding: 0 12px 10px;
       border-bottom: 1px solid var(--border); margin-bottom: 2px;
     }
@@ -56,7 +56,7 @@
 
     .row {
       display: grid;
-      grid-template-columns: 38px 1fr 160px 70px 150px;
+      grid-template-columns: 38px 1fr 56px 56px 140px 64px 130px;
       gap: 0 10px; padding: 11px 12px;
       border-bottom: 1px solid var(--border2);
       align-items: center; border-left: 3px solid transparent;
@@ -83,6 +83,14 @@
     .stadium-name { font-size: 10px; color: #3a4560; margin-top: 3px; font-family: 'Barlow',sans-serif; }
     .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
     .wiki-link:hover { color: var(--gold); }
+
+    /* Match count columns */
+    .match-badge { text-align: right; }
+    .match-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+    .match-num.zero { color: var(--faint); font-size: 14px; }
+    .match-num.played { color: var(--gold); }
+    .match-sub { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #333; margin-top: 2px; }
+    .match-progress { font-size: 9px; color: #22c55e; margin-top: 1px; font-family: "Barlow",sans-serif; }
 
     /* Economic Interest — primary column */
     .econ-badge { text-align: right; }
@@ -152,6 +160,8 @@
   <div class="col-headers">
     <span></span>
     <span>City &amp; Stadium</span>
+    <span class="col-right" title="Group stage matches scheduled at this venue">Grp</span>
+    <span class="col-right" title="Knockout matches scheduled at this venue">K/O</span>
     <span class="col-right">Economic Interest</span>
     <span class="col-right">Points</span>
     <span class="hide-sm">Interest bar</span>
@@ -163,6 +173,10 @@
   <div class="notes-box">
     <div class="notes-title">Methodology</div>
     <div class="notes-grid">
+      <div>
+        <div class="note-h">Match columns</div>
+        <div class="note-b"><strong style="color:var(--muted)">Grp</strong> = group stage matches at this venue &middot; <strong style="color:var(--muted)">K/O</strong> = knockout matches. Numbers turn gold once matches are played. Schedule from openfootball/worldcup.json (public domain).</div>
+      </div>
       <div>
         <div class="note-h">Two signals</div>
         <div class="note-b">
@@ -246,6 +260,24 @@ function render(cities) {
     const row = document.createElement('div');
     row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
     row.style.animationDelay = delay + 'ms';
+    // Match count cells
+    const grpPlayed  = Math.min(city.matchesPlayed || 0, city.matchesGroup    || 0);
+    const koPlayed   = Math.max(0, (city.matchesPlayed || 0) - grpPlayed);
+    const grpTotal   = city.matchesGroup    || 0;
+    const koTotal    = city.matchesKnockout || 0;
+
+    const grpDisplay = grpTotal > 0
+      ? '<div class="match-num' + (grpPlayed > 0 ? ' played' : '') + '">' + grpTotal + '</div>' +
+        '<div class="match-sub">group</div>' +
+        (grpPlayed > 0 ? '<div class="match-progress">' + grpPlayed + ' played</div>' : '')
+      : '<div class="match-num zero">—</div><div class="match-sub">group</div>';
+
+    const koDisplay  = koTotal > 0
+      ? '<div class="match-num' + (koPlayed > 0 ? ' played' : '') + '">' + koTotal + '</div>' +
+        '<div class="match-sub">k/o</div>' +
+        (koPlayed > 0 ? '<div class="match-progress">' + koPlayed + ' played</div>' : '')
+      : '<div class="match-num zero">—</div><div class="match-sub">k/o</div>';
+
     row.innerHTML =
       '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
       '<div>' +
@@ -257,6 +289,8 @@ function render(cities) {
         '<div class="stadium-name">' + (city.stadium || '') + '</div>' +
         '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
       '</div>' +
+      '<div class="match-badge">' + grpDisplay + '</div>' +
+      '<div class="match-badge">' + koDisplay  + '</div>' +
       '<div class="econ-badge">' +
         '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;</div>' +
         '<div class="econ-label">vs baseline</div>' +
