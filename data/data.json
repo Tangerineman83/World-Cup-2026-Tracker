@@ -1,7 +1,7 @@
 {
-  "updated": "2026-06-07T15:22:11Z",
-  "updatedDisplay": "07 Jun 2026, 15:22z",
-  "metric": "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023)",
+  "updated": "2026-06-07T15:54:12Z",
+  "updatedDisplay": "07 Jun 2026, 15:54z",
+  "metric": "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | Match counts from openfootball/worldcup.json",
   "baselineYears": [
     2019,
     2022,
@@ -168,7 +168,11 @@
       "lastWeekCombined": 779.2,
       "lastWeekStadium": 883.7,
       "lastWeekVoyage": 674.6,
-      "lastWeekPts": 10
+      "lastWeekPts": 10,
+      "matchesGroup": 4,
+      "matchesKnockout": 0,
+      "matchesTotal": 4,
+      "matchesPlayed": 0
     },
     {
       "name": "Mexico City",
@@ -183,7 +187,11 @@
       "lastWeekCombined": 710.7,
       "lastWeekStadium": 669.1,
       "lastWeekVoyage": 752.3,
-      "lastWeekPts": 9
+      "lastWeekPts": 9,
+      "matchesGroup": 3,
+      "matchesKnockout": 2,
+      "matchesTotal": 5,
+      "matchesPlayed": 0
     },
     {
       "name": "Monterrey",
@@ -198,7 +206,11 @@
       "lastWeekCombined": 680.3,
       "lastWeekStadium": 860.6,
       "lastWeekVoyage": 500.0,
-      "lastWeekPts": 8
+      "lastWeekPts": 8,
+      "matchesGroup": 3,
+      "matchesKnockout": 1,
+      "matchesTotal": 4,
+      "matchesPlayed": 0
     },
     {
       "name": "Kansas City",
@@ -213,7 +225,11 @@
       "lastWeekCombined": 460.8,
       "lastWeekStadium": 405.6,
       "lastWeekVoyage": 515.9,
-      "lastWeekPts": 7
+      "lastWeekPts": 7,
+      "matchesGroup": 4,
+      "matchesKnockout": 2,
+      "matchesTotal": 6,
+      "matchesPlayed": 0
     },
     {
       "name": "New York / New Jersey",
@@ -228,7 +244,11 @@
       "lastWeekCombined": 424.4,
       "lastWeekStadium": 409.0,
       "lastWeekVoyage": 439.8,
-      "lastWeekPts": 6
+      "lastWeekPts": 6,
+      "matchesGroup": 5,
+      "matchesKnockout": 3,
+      "matchesTotal": 8,
+      "matchesPlayed": 0
     },
     {
       "name": "Dallas",
@@ -243,7 +263,11 @@
       "lastWeekCombined": 409.5,
       "lastWeekStadium": 342.9,
       "lastWeekVoyage": 476.1,
-      "lastWeekPts": 5
+      "lastWeekPts": 5,
+      "matchesGroup": 5,
+      "matchesKnockout": 4,
+      "matchesTotal": 9,
+      "matchesPlayed": 0
     },
     {
       "name": "Toronto",
@@ -258,7 +282,11 @@
       "lastWeekCombined": 389.9,
       "lastWeekStadium": 481.4,
       "lastWeekVoyage": 298.3,
-      "lastWeekPts": 4
+      "lastWeekPts": 4,
+      "matchesGroup": 5,
+      "matchesKnockout": 1,
+      "matchesTotal": 6,
+      "matchesPlayed": 0
     },
     {
       "name": "Atlanta",
@@ -273,7 +301,11 @@
       "lastWeekCombined": 363.0,
       "lastWeekStadium": 298.4,
       "lastWeekVoyage": 427.6,
-      "lastWeekPts": 3
+      "lastWeekPts": 3,
+      "matchesGroup": 5,
+      "matchesKnockout": 3,
+      "matchesTotal": 8,
+      "matchesPlayed": 0
     },
     {
       "name": "Vancouver",
@@ -288,7 +320,11 @@
       "lastWeekCombined": 361.3,
       "lastWeekStadium": 351.7,
       "lastWeekVoyage": 370.9,
-      "lastWeekPts": 2
+      "lastWeekPts": 2,
+      "matchesGroup": 5,
+      "matchesKnockout": 2,
+      "matchesTotal": 7,
+      "matchesPlayed": 0
     },
     {
       "name": "Los Angeles",
@@ -303,7 +339,11 @@
       "lastWeekCombined": 335.6,
       "lastWeekStadium": 234.2,
       "lastWeekVoyage": 437.0,
-      "lastWeekPts": 1
+      "lastWeekPts": 1,
+      "matchesGroup": 5,
+      "matchesKnockout": 3,
+      "matchesTotal": 8,
+      "matchesPlayed": 0
     },
     {
       "name": "Houston",
@@ -318,7 +358,11 @@
       "lastWeekCombined": 333.9,
       "lastWeekStadium": 272.7,
       "lastWeekVoyage": 395.0,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 5,
+      "matchesKnockout": 2,
+      "matchesTotal": 7,
+      "matchesPlayed": 0
     },
     {
       "name": "Miami",
@@ -333,7 +377,11 @@
       "lastWeekCombined": 333.1,
       "lastWeekStadium": 190.0,
       "lastWeekVoyage": 476.1,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 4,
+      "matchesKnockout": 3,
+      "matchesTotal": 7,
+      "matchesPlayed": 0
     },
     {
       "name": "Seattle",
@@ -348,7 +396,11 @@
       "lastWeekCombined": 305.1,
       "lastWeekStadium": 208.1,
       "lastWeekVoyage": 402.0,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 4,
+      "matchesKnockout": 2,
+      "matchesTotal": 6,
+      "matchesPlayed": 0
     },
     {
       "name": "Boston",
@@ -363,7 +415,11 @@
       "lastWeekCombined": 282.6,
       "lastWeekStadium": 309.2,
       "lastWeekVoyage": 255.9,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 5,
+      "matchesKnockout": 2,
+      "matchesTotal": 7,
+      "matchesPlayed": 0
     },
     {
       "name": "Philadelphia",
@@ -378,7 +434,11 @@
       "lastWeekCombined": 272.5,
       "lastWeekStadium": 198.2,
       "lastWeekVoyage": 346.9,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 5,
+      "matchesKnockout": 1,
+      "matchesTotal": 6,
+      "matchesPlayed": 0
     },
     {
       "name": "San Francisco",
@@ -393,7 +453,11 @@
       "lastWeekCombined": 236.2,
       "lastWeekStadium": 262.0,
       "lastWeekVoyage": 210.4,
-      "lastWeekPts": 0
+      "lastWeekPts": 0,
+      "matchesGroup": 5,
+      "matchesKnockout": 1,
+      "matchesTotal": 6,
+      "matchesPlayed": 0
     }
   ]
 }
