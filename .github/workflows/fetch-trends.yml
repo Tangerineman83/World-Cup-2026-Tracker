@@ -27,7 +27,7 @@ jobs:
      - name: Install dependencies
        run: pip install pytrends==4.9.2 requests urllib3==1.26.18
 
-     - name: Fetch Google Trends data
+     - name: Fetch Trends data
        run: python scripts/fetch_trends.py
 
      - name: Commit updated data
