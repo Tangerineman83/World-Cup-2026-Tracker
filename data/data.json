@@ -13,7 +13,7 @@
     "low_conf_cap": "5.0x",
     "low_conf_threshold_weekly": 150
   },
-  "baselineWindow": "2025-06-01 to 2026-05-31",
+  "baselineWindow": "2026-06-01 to 2026-06-07 (equiv. in [2019, 2022, 2023])",
   "weeks": [
     {
       "label": "Week 1",
@@ -981,5 +981,16 @@
     2023
   ],
   "baselineMethod": "Same-period average: 2019, 2022, 2023 (clean pre-tournament years)",
-  "_baselineInProgress": true
+  "_baselineInProgress": true,
+  "baselines": {
+    "New York / New Jersey": {
+      "stadium_avg_weekly": 8992.0,
+      "city_avg_weekly": 232159.7,
+      "wikivoyage_avg_weekly": 1428.7,
+      "stadium_total": 26976,
+      "city_total": 696479,
+      "wikivoyage_total": 4286,
+      "wikivoyage_low_conf": false
+    }
+  }
 }
