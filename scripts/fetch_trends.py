@@ -208,60 +208,67 @@ def git_commit(message):
 
 def fetch_match_counts():
     """
-    Fetch the 2026 World Cup schedule from openfootball (public domain, no API key)
-    and return match counts per city split by group stage and knockout.
-    Falls back to hardcoded totals if the fetch fails.
+    Fetch the 2026 World Cup schedule from openfootball (public domain, no API key).
+    Returns per-city counts of:
+      - total:  all matches scheduled at that venue
+      - played: matches where a score is present in the JSON (updated as tournament progresses)
+
+    Falls back to hardcoded totals (played=0) if the fetch fails.
     """
-    # Hardcoded fallback (correct as of schedule published June 2026)
+    # Hardcoded scheduled totals — correct as of schedule published June 2026.
+    # played always starts at 0 in fallback; real counts come from the live JSON.
     fallback = {
-        "New York / New Jersey": {"group": 5, "knockout": 3, "total": 8},
-        "Los Angeles":           {"group": 5, "knockout": 3, "total": 8},
-        "Dallas":                {"group": 5, "knockout": 4, "total": 9},
-        "Mexico City":           {"group": 3, "knockout": 2, "total": 5},
-        "Miami":                 {"group": 4, "knockout": 3, "total": 7},
-        "Atlanta":               {"group": 5, "knockout": 3, "total": 8},
-        "San Francisco":         {"group": 5, "knockout": 1, "total": 6},
-        "Seattle":               {"group": 4, "knockout": 2, "total": 6},
-        "Toronto":               {"group": 5, "knockout": 1, "total": 6},
-        "Boston":                {"group": 5, "knockout": 2, "total": 7},
-        "Guadalajara":           {"group": 4, "knockout": 0, "total": 4},
-        "Houston":               {"group": 5, "knockout": 2, "total": 7},
-        "Philadelphia":          {"group": 5, "knockout": 1, "total": 6},
-        "Vancouver":             {"group": 5, "knockout": 2, "total": 7},
-        "Monterrey":             {"group": 3, "knockout": 1, "total": 4},
-        "Kansas City":           {"group": 4, "knockout": 2, "total": 6},
+        "New York / New Jersey": {"total": 8,  "played": 0},
+        "Los Angeles":           {"total": 8,  "played": 0},
+        "Dallas":                {"total": 9,  "played": 0},
+        "Mexico City":           {"total": 5,  "played": 0},
+        "Miami":                 {"total": 7,  "played": 0},
+        "Atlanta":               {"total": 8,  "played": 0},
+        "San Francisco":         {"total": 6,  "played": 0},
+        "Seattle":               {"total": 6,  "played": 0},
+        "Toronto":               {"total": 6,  "played": 0},
+        "Boston":                {"total": 7,  "played": 0},
+        "Guadalajara":           {"total": 4,  "played": 0},
+        "Houston":               {"total": 7,  "played": 0},
+        "Philadelphia":          {"total": 6,  "played": 0},
+        "Vancouver":             {"total": 7,  "played": 0},
+        "Monterrey":             {"total": 4,  "played": 0},
+        "Kansas City":           {"total": 6,  "played": 0},
     }
     try:
         req = urllib.request.Request(SCHEDULE_URL, headers={"User-Agent": WIKI_AGENT})
         with urllib.request.urlopen(req, timeout=15) as r:
             data = json.loads(r.read())
+
         matches = data.get("matches", [])
-        counts  = {city: {"group": 0, "knockout": 0, "total": 0, "played": 0}
-                   for city in GROUND_MAP.values()}
-        today_str = date.today().strftime("%Y-%m-%d")
+        counts  = {city: {"total": 0, "played": 0} for city in GROUND_MAP.values()}
+
         for m in matches:
             city = GROUND_MAP.get(m.get("ground", ""))
             if not city:
                 continue
             rnd = m.get("round", "")
-            if rnd in GROUP_ROUNDS:
-                counts[city]["group"]    += 1
-            elif rnd in KNOCKOUT_ROUNDS:
-                counts[city]["knockout"] += 1
-            else:
+            if rnd not in GROUP_ROUNDS and rnd not in KNOCKOUT_ROUNDS:
                 continue
+
             counts[city]["total"] += 1
-            # Count played matches (score present or date has passed)
-            if m.get("date", "9999") <= today_str:
-                score1 = m.get("score1")
-                score2 = m.get("score2")
-                if score1 is not None and score2 is not None:
-                    counts[city]["played"] += 1
-        print("  Schedule fetched: " + str(sum(c["total"] for c in counts.values())) + " matches mapped")
+
+            # A match is played when score1 and score2 are both present in the JSON.
+            # openfootball populates these fields once a result is confirmed.
+            score1 = m.get("score1")
+            score2 = m.get("score2")
+            if score1 is not None and score2 is not None:
+                counts[city]["played"] += 1
+
+        total_scheduled = sum(c["total"]  for c in counts.values())
+        total_played    = sum(c["played"] for c in counts.values())
+        print("  Schedule fetched: " + str(total_scheduled) + " scheduled, "
+              + str(total_played) + " played")
         return counts
+
     except Exception as e:
         print("  Schedule fetch failed (" + str(e) + ") - using hardcoded fallback")
-        return {k: dict(v, played=0) for k, v in fallback.items()}
+        return fallback
 
 
 def baseline_dates(start_date, end_date, year):
@@ -482,7 +489,7 @@ def main():
     for city in CITIES:
         n  = city["name"]
         bl = baselines.get(n, {})
-        mc = match_counts.get(n, {"group": 0, "knockout": 0, "total": 0, "played": 0})
+        mc = match_counts.get(n, {"total": 0, "played": 0})
         results.append({
             "name":    n, "country": city["country"],
             "flag":    city["flag"], "region":  city["region"],
@@ -494,8 +501,6 @@ def main():
             "lastWeekStadium":   current["stadium"][n],
             "lastWeekVoyage":    current["voyage"][n],
             "lastWeekPts":       current["points"][n],
-            "matchesGroup":      mc["group"],
-            "matchesKnockout":   mc["knockout"],
             "matchesTotal":      mc["total"],
             "matchesPlayed":     mc["played"],
         })
