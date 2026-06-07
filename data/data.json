@@ -853,5 +853,25 @@
       },
       "first4Pts": 0
     }
-  ]
+  ],
+  "periodBaselines": {
+    "Week 1": {
+      "New York / New Jersey": {
+        "stadium_avg_weekly": 17121.0,
+        "city_avg_weekly": 190527.3,
+        "wikivoyage_avg_weekly": 682.7,
+        "stadium_total": 51363,
+        "city_total": 571582,
+        "wikivoyage_total": 2048,
+        "wikivoyage_low_conf": false
+      }
+    }
+  },
+  "baselineYears": [
+    2019,
+    2022,
+    2023
+  ],
+  "baselineMethod": "Same-period average: 2019, 2022, 2023 (clean pre-tournament years)",
+  "_baselineInProgress": true
 }
