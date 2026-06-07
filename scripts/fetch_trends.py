@@ -288,24 +288,37 @@ def fetch_period_views(article, project, start_date, end_date):
         return voyage(article, start_date, end_date)
 
 
-def fetch_baseline_for_period(start_date, end_date):
+def fetch_baseline_for_period(start_date, end_date, period_label,
+                               all_period_baselines, save_fn):
     """
     Fetch baseline views for all 16 cities across all three baseline years
-    for a specific date window (e.g. Jun 11-17).
-    Returns dict of {city_name: {stadium_avg_weekly, city_avg_weekly,
-                                  wikivoyage_avg_weekly, wikivoyage_low_conf}}
+    for a specific date window. Saves progress after EACH CITY so the repo
+    is updated every ~14 seconds rather than every ~4 minutes.
+
+    Resumes from partially-completed city data if a prior run was interrupted.
     """
     days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
     week_fraction = days / 7.0
     n_years = len(BASELINE_YEARS)
 
     print("\n  Baseline: same window in " + str(BASELINE_YEARS))
-    baselines = {}
+
+    # Resume: load any cities already fetched for this period
+    baselines = all_period_baselines.get(period_label, {})
+    already_done = set(baselines.keys())
+    if already_done:
+        print("  Resuming " + period_label + ": " +
+              str(len(already_done)) + " cities already fetched")
 
     for city in CITIES:
         n = city["name"]
-        s_total = c_total = v_total = 0
 
+        # Skip cities already fetched in a previous interrupted run
+        if n in already_done:
+            print("    Skipping " + n + " (already fetched)")
+            continue
+
+        s_total = c_total = v_total = 0
         for year in BASELINE_YEARS:
             bs, be = baseline_window_for_period(start_date, end_date, year)
             sv = wiki(city["stadium_article"],      bs, be); time.sleep(1.0)
@@ -315,7 +328,6 @@ def fetch_baseline_for_period(start_date, end_date):
             c_total += cv
             v_total += vv
 
-        # Average weekly views across baseline years (normalised to 7-day equiv)
         s_avg = round((s_total / n_years) / week_fraction, 1)
         c_avg = round((c_total / n_years) / week_fraction, 1)
         v_avg = round((v_total / n_years) / week_fraction, 1)
@@ -335,6 +347,10 @@ def fetch_baseline_for_period(start_date, end_date):
               + "  city=" + str(c_avg) + "/wk"
               + "  voyage=" + str(v_avg) + "/wk"
               + (" [LOW CONF]" if v_low else ""))
+
+        # Save after every city — progress committed to repo immediately
+        all_period_baselines[period_label] = baselines
+        save_fn(all_period_baselines)
 
     return baselines
 
@@ -390,9 +406,12 @@ def fetch_baselines():
         # Commit to repo so progress survives a cancelled run
         try:
             subprocess.run(["git", "add", "data/data.json"], check=True)
+            # Count total cities fetched across all periods
+            total_cities = sum(len(v) for v in pb.values() if isinstance(v, dict))
+            total_expected = len(CITIES) * (len(WEEKS) + 1)
             subprocess.run(["git", "commit", "-m",
-                "chore: baseline progress save (" + str(len(pb)) + "/" +
-                str(len(WEEKS) + 1) + " periods)"], check=True)
+                "chore: baseline progress (" + str(total_cities) + "/" +
+                str(total_expected) + " cities)"], check=True)
             subprocess.run(["git", "push"], check=True)
             print("    Committed to repo.")
         except subprocess.CalledProcessError as e:
@@ -404,8 +423,9 @@ def fetch_baselines():
             print("  Skipping " + week["label"] + " (already fetched)")
             continue
         print("\n  " + week["label"] + " (" + week["start"] + " to " + week["end"] + ")")
-        period_baselines[week["label"]] = fetch_baseline_for_period(
-            week["start"], week["end"]
+        fetch_baseline_for_period(
+            week["start"], week["end"],
+            week["label"], period_baselines, save_progress
         )
         save_progress(period_baselines)
         print("  Progress saved (" + str(len(period_baselines)) + "/" +
@@ -422,7 +442,10 @@ def fetch_baselines():
             l7_end   = "2026-06-17"
             l7_start = "2026-06-11"
         print("\n  Last 7 days baseline window: " + l7_start + " to " + l7_end)
-        period_baselines["last7"] = fetch_baseline_for_period(l7_start, l7_end)
+        fetch_baseline_for_period(
+            l7_start, l7_end,
+            "last7", period_baselines, save_progress
+        )
         save_progress(period_baselines)
         print("  All baseline periods complete.")
     else:
