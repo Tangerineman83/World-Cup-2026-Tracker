@@ -2,13 +2,14 @@
 """
 fetch_trends.py  —  Wikipedia + Wikivoyage Uplift Tracker
 
-Combined uplift index vs 12-month baseline:
+Combined uplift index vs same-period baseline (avg of 2019, 2022, 2023):
   combined = (stadium_wikipedia * 0.50) + (wikivoyage_city * 0.30) + (city_wikipedia * 0.20)
 
 Wikivoyage uplift is clamped to [1.0x, 10.0x] to smooth noise from small sample sizes.
 Stadium and city Wikipedia are uncapped (large baselines, noise-resistant).
 
 Low-confidence flag: Wikivoyage baseline < 150 views/week -> flagged in output.
+Baseline years: 2019, 2022, 2023 (fully clean - no Copa America, Club WC, or COVID).
 """
 
 import json, time, os, urllib.request, urllib.error
@@ -152,9 +153,15 @@ WEEKS = [
     {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
 ]
 
-BASELINE_START = "2025-06-01"
-BASELINE_END   = "2026-05-31"
-BASELINE_WEEKS = 52
+# Same-period baseline: average of equivalent weeks in 2019, 2022, 2023.
+# These three years are fully clean for all 16 venues (no Copa America,
+# Club World Cup, or COVID anomalies in the Jun 11 - Jul 8 window).
+# 2024 excluded: Copa America ran Jun 20-Jul 14 in 8 of our venues.
+# 2025 excluded: Club World Cup ran Jun 15-Jul 13 in 6+ of our venues.
+# 2020/2021 excluded: COVID lockdowns distort all traffic patterns.
+BASELINE_YEARS       = [2019, 2022, 2023]
+BASELINE_DESCRIPTION = "Same-period average: 2019, 2022, 2023 (clean pre-tournament years)"
+WIKIVOYAGE_LOW_CONF_ABSOLUTE = 150  # baseline views/week below this = low confidence
 
 # Weights
 STADIUM_WEIGHT    = 0.50
@@ -164,7 +171,7 @@ CITY_WIKI_WEIGHT  = 0.20
 # Wikivoyage noise controls (as index values: 100 = 1x, 1000 = 10x)
 WIKIVOYAGE_FLOOR      = 100.0   # 1.0x minimum — no downward drag from noise
 WIKIVOYAGE_CAP        = 1000.0  # 10.0x maximum — prevents outlier spikes from tiny baselines
-WIKIVOYAGE_LOW_CONF   = 150     # views/week below this flags low confidence
+WIKIVOYAGE_LOW_CONF   = WIKIVOYAGE_LOW_CONF_ABSOLUTE
 
 WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
@@ -258,122 +265,162 @@ def to_points(combined_scores):
 
 # ── Baseline ───────────────────────────────────────────────────────────────────
 
-def fetch_baselines():
-    """Full 12-month baseline fetch for all three signals."""
-    print("\n=== Fetching 12-month baselines (" + BASELINE_START + " to " + BASELINE_END + ") ===")
-    print("    (Stored in data.json and reused on future runs)")
+def baseline_window_for_period(start_date, end_date, year):
+    """
+    Return the equivalent date window in a prior year.
+    e.g. 2026-06-11 -> 2026-06-17 in year 2019 = 2019-06-11 -> 2019-06-17
+    We use the same calendar dates (not the same day-of-week) so the
+    comparison is always the same seasonal window.
+    """
+    s = date.fromisoformat(start_date)
+    e = date.fromisoformat(end_date)
+    return (
+        s.replace(year=year).strftime("%Y-%m-%d"),
+        e.replace(year=year).strftime("%Y-%m-%d"),
+    )
+
+
+def fetch_period_views(article, project, start_date, end_date):
+    """Fetch views for one article over one period. Returns total int."""
+    if project == "wikipedia":
+        return wiki(article, start_date, end_date)
+    else:
+        return voyage(article, start_date, end_date)
+
+
+def fetch_baseline_for_period(start_date, end_date):
+    """
+    Fetch baseline views for all 16 cities across all three baseline years
+    for a specific date window (e.g. Jun 11-17).
+    Returns dict of {city_name: {stadium_avg_weekly, city_avg_weekly,
+                                  wikivoyage_avg_weekly, wikivoyage_low_conf}}
+    """
+    days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
+    week_fraction = days / 7.0
+    n_years = len(BASELINE_YEARS)
+
+    print("\n  Baseline: same window in " + str(BASELINE_YEARS))
     baselines = {}
+
     for city in CITIES:
         n = city["name"]
-        print("  " + n)
+        s_total = c_total = v_total = 0
 
-        st = wiki(city["stadium_article"],    BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
-        ct = wiki(city["city_article"],       BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
-        vt = voyage(city["wikivoyage_article"], BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
+        for year in BASELINE_YEARS:
+            bs, be = baseline_window_for_period(start_date, end_date, year)
+            sv = wiki(city["stadium_article"],      bs, be); time.sleep(1.0)
+            cv = wiki(city["city_article"],          bs, be); time.sleep(1.0)
+            vv = voyage(city["wikivoyage_article"],  bs, be); time.sleep(1.0)
+            s_total += sv
+            c_total += cv
+            v_total += vv
 
-        s_avg = round(st / BASELINE_WEEKS, 1)
-        c_avg = round(ct / BASELINE_WEEKS, 1)
-        v_avg = round(vt / BASELINE_WEEKS, 1)
+        # Average weekly views across baseline years (normalised to 7-day equiv)
+        s_avg = round((s_total / n_years) / week_fraction, 1)
+        c_avg = round((c_total / n_years) / week_fraction, 1)
+        v_avg = round((v_total / n_years) / week_fraction, 1)
         v_low = v_avg < WIKIVOYAGE_LOW_CONF
 
         baselines[n] = {
             "stadium_avg_weekly":    s_avg,
             "city_avg_weekly":       c_avg,
             "wikivoyage_avg_weekly": v_avg,
-            "stadium_total":         st,
-            "city_total":            ct,
-            "wikivoyage_total":      vt,
+            "stadium_total":         s_total,
+            "city_total":            c_total,
+            "wikivoyage_total":      v_total,
             "wikivoyage_low_conf":   v_low,
         }
-        print("    stadium=" + str(s_avg) + "/wk"
+        print("    " + n.ljust(25)
+              + " stadium=" + str(s_avg) + "/wk"
               + "  city=" + str(c_avg) + "/wk"
               + "  voyage=" + str(v_avg) + "/wk"
               + (" [LOW CONF]" if v_low else ""))
+
     return baselines
+
+
+def fetch_baselines():
+    """
+    Fetch same-period baselines for all weeks + last-7-days window.
+    Each period gets its own baseline from the equivalent window in
+    BASELINE_YEARS (2019, 2022, 2023), averaged.
+
+    Returns dict keyed by period label:
+      {"Week 1": {city_name: baseline_dict}, "last7": {...}, ...}
+    """
+    print("\n=== Fetching same-period baselines ===")
+    print("    Years: " + str(BASELINE_YEARS))
+    print("    (Stored in data.json and reused on future runs)")
+
+    period_baselines = {}
+
+    # One baseline set per discrete tournament week
+    for week in WEEKS:
+        print("\n  " + week["label"] + " (" + week["start"] + " to " + week["end"] + ")")
+        period_baselines[week["label"]] = fetch_baseline_for_period(
+            week["start"], week["end"]
+        )
+
+    # Last-7-days baseline: use equivalent 7-day window starting Jun 11
+    # (tournament start date) so the baseline is always the same seasonal anchor.
+    # Once the tournament is underway we use the actual current 7-day window.
+    today = date.today()
+    tournament_start = date(2026, 6, 11)
+    if today >= tournament_start:
+        l7_end   = today.strftime("%Y-%m-%d")
+        l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
+    else:
+        l7_end   = "2026-06-17"
+        l7_start = "2026-06-11"
+    print("\n  Last 7 days baseline window: " + l7_start + " to " + l7_end)
+    period_baselines["last7"] = fetch_baseline_for_period(l7_start, l7_end)
+
+    return period_baselines
 
 
 def load_baselines(existing_data):
     """
-    Reuse baselines from data.json if valid.
-    Returns (baselines_dict, needs_refetch_list).
-    needs_refetch contains (name, kind) tuples for any zero baselines.
+    Reuse per-period baselines from data.json if valid.
+    Returns (period_baselines_dict, needs_full_refetch: bool).
+    The per-period structure is: {period_label: {city_name: baseline_dict}}
     """
     if not existing_data:
-        return None, []
-    cities = existing_data.get("cities", [])
-    if not cities or "baselineStadiumAvgWeekly" not in cities[0]:
-        return None, []
+        return None, True
+    pb = existing_data.get("periodBaselines")
+    if not pb:
+        print("  No period baselines found in data.json - full fetch required.")
+        return None, True
 
-    result = {}
-    needs_refetch = []
-    for c in cities:
-        n = c["name"]
-        s = c.get("baselineStadiumAvgWeekly",    0)
-        cv = c.get("baselineCityAvgWeekly",       0)
-        v = c.get("baselineVoyageAvgWeekly",      0)
-        result[n] = {
-            "stadium_avg_weekly":    s,
-            "city_avg_weekly":       cv,
-            "wikivoyage_avg_weekly": v,
-            "stadium_total":         c.get("baselineStadiumTotal",    0),
-            "city_total":            c.get("baselineCityTotal",       0),
-            "wikivoyage_total":      c.get("baselineVoyageTotal",     0),
-            "wikivoyage_low_conf":   v < WIKIVOYAGE_LOW_CONF,
-        }
-        if s  == 0: needs_refetch.append((n, "stadium"))
-        if cv == 0: needs_refetch.append((n, "city"))
-        if v  == 0: needs_refetch.append((n, "wikivoyage"))
+    # Validate: check all expected periods are present and no zero values
+    expected = [w["label"] for w in WEEKS] + ["last7"]
+    missing  = [p for p in expected if p not in pb]
+    if missing:
+        print("  Missing periods: " + str(missing) + " - full fetch required.")
+        return None, True
 
-    if needs_refetch:
-        print("  Zero baselines found - will re-fetch:")
-        for name, kind in needs_refetch:
-            print("    -> " + name + " (" + kind + ")")
-    else:
-        print("  All baselines valid - reusing.")
-    return result, needs_refetch
+    zero_found = False
+    for period, city_bl in pb.items():
+        for city_name, bl in city_bl.items():
+            if bl.get("stadium_avg_weekly", 0) == 0:
+                print("  Zero stadium baseline: " + city_name + " in " + period)
+                zero_found = True
+
+    if zero_found:
+        print("  Zero baselines found - full fetch required.")
+        return None, True
+
+    # Restore low_conf flag in case threshold changed
+    for period in pb:
+        for city_name in pb[period]:
+            v = pb[period][city_name].get("wikivoyage_avg_weekly", 0)
+            pb[period][city_name]["wikivoyage_low_conf"] = v < WIKIVOYAGE_LOW_CONF
+
+    print("  All period baselines valid - reusing from data.json.")
+    return pb, False
 
 
-def refetch_baselines(existing, needs_refetch):
-    """Partial re-fetch: only articles with zero baselines."""
-    print("\n=== Partial baseline re-fetch ===")
-    baselines = dict(existing)
-    for name, kind in needs_refetch:
-        city = next(c for c in CITIES if c["name"] == name)
-        print("  Re-fetching " + kind + " for: " + name)
-        if kind == "stadium":
-            t = wiki(city["stadium_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                baselines[name]["stadium_avg_weekly"] = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["stadium_total"]      = t
-                print("    -> " + str(baselines[name]["stadium_avg_weekly"]) + "/wk")
-            else:
-                print("    -> Still 0 - will retry next run")
-        elif kind == "city":
-            t = wiki(city["city_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                baselines[name]["city_avg_weekly"] = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["city_total"]      = t
-                print("    -> " + str(baselines[name]["city_avg_weekly"]) + "/wk")
-            else:
-                print("    -> Still 0 - will retry next run")
-        elif kind == "wikivoyage":
-            t = voyage(city["wikivoyage_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                v_avg = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["wikivoyage_avg_weekly"] = v_avg
-                baselines[name]["wikivoyage_total"]      = t
-                baselines[name]["wikivoyage_low_conf"]   = v_avg < WIKIVOYAGE_LOW_CONF
-                print("    -> " + str(v_avg) + "/wk"
-                      + (" [LOW CONF]" if baselines[name]["wikivoyage_low_conf"] else ""))
-            else:
-                print("    -> Still 0 - will retry next run")
-    return baselines
+# (refetch_baselines removed - with per-period baselines, any failure
+#  triggers a full re-fetch via fetch_baselines() which is cleaner)
 
 
 # ── Period fetch ───────────────────────────────────────────────────────────────
@@ -446,35 +493,32 @@ def main():
         except Exception:
             pass
 
-    loaded, needs_refetch = load_baselines(existing_data)
-    if loaded is None:
-        baselines = fetch_baselines()
-    elif needs_refetch:
-        baselines = refetch_baselines(loaded, needs_refetch)
-    else:
-        baselines = loaded
+    period_baselines, needs_fetch = load_baselines(existing_data)
+    if needs_fetch:
+        period_baselines = fetch_baselines()
 
-    # Discrete weeks
+    # Discrete weeks - each uses its own same-period baseline
     week_data = {}
     for week in WEEKS:
         if today < date.fromisoformat(week["start"]):
             print("\nSkipping " + week["label"] + " (starts " + week["start"] + ")")
             continue
         print("\n=== " + week["label"] + " ===")
+        week_bl = period_baselines[week["label"]]
         week_data[week["label"]] = fetch_period(
-            week["label"], week["start"], week["end"], baselines)
+            week["label"], week["start"], week["end"], week_bl)
 
-    # Rolling last 7 days
+    # Rolling last 7 days - uses last7 baseline
     print("\n=== Last 7 Days (rolling) ===")
     l7_end   = today.strftime("%Y-%m-%d")
     l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
-    l7 = fetch_period("Last 7 days", l7_start, l7_end, baselines)
+    l7 = fetch_period("Last 7 days", l7_start, l7_end, period_baselines["last7"])
 
     # Build results
     results = []
     for city in CITIES:
         n  = city["name"]
-        bl = baselines[n]
+        bl = period_baselines["last7"][n]  # for baseline display in HTML
 
         week_pts     = {}
         week_combined = {}
@@ -540,10 +584,12 @@ def main():
         json.dump({
             "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":         "Uplift index: 50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs 12-month baseline",
+            "metric":         "Uplift index: 50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs same-period baseline (2019, 2022, 2023)",
             "weights":        {"stadium": "50%", "wikivoyage": "30%", "city_wikipedia": "20%"},
             "wikivoyageBounds": {"floor": "1.0x", "cap": "10.0x", "low_conf_cap": "5.0x", "low_conf_threshold_weekly": WIKIVOYAGE_LOW_CONF},
-            "baselineWindow": BASELINE_START + " to " + BASELINE_END,
+            "baselineMethod": BASELINE_DESCRIPTION,
+            "baselineYears":  BASELINE_YEARS,
+            "periodBaselines": period_baselines,
             "weeks":          WEEKS,
             "cities":         results,
         }, f, ensure_ascii=False, indent=2)
