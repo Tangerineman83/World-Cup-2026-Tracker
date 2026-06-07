@@ -1,12 +1,19 @@
 {
-  "updated": "2026-06-07T08:09:37Z",
-  "updatedDisplay": "07 Jun 2026, 08:09z",
-  "metric": "Wikipedia uplift index: 2/3 stadium + 1/3 city vs 12-month baseline",
-  "baselineWindow": "2025-06-01 to 2026-05-31",
+  "updated": "2026-06-07T10:47:13Z",
+  "updatedDisplay": "07 Jun 2026, 10:47z",
+  "metric": "Uplift index: 50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs 12-month baseline",
   "weights": {
-    "stadium": "2/3",
-    "city": "1/3"
+    "stadium": "50%",
+    "wikivoyage": "30%",
+    "city_wikipedia": "20%"
   },
+  "wikivoyageBounds": {
+    "floor": "1.0x",
+    "cap": "10.0x",
+    "low_conf_cap": "5.0x",
+    "low_conf_threshold_weekly": 150
+  },
+  "baselineWindow": "2025-06-01 to 2026-05-31",
   "weeks": [
     {
       "label": "Week 1",
@@ -39,13 +46,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
       "baselineStadiumAvgWeekly": 9685.1,
       "baselineCityAvgWeekly": 36871.8,
+      "baselineVoyageAvgWeekly": 3125.3,
       "baselineStadiumTotal": 503626,
       "baselineCityTotal": 1917331,
-      "lastWeekStadiumViews": 29835,
-      "lastWeekCityViews": 30601,
-      "lastWeekStadiumUplift": 308.1,
-      "lastWeekCityUplift": 83.0,
-      "lastWeekUplift": 233.1,
+      "baselineVoyageTotal": 162516,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 211.8,
+      "lastWeekStadium": 308.1,
+      "lastWeekCity": 83.0,
+      "lastWeekVoyage": 137.0,
       "lastWeekPts": 10,
       "weekPoints": {
         "Week 1": null,
@@ -53,25 +62,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Toronto",
@@ -82,13 +97,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field",
       "baselineStadiumAvgWeekly": 5144.7,
       "baselineCityAvgWeekly": 42896.8,
+      "baselineVoyageAvgWeekly": 2973.2,
       "baselineStadiumTotal": 267524,
       "baselineCityTotal": 2230636,
-      "lastWeekStadiumViews": 13134,
-      "lastWeekCityViews": 33306,
-      "lastWeekStadiumUplift": 255.3,
-      "lastWeekCityUplift": 77.6,
-      "lastWeekUplift": 196.1,
+      "baselineVoyageTotal": 154606,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 173.2,
+      "lastWeekStadium": 255.3,
+      "lastWeekCity": 77.6,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 9,
       "weekPoints": {
         "Week 1": null,
@@ -96,25 +113,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Guadalajara",
@@ -125,13 +148,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
       "baselineStadiumAvgWeekly": 4178.5,
       "baselineCityAvgWeekly": 13083.8,
+      "baselineVoyageAvgWeekly": 1280.1,
       "baselineStadiumTotal": 217282,
       "baselineCityTotal": 680358,
-      "lastWeekStadiumViews": 9638,
-      "lastWeekCityViews": 10952,
-      "lastWeekStadiumUplift": 230.7,
-      "lastWeekCityUplift": 83.7,
-      "lastWeekUplift": 181.7,
+      "baselineVoyageTotal": 66564,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 163.8,
+      "lastWeekStadium": 230.7,
+      "lastWeekCity": 83.7,
+      "lastWeekVoyage": 105.8,
       "lastWeekPts": 8,
       "weekPoints": {
         "Week 1": null,
@@ -139,68 +164,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Monterrey",
-      "country": "MEX",
-      "flag": "MX",
-      "region": "Central",
-      "stadium": "Estadio BBVA",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
-      "baselineStadiumAvgWeekly": 4097.5,
-      "baselineCityAvgWeekly": 10495.2,
-      "baselineStadiumTotal": 213072,
-      "baselineCityTotal": 545751,
-      "lastWeekStadiumViews": 8339,
-      "lastWeekCityViews": 10481,
-      "lastWeekStadiumUplift": 203.5,
-      "lastWeekCityUplift": 99.9,
-      "lastWeekUplift": 169.0,
-      "lastWeekPts": 7,
-      "weekPoints": {
+      "weekVoyage": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekStadiumUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekCityUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
+      "first4Pts": 0
     },
     {
       "name": "Vancouver",
@@ -211,13 +199,66 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place",
       "baselineStadiumAvgWeekly": 5289.1,
       "baselineCityAvgWeekly": 31388.4,
+      "baselineVoyageAvgWeekly": 2714.1,
       "baselineStadiumTotal": 275032,
       "baselineCityTotal": 1632199,
-      "lastWeekStadiumViews": 11223,
-      "lastWeekCityViews": 25172,
-      "lastWeekStadiumUplift": 212.2,
-      "lastWeekCityUplift": 80.2,
-      "lastWeekUplift": 168.2,
+      "baselineVoyageTotal": 141131,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 152.1,
+      "lastWeekStadium": 212.2,
+      "lastWeekCity": 80.2,
+      "lastWeekVoyage": 100.0,
+      "lastWeekPts": 7,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCombined": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadium": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCity": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
+    },
+    {
+      "name": "Monterrey",
+      "country": "MEX",
+      "flag": "MX",
+      "region": "Central",
+      "stadium": "Estadio BBVA",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
+      "baselineStadiumAvgWeekly": 4097.5,
+      "baselineCityAvgWeekly": 10495.2,
+      "baselineVoyageAvgWeekly": 1089.4,
+      "baselineStadiumTotal": 213072,
+      "baselineCityTotal": 545751,
+      "baselineVoyageTotal": 56648,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 151.7,
+      "lastWeekStadium": 203.5,
+      "lastWeekCity": 99.9,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 6,
       "weekPoints": {
         "Week 1": null,
@@ -225,25 +266,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Dallas",
@@ -254,13 +301,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
       "baselineStadiumAvgWeekly": 11092.2,
       "baselineCityAvgWeekly": 27993.7,
+      "baselineVoyageAvgWeekly": 1391.9,
       "baselineStadiumTotal": 576797,
       "baselineCityTotal": 1455672,
-      "lastWeekStadiumViews": 21445,
-      "lastWeekCityViews": 21019,
-      "lastWeekStadiumUplift": 193.3,
-      "lastWeekCityUplift": 75.1,
-      "lastWeekUplift": 153.9,
+      "baselineVoyageTotal": 72378,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 141.7,
+      "lastWeekStadium": 193.3,
+      "lastWeekCity": 75.1,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 5,
       "weekPoints": {
         "Week 1": null,
@@ -268,111 +317,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
-    },
-    {
-      "name": "Houston",
-      "country": "USA",
-      "flag": "US",
-      "region": "Central",
-      "stadium": "NRG Stadium",
-      "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
-      "baselineStadiumAvgWeekly": 5771.2,
-      "baselineCityAvgWeekly": 30786.1,
-      "baselineStadiumTotal": 300102,
-      "baselineCityTotal": 1600875,
-      "lastWeekStadiumViews": 9161,
-      "lastWeekCityViews": 23786,
-      "lastWeekStadiumUplift": 158.7,
-      "lastWeekCityUplift": 77.3,
-      "lastWeekUplift": 131.6,
-      "lastWeekPts": 4,
-      "weekPoints": {
+      "weekVoyage": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekStadiumUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekCityUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
-    },
-    {
-      "name": "New York / New Jersey",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "stadium": "MetLife Stadium",
-      "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
-      "baselineStadiumAvgWeekly": 23238.6,
-      "baselineCityAvgWeekly": 139192.3,
-      "baselineStadiumTotal": 1208407,
-      "baselineCityTotal": 7237998,
-      "lastWeekStadiumViews": 36778,
-      "lastWeekCityViews": 102330,
-      "lastWeekStadiumUplift": 158.3,
-      "lastWeekCityUplift": 73.5,
-      "lastWeekUplift": 130.0,
-      "lastWeekPts": 3,
-      "weekPoints": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekStadiumUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "weekCityUplift": {
-        "Week 1": null,
-        "Week 2": null,
-        "Week 3": null,
-        "Week 4": null
-      },
-      "toDatePoints": 0
+      "first4Pts": 0
     },
     {
       "name": "Los Angeles",
@@ -383,13 +352,117 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
       "baselineStadiumAvgWeekly": 16025.1,
       "baselineCityAvgWeekly": 83458.6,
+      "baselineVoyageAvgWeekly": 3318.7,
       "baselineStadiumTotal": 833307,
       "baselineCityTotal": 4339849,
-      "lastWeekStadiumViews": 20406,
-      "lastWeekCityViews": 86516,
-      "lastWeekStadiumUplift": 127.3,
-      "lastWeekCityUplift": 103.7,
-      "lastWeekUplift": 119.4,
+      "baselineVoyageTotal": 172571,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 126.0,
+      "lastWeekStadium": 127.3,
+      "lastWeekCity": 103.7,
+      "lastWeekVoyage": 138.8,
+      "lastWeekPts": 4,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCombined": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadium": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCity": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
+    },
+    {
+      "name": "Houston",
+      "country": "USA",
+      "flag": "US",
+      "region": "Central",
+      "stadium": "NRG Stadium",
+      "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
+      "baselineStadiumAvgWeekly": 5771.2,
+      "baselineCityAvgWeekly": 30786.1,
+      "baselineVoyageAvgWeekly": 1502.5,
+      "baselineStadiumTotal": 300102,
+      "baselineCityTotal": 1600875,
+      "baselineVoyageTotal": 78130,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 124.8,
+      "lastWeekStadium": 158.7,
+      "lastWeekCity": 77.3,
+      "lastWeekVoyage": 100.0,
+      "lastWeekPts": 3,
+      "weekPoints": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCombined": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekStadium": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekCity": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
+    },
+    {
+      "name": "New York / New Jersey",
+      "country": "USA",
+      "flag": "US",
+      "region": "East",
+      "stadium": "MetLife Stadium",
+      "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
+      "baselineStadiumAvgWeekly": 23238.6,
+      "baselineCityAvgWeekly": 139192.3,
+      "baselineVoyageAvgWeekly": 8900.6,
+      "baselineStadiumTotal": 1208407,
+      "baselineCityTotal": 7237998,
+      "baselineVoyageTotal": 462829,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 123.9,
+      "lastWeekStadium": 158.3,
+      "lastWeekCity": 73.5,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 2,
       "weekPoints": {
         "Week 1": null,
@@ -397,25 +470,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Kansas City",
@@ -426,13 +505,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
       "baselineStadiumAvgWeekly": 6873.6,
       "baselineCityAvgWeekly": 21869.5,
+      "baselineVoyageAvgWeekly": 1078.7,
       "baselineStadiumTotal": 357429,
       "baselineCityTotal": 1137214,
-      "lastWeekStadiumViews": 9135,
-      "lastWeekCityViews": 19603,
-      "lastWeekStadiumUplift": 132.9,
-      "lastWeekCityUplift": 89.6,
-      "lastWeekUplift": 118.5,
+      "baselineVoyageTotal": 56091,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 123.2,
+      "lastWeekStadium": 132.9,
+      "lastWeekCity": 89.6,
+      "lastWeekVoyage": 129.6,
       "lastWeekPts": 1,
       "weekPoints": {
         "Week 1": null,
@@ -440,25 +521,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Boston",
@@ -469,13 +556,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
       "baselineStadiumAvgWeekly": 9797.4,
       "baselineCityAvgWeekly": 38988.3,
+      "baselineVoyageAvgWeekly": 3263.9,
       "baselineStadiumTotal": 509466,
       "baselineCityTotal": 2027393,
-      "lastWeekStadiumViews": 13255,
-      "lastWeekCityViews": 29628,
-      "lastWeekStadiumUplift": 135.3,
-      "lastWeekCityUplift": 76.0,
-      "lastWeekUplift": 115.5,
+      "baselineVoyageTotal": 169725,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 112.9,
+      "lastWeekStadium": 135.3,
+      "lastWeekCity": 76.0,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -483,25 +572,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Atlanta",
@@ -512,13 +607,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
       "baselineStadiumAvgWeekly": 10271.2,
       "baselineCityAvgWeekly": 37197.6,
+      "baselineVoyageAvgWeekly": 1521.9,
       "baselineStadiumTotal": 534103,
       "baselineCityTotal": 1934276,
-      "lastWeekStadiumViews": 12099,
-      "lastWeekCityViews": 28074,
-      "lastWeekStadiumUplift": 117.8,
-      "lastWeekCityUplift": 75.5,
-      "lastWeekUplift": 103.7,
+      "baselineVoyageTotal": 79140,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 108.3,
+      "lastWeekStadium": 117.8,
+      "lastWeekCity": 75.5,
+      "lastWeekVoyage": 114.3,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -526,25 +623,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Philadelphia",
@@ -555,13 +658,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
       "baselineStadiumAvgWeekly": 6500.2,
       "baselineCityAvgWeekly": 39178.2,
+      "baselineVoyageAvgWeekly": 2160.8,
       "baselineStadiumTotal": 338012,
       "baselineCityTotal": 2037269,
-      "lastWeekStadiumViews": 6551,
-      "lastWeekCityViews": 30606,
-      "lastWeekStadiumUplift": 100.8,
-      "lastWeekCityUplift": 78.1,
-      "lastWeekUplift": 93.2,
+      "baselineVoyageTotal": 112364,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 96.0,
+      "lastWeekStadium": 100.8,
+      "lastWeekCity": 78.1,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -569,25 +674,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Seattle",
@@ -598,13 +709,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
       "baselineStadiumAvgWeekly": 9097.8,
       "baselineCityAvgWeekly": 42211.4,
+      "baselineVoyageAvgWeekly": 3835.7,
       "baselineStadiumTotal": 473084,
       "baselineCityTotal": 2194995,
-      "lastWeekStadiumViews": 8482,
-      "lastWeekCityViews": 29018,
-      "lastWeekStadiumUplift": 93.2,
-      "lastWeekCityUplift": 68.7,
-      "lastWeekUplift": 85.0,
+      "baselineVoyageTotal": 199454,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 90.3,
+      "lastWeekStadium": 93.2,
+      "lastWeekCity": 68.7,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -612,25 +725,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "Miami",
@@ -641,13 +760,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
       "baselineStadiumAvgWeekly": 13447.1,
       "baselineCityAvgWeekly": 33905.1,
+      "baselineVoyageAvgWeekly": 0,
       "baselineStadiumTotal": 699249,
       "baselineCityTotal": 1763065,
-      "lastWeekStadiumViews": 10548,
-      "lastWeekCityViews": 22496,
-      "lastWeekStadiumUplift": 78.4,
-      "lastWeekCityUplift": 66.3,
-      "lastWeekUplift": 74.4,
+      "baselineVoyageTotal": 0,
+      "wikivoyageLowConf": true,
+      "lastWeekCombined": 82.5,
+      "lastWeekStadium": 78.4,
+      "lastWeekCity": 66.3,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -655,25 +776,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     },
     {
       "name": "San Francisco",
@@ -684,13 +811,15 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
       "baselineStadiumAvgWeekly": 15400.3,
       "baselineCityAvgWeekly": 43390.9,
+      "baselineVoyageAvgWeekly": 2790.7,
       "baselineStadiumTotal": 800816,
       "baselineCityTotal": 2256328,
-      "lastWeekStadiumViews": 8887,
-      "lastWeekCityViews": 33874,
-      "lastWeekStadiumUplift": 57.7,
-      "lastWeekCityUplift": 78.1,
-      "lastWeekUplift": 64.5,
+      "baselineVoyageTotal": 145115,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 58.9,
+      "lastWeekStadium": 57.7,
+      "lastWeekCity": 0.0,
+      "lastWeekVoyage": 100.0,
       "lastWeekPts": 0,
       "weekPoints": {
         "Week 1": null,
@@ -698,25 +827,31 @@
         "Week 3": null,
         "Week 4": null
       },
-      "weekUplift": {
+      "weekCombined": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekStadiumUplift": {
+      "weekStadium": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "weekCityUplift": {
+      "weekCity": {
         "Week 1": null,
         "Week 2": null,
         "Week 3": null,
         "Week 4": null
       },
-      "toDatePoints": 0
+      "weekVoyage": {
+        "Week 1": null,
+        "Week 2": null,
+        "Week 3": null,
+        "Week 4": null
+      },
+      "first4Pts": 0
     }
   ]
 }
