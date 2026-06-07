@@ -1,555 +1,530 @@
-#!/usr/bin/env python3
-"""
-fetch_trends.py  —  Wikipedia + Wikivoyage Uplift Tracker
-
-Combined uplift index vs 12-month baseline:
-  combined = (stadium_wikipedia * 0.50) + (wikivoyage_city * 0.30) + (city_wikipedia * 0.20)
-
-Wikivoyage uplift is clamped to [1.0x, 10.0x] to smooth noise from small sample sizes.
-Stadium and city Wikipedia are uncapped (large baselines, noise-resistant).
-
-Low-confidence flag: Wikivoyage baseline < 150 views/week -> flagged in output.
-"""
-
-import json, time, os, urllib.request, urllib.error
-from datetime import datetime, timezone, date, timedelta
-
-CITIES = [
-    {
-        "name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "MetLife Stadium",
-        "stadium_article":    "MetLife_Stadium",
-        "city_article":       "New_York_City",
-        "wikivoyage_article": "New_York_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
-    },
-    {
-        "name": "Los Angeles", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "SoFi Stadium",
-        "stadium_article":    "SoFi_Stadium",
-        "city_article":       "Los_Angeles",
-        "wikivoyage_article": "Los_Angeles",
-        "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
-    },
-    {
-        "name": "Dallas", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "AT&T Stadium",
-        "stadium_article":    "AT%26T_Stadium",
-        "city_article":       "Dallas",
-        "wikivoyage_article": "Dallas",
-        "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
-    },
-    {
-        "name": "Mexico City", "country": "MEX", "flag": "MX", "region": "Central",
-        "stadium": "Estadio Azteca",
-        "stadium_article":    "Estadio_Azteca",
-        "city_article":       "Mexico_City",
-        "wikivoyage_article": "Mexico_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
-    },
-    {
-        "name": "Miami", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Hard Rock Stadium",
-        "stadium_article":    "Hard_Rock_Stadium",
-        "city_article":       "Miami",
-        "wikivoyage_article": "Miami",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
-    },
-    {
-        "name": "Atlanta", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "Mercedes-Benz Stadium",
-        "stadium_article":    "Mercedes-Benz_Stadium",
-        "city_article":       "Atlanta",
-        "wikivoyage_article": "Atlanta",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
-    },
-    {
-        "name": "San Francisco", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "Levi's Stadium",
-        "stadium_article":    "Levi%27s_Stadium",
-        "city_article":       "San_Francisco",
-        "wikivoyage_article": "San_Francisco",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
-    },
-    {
-        "name": "Seattle", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "Lumen Field",
-        "stadium_article":    "Lumen_Field",
-        "city_article":       "Seattle",
-        "wikivoyage_article": "Seattle",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
-    },
-    {
-        "name": "Toronto", "country": "CAN", "flag": "CA", "region": "East",
-        "stadium": "BMO Field",
-        "stadium_article":    "BMO_Field",
-        "city_article":       "Toronto",
-        "wikivoyage_article": "Toronto",
-        "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field",
-    },
-    {
-        "name": "Boston", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Gillette Stadium",
-        "stadium_article":    "Gillette_Stadium",
-        "city_article":       "Boston",
-        "wikivoyage_article": "Boston",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
-    },
-    {
-        "name": "Guadalajara", "country": "MEX", "flag": "MX", "region": "West",
-        "stadium": "Estadio Akron",
-        "stadium_article":    "Estadio_Akron",
-        "city_article":       "Guadalajara",
-        "wikivoyage_article": "Guadalajara",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
-    },
-    {
-        "name": "Houston", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "NRG Stadium",
-        "stadium_article":    "NRG_Stadium",
-        "city_article":       "Houston",
-        "wikivoyage_article": "Houston",
-        "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
-    },
-    {
-        "name": "Philadelphia", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Lincoln Financial Field",
-        "stadium_article":    "Lincoln_Financial_Field",
-        "city_article":       "Philadelphia",
-        "wikivoyage_article": "Philadelphia",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
-    },
-    {
-        "name": "Vancouver", "country": "CAN", "flag": "CA", "region": "West",
-        "stadium": "BC Place",
-        "stadium_article":    "BC_Place",
-        "city_article":       "Vancouver",
-        "wikivoyage_article": "Vancouver",
-        "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place",
-    },
-    {
-        "name": "Monterrey", "country": "MEX", "flag": "MX", "region": "Central",
-        "stadium": "Estadio BBVA",
-        "stadium_article":    "Estadio_BBVA",
-        "city_article":       "Monterrey",
-        "wikivoyage_article": "Monterrey",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
-    },
-    {
-        "name": "Kansas City", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "Arrowhead Stadium",
-        "stadium_article":    "Arrowhead_Stadium",
-        "city_article":       "Kansas_City,_Missouri",
-        "wikivoyage_article": "Kansas_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
-    },
-]
-
-WEEKS = [
-    {"label": "Week 1", "start": "2026-06-11", "end": "2026-06-17"},
-    {"label": "Week 2", "start": "2026-06-18", "end": "2026-06-24"},
-    {"label": "Week 3", "start": "2026-06-25", "end": "2026-07-01"},
-    {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
-]
-
-BASELINE_START = "2025-06-01"
-BASELINE_END   = "2026-05-31"
-BASELINE_WEEKS = 52
-
-# Weights
-STADIUM_WEIGHT    = 0.50
-WIKIVOYAGE_WEIGHT = 0.30
-CITY_WIKI_WEIGHT  = 0.20
-
-# Wikivoyage noise controls (as index values: 100 = 1x, 1000 = 10x)
-WIKIVOYAGE_FLOOR      = 100.0   # 1.0x minimum — no downward drag from noise
-WIKIVOYAGE_CAP        = 1000.0  # 10.0x maximum — prevents outlier spikes from tiny baselines
-WIKIVOYAGE_LOW_CONF   = 150     # views/week below this flags low confidence
-
-WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
-
-
-# ── API ────────────────────────────────────────────────────────────────────────
-
-def get_pageviews(project, article, start_date, end_date, retries=4):
-    """
-    Fetch total pageviews from Wikimedia for any project (wikipedia or wikivoyage).
-    project: e.g. 'en.wikipedia' or 'en.wikivoyage'
-    """
-    start = start_date.replace("-", "")
-    end   = end_date.replace("-", "")
-    url = (
-        "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-        + project + "/all-access/all-agents/"
-        + article + "/daily/" + start + "/" + end
-    )
-    for attempt in range(retries):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
-            with urllib.request.urlopen(req, timeout=15) as r:
-                data = json.loads(r.read())
-                return sum(item["views"] for item in data.get("items", []))
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                wait = 5 * (2 ** attempt)
-                print("    429 rate limit - waiting " + str(wait) + "s...")
-                time.sleep(wait)
-            elif e.code == 404:
-                print("    404 not found: " + project + "/" + article)
-                return 0
-            else:
-                print("    HTTP " + str(e.code) + ": " + article)
-                return 0
-        except Exception as e:
-            print("    Error (" + article + "): " + str(e))
-            return 0
-    print("    All retries failed: " + article)
-    return 0
-
-
-def wiki(article, start, end):
-    """Shorthand for English Wikipedia."""
-    return get_pageviews("en.wikipedia", article, start, end)
-
-
-def voyage(article, start, end):
-    """Shorthand for English Wikivoyage."""
-    return get_pageviews("en.wikivoyage", article, start, end)
-
-
-# ── Uplift calculation ─────────────────────────────────────────────────────────
-
-def uplift(views, avg_weekly, week_fraction=1.0):
-    """Raw uplift index. Returns 0.0 if baseline missing."""
-    if avg_weekly <= 0:
-        return 0.0
-    weekly_equiv = views / week_fraction
-    return round(weekly_equiv / avg_weekly * 100, 1)
-
-
-def clamp_wikivoyage(raw_uplift, low_conf=False):
-    """
-    Apply floor and cap to Wikivoyage uplift.
-    Floor: 100 (1.0x) — prevents noisy below-baseline weeks from dragging score down.
-    Cap:  1000 (10.0x) — prevents outlier spikes on small samples inflating score.
-    Low-confidence baseline (<150 views/week): cap reduced to 500 (5x) for extra caution.
-    """
-    effective_cap = 500.0 if low_conf else WIKIVOYAGE_CAP
-    return round(max(WIKIVOYAGE_FLOOR, min(effective_cap, raw_uplift)), 1)
-
-
-def combined(stadium_u, wikivoyage_u, city_u):
-    """Weighted combination of three uplift signals."""
-    return round(
-        stadium_u    * STADIUM_WEIGHT +
-        wikivoyage_u * WIKIVOYAGE_WEIGHT +
-        city_u       * CITY_WIKI_WEIGHT,
-        1
-    )
-
-
-def to_points(combined_scores):
-    """1st=10pts ... 10th=1pt, 11th-16th=0pts. No points if all zero."""
-    if not combined_scores or max(combined_scores.values()) == 0:
-        return {n: 0 for n in combined_scores}
-    ranked = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-    return {name: max(0, 10 - i) for i, (name, _) in enumerate(ranked)}
-
-
-# ── Baseline ───────────────────────────────────────────────────────────────────
-
-def fetch_baselines():
-    """Full 12-month baseline fetch for all three signals."""
-    print("\n=== Fetching 12-month baselines (" + BASELINE_START + " to " + BASELINE_END + ") ===")
-    print("    (Stored in data.json and reused on future runs)")
-    baselines = {}
-    for city in CITIES:
-        n = city["name"]
-        print("  " + n)
-
-        st = wiki(city["stadium_article"],    BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
-        ct = wiki(city["city_article"],       BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
-        vt = voyage(city["wikivoyage_article"], BASELINE_START, BASELINE_END)
-        time.sleep(1.5)
-
-        s_avg = round(st / BASELINE_WEEKS, 1)
-        c_avg = round(ct / BASELINE_WEEKS, 1)
-        v_avg = round(vt / BASELINE_WEEKS, 1)
-        v_low = v_avg < WIKIVOYAGE_LOW_CONF
-
-        baselines[n] = {
-            "stadium_avg_weekly":    s_avg,
-            "city_avg_weekly":       c_avg,
-            "wikivoyage_avg_weekly": v_avg,
-            "stadium_total":         st,
-            "city_total":            ct,
-            "wikivoyage_total":      vt,
-            "wikivoyage_low_conf":   v_low,
-        }
-        print("    stadium=" + str(s_avg) + "/wk"
-              + "  city=" + str(c_avg) + "/wk"
-              + "  voyage=" + str(v_avg) + "/wk"
-              + (" [LOW CONF]" if v_low else ""))
-    return baselines
-
-
-def load_baselines(existing_data):
-    """
-    Reuse baselines from data.json if valid.
-    Returns (baselines_dict, needs_refetch_list).
-    needs_refetch contains (name, kind) tuples for any zero baselines.
-    """
-    if not existing_data:
-        return None, []
-    cities = existing_data.get("cities", [])
-    if not cities or "baselineStadiumAvgWeekly" not in cities[0]:
-        return None, []
-
-    result = {}
-    needs_refetch = []
-    for c in cities:
-        n = c["name"]
-        s = c.get("baselineStadiumAvgWeekly",    0)
-        cv = c.get("baselineCityAvgWeekly",       0)
-        v = c.get("baselineVoyageAvgWeekly",      0)
-        result[n] = {
-            "stadium_avg_weekly":    s,
-            "city_avg_weekly":       cv,
-            "wikivoyage_avg_weekly": v,
-            "stadium_total":         c.get("baselineStadiumTotal",    0),
-            "city_total":            c.get("baselineCityTotal",       0),
-            "wikivoyage_total":      c.get("baselineVoyageTotal",     0),
-            "wikivoyage_low_conf":   v < WIKIVOYAGE_LOW_CONF,
-        }
-        if s  == 0: needs_refetch.append((n, "stadium"))
-        if cv == 0: needs_refetch.append((n, "city"))
-        if v  == 0: needs_refetch.append((n, "wikivoyage"))
-
-    if needs_refetch:
-        print("  Zero baselines found - will re-fetch:")
-        for name, kind in needs_refetch:
-            print("    -> " + name + " (" + kind + ")")
-    else:
-        print("  All baselines valid - reusing.")
-    return result, needs_refetch
-
-
-def refetch_baselines(existing, needs_refetch):
-    """Partial re-fetch: only articles with zero baselines."""
-    print("\n=== Partial baseline re-fetch ===")
-    baselines = dict(existing)
-    for name, kind in needs_refetch:
-        city = next(c for c in CITIES if c["name"] == name)
-        print("  Re-fetching " + kind + " for: " + name)
-        if kind == "stadium":
-            t = wiki(city["stadium_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                baselines[name]["stadium_avg_weekly"] = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["stadium_total"]      = t
-                print("    -> " + str(baselines[name]["stadium_avg_weekly"]) + "/wk")
-            else:
-                print("    -> Still 0 - will retry next run")
-        elif kind == "city":
-            t = wiki(city["city_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                baselines[name]["city_avg_weekly"] = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["city_total"]      = t
-                print("    -> " + str(baselines[name]["city_avg_weekly"]) + "/wk")
-            else:
-                print("    -> Still 0 - will retry next run")
-        elif kind == "wikivoyage":
-            t = voyage(city["wikivoyage_article"], BASELINE_START, BASELINE_END)
-            time.sleep(1.5)
-            if t > 0:
-                v_avg = round(t / BASELINE_WEEKS, 1)
-                baselines[name]["wikivoyage_avg_weekly"] = v_avg
-                baselines[name]["wikivoyage_total"]      = t
-                baselines[name]["wikivoyage_low_conf"]   = v_avg < WIKIVOYAGE_LOW_CONF
-                print("    -> " + str(v_avg) + "/wk"
-                      + (" [LOW CONF]" if baselines[name]["wikivoyage_low_conf"] else ""))
-            else:
-                print("    -> Still 0 - will retry next run")
-    return baselines
-
-
-# ── Period fetch ───────────────────────────────────────────────────────────────
-
-def fetch_period(label, start_date, end_date, baselines):
-    """Fetch all three signals, compute uplifts and points for one time window."""
-    days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
-    wf   = days / 7.0  # week fraction for normalisation
-    print("\n  [" + label + "] " + start_date + " to " + end_date)
-
-    stadium_u  = {}
-    city_u     = {}
-    voyage_u   = {}
-    combined_u = {}
-
-    for city in CITIES:
-        n  = city["name"]
-        bl = baselines[n]
-
-        sv = wiki(city["stadium_article"],      start_date, end_date); time.sleep(1.5)
-        cv = wiki(city["city_article"],          start_date, end_date); time.sleep(1.5)
-        vv = voyage(city["wikivoyage_article"],  start_date, end_date); time.sleep(1.5)
-
-        # Warn on zero views where baseline exists
-        if sv == 0 and bl["stadium_avg_weekly"]    > 0: print("    WARNING: " + n + " stadium=0 (baseline=" + str(bl["stadium_avg_weekly"]) + ")")
-        if cv == 0 and bl["city_avg_weekly"]        > 0: print("    WARNING: " + n + " city=0 (baseline=" + str(bl["city_avg_weekly"]) + ")")
-        if vv == 0 and bl["wikivoyage_avg_weekly"]  > 0: print("    WARNING: " + n + " voyage=0 (baseline=" + str(bl["wikivoyage_avg_weekly"]) + ")")
-
-        su = uplift(sv, bl["stadium_avg_weekly"],    wf)
-        cu = uplift(cv, bl["city_avg_weekly"],       wf)
-        vu_raw = uplift(vv, bl["wikivoyage_avg_weekly"], wf)
-        vu = clamp_wikivoyage(vu_raw, bl["wikivoyage_low_conf"])
-
-        wu = combined(su, vu, cu)
-
-        stadium_u[n]  = su
-        city_u[n]     = cu
-        voyage_u[n]   = vu
-        combined_u[n] = wu
-
-        print("  " + n.ljust(25)
-              + " stadium=" + str(su) + "x"
-              + "  voyage=" + str(vu) + "x" + (" [clamped from " + str(vu_raw) + "]" if vu != vu_raw else "")
-              + ("~" if bl["wikivoyage_low_conf"] else "")
-              + "  city=" + str(cu) + "x"
-              + "  combined=" + str(wu) + "x")
-
-    pts = to_points(combined_u)
-    top3 = sorted(combined_u.items(), key=lambda x: x[1], reverse=True)[:3]
-    print("  Top 3: " + " | ".join(n + " (" + str(v) + "x)" for n, v in top3))
-    return {"stadium": stadium_u, "city": city_u, "voyage": voyage_u,
-            "combined": combined_u, "points": pts}
-
-
-# ── Main ───────────────────────────────────────────────────────────────────────
-
-def main():
-    print("Wikipedia + Wikivoyage Uplift Tracker")
-    print("Weights: stadium=50% | wikivoyage=30% | city_wiki=20%")
-    print("Wikivoyage bounds: floor=1.0x  cap=10.0x (5x if low-confidence baseline)")
-
-    today = date.today()
-
-    # Load / build baselines
-    existing_data = None
-    if os.path.exists("data/data.json"):
-        try:
-            with open("data/data.json") as f:
-                existing_data = json.load(f)
-        except Exception:
-            pass
-
-    loaded, needs_refetch = load_baselines(existing_data)
-    if loaded is None:
-        baselines = fetch_baselines()
-    elif needs_refetch:
-        baselines = refetch_baselines(loaded, needs_refetch)
-    else:
-        baselines = loaded
-
-    # Discrete weeks
-    week_data = {}
-    for week in WEEKS:
-        if today < date.fromisoformat(week["start"]):
-            print("\nSkipping " + week["label"] + " (starts " + week["start"] + ")")
-            continue
-        print("\n=== " + week["label"] + " ===")
-        week_data[week["label"]] = fetch_period(
-            week["label"], week["start"], week["end"], baselines)
-
-    # Rolling last 7 days
-    print("\n=== Last 7 Days (rolling) ===")
-    l7_end   = today.strftime("%Y-%m-%d")
-    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
-    l7 = fetch_period("Last 7 days", l7_start, l7_end, baselines)
-
-    # Build results
-    results = []
-    for city in CITIES:
-        n  = city["name"]
-        bl = baselines[n]
-
-        week_pts     = {}
-        week_combined = {}
-        week_stadium = {}
-        week_city    = {}
-        week_voyage  = {}
-
-        for week in WEEKS:
-            lbl = week["label"]
-            if lbl in week_data:
-                wd = week_data[lbl]
-                week_pts[lbl]      = wd["points"][n]
-                week_combined[lbl] = wd["combined"][n]
-                week_stadium[lbl]  = wd["stadium"][n]
-                week_city[lbl]     = wd["city"][n]
-                week_voyage[lbl]   = wd["voyage"][n]
-            else:
-                week_pts[lbl] = week_combined[lbl] = week_stadium[lbl] = week_city[lbl] = week_voyage[lbl] = None
-
-        # First 4 weeks total = sum of available discrete week points only
-        first4_pts = sum(v for v in week_pts.values() if v is not None)
-
-        results.append({
-            "name":    n, "country": city["country"],
-            "flag":    city["flag"], "region": city["region"],
-            "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
-            # Baselines
-            "baselineStadiumAvgWeekly":  bl["stadium_avg_weekly"],
-            "baselineCityAvgWeekly":     bl["city_avg_weekly"],
-            "baselineVoyageAvgWeekly":   bl["wikivoyage_avg_weekly"],
-            "baselineStadiumTotal":      bl["stadium_total"],
-            "baselineCityTotal":         bl["city_total"],
-            "baselineVoyageTotal":       bl["wikivoyage_total"],
-            "wikivoyageLowConf":         bl["wikivoyage_low_conf"],
-            # Last 7 days
-            "lastWeekCombined":  l7["combined"][n],
-            "lastWeekStadium":   l7["stadium"][n],
-            "lastWeekCity":      l7["city"][n],
-            "lastWeekVoyage":    l7["voyage"][n],
-            "lastWeekPts":       l7["points"][n],
-            # Discrete weeks
-            "weekPoints":        week_pts,
-            "weekCombined":      week_combined,
-            "weekStadium":       week_stadium,
-            "weekCity":          week_city,
-            "weekVoyage":        week_voyage,
-            # Aggregate
-            "first4Pts":         first4_pts,
-        })
-
-    results.sort(key=lambda x: (x["first4Pts"], x["lastWeekCombined"]), reverse=True)
-
-    print("\n=== Final Standings ===")
-    for city in results:
-        print("  " + city["name"].ljust(25)
-              + "  combined=" + str(city["lastWeekCombined"]) + "x"
-              + "  pts=" + str(city["lastWeekPts"])
-              + "  first4=" + str(city["first4Pts"]))
-
-    now = datetime.now(timezone.utc)
-    os.makedirs("data", exist_ok=True)
-    with open("data/data.json", "w", encoding="utf-8") as f:
-        json.dump({
-            "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":         "Uplift index: 50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs 12-month baseline",
-            "weights":        {"stadium": "50%", "wikivoyage": "30%", "city_wikipedia": "20%"},
-            "wikivoyageBounds": {"floor": "1.0x", "cap": "10.0x", "low_conf_cap": "5.0x", "low_conf_threshold_weekly": WIKIVOYAGE_LOW_CONF},
-            "baselineWindow": BASELINE_START + " to " + BASELINE_END,
-            "weeks":          WEEKS,
-            "cities":         results,
-        }, f, ensure_ascii=False, indent=2)
-
-    print("\nDone. Top city: " + results[0]["name"]
-          + " (combined: " + str(results[0]["lastWeekCombined"]) + "x)")
-
-
-main()
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026 — Host City Interest Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #080b14;
+      --surface: #0d1120;
+      --border:  #1a1f2e;
+      --border2: #111828;
+      --gold:    #f0c040;
+      --silver:  #9ca3af;
+      --bronze:  #b87333;
+      --text:    #e8eaf0;
+      --muted:   #6b7280;
+      --faint:   #2d3448;
+      --usa:     #4f8ef7;
+      --mex:     #f59e0b;
+      --can:     #2dd4bf;
+      --east:    #60a5fa;
+      --west:    #34d399;
+      --central: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed','Arial Narrow',sans-serif; min-height: 100vh; }
+
+    /* HEADER */
+    .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 24px 32px 20px; }
+    .header-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+    h1 { font-size: clamp(20px,4vw,34px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
+    h1 span { color: var(--gold); }
+    .subtitle { margin-top: 8px; font-size: 13px; color: var(--muted); font-family: 'Barlow',sans-serif; }
+    .updated-badge { font-size: 10px; color: #444; letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; text-align: right; }
+    .updated-badge strong { color: var(--muted); }
+
+    /* EXPLAINER */
+    .explainer { background: rgba(34,197,94,.06); border-bottom: 1px solid rgba(34,197,94,.15); padding: 12px 32px; }
+    .explainer-inner { max-width: 980px; margin: 0 auto; font-size: 12px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.5; }
+    .explainer-inner strong { color: #22c55e; }
+
+    /* TABS */
+    .controls { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; }
+    .controls-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: stretch; overflow-x: auto; }
+    .tab-btn {
+      background: transparent; border: none; border-bottom: 3px solid transparent;
+      cursor: pointer; font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 14px 16px 11px; white-space: nowrap; color: #555; transition: all .15s;
+    }
+    .tab-btn:hover:not(.active) { color: var(--muted); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab-btn.disabled { opacity: .35; cursor: default; }
+    .tab-separator { width: 1px; background: var(--border); margin: 8px 4px; flex-shrink: 0; }
+
+    /* WEEK BAR + UNAVAILABLE MESSAGE */
+    .week-bar { max-width: 980px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .week-label-text { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+    .week-dates-text { font-size: 10px; color: #444; letter-spacing: .05em; }
+    .week-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 2px; letter-spacing: .07em; text-transform: uppercase; }
+    .week-status.live { background: rgba(34,197,94,.15); color: #22c55e; }
+    .week-status.rolling { background: rgba(96,165,250,.15); color: #60a5fa; }
+    .week-status.upcoming { background: rgba(100,116,139,.1); color: #475569; }
+
+    /* UNAVAILABLE PANEL */
+    .unavail-panel {
+      max-width: 980px; margin: 16px auto 0; padding: 0 32px;
+    }
+    .unavail-box {
+      background: #0a0e1a; border: 1px solid var(--border);
+      border-left: 3px solid #2d3a55;
+      border-radius: 4px; padding: 18px 22px;
+      font-family: 'Barlow',sans-serif;
+    }
+    .unavail-title { font-size: 13px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .unavail-body { font-size: 13px; color: #374151; line-height: 1.6; }
+    .unavail-body strong { color: #4a5568; }
+    .unavail-dates { margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .unavail-date-item { font-size: 11px; }
+    .unavail-date-label { color: #2d3448; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+    .unavail-date-val { color: #374151; margin-left: 4px; }
+
+    /* TABLE */
+    .table-wrap { max-width: 980px; margin: 12px auto 0; padding: 0 32px 48px; }
+
+    /* Grid: rank | city | economic interest | points | bar */
+    .col-headers {
+      display: grid;
+      grid-template-columns: 38px 1fr 160px 70px 150px;
+      gap: 0 10px; padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border); margin-bottom: 2px;
+    }
+    .col-headers span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #3a4258; }
+    .col-right { text-align: right; }
+    .col-center { text-align: center; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 38px 1fr 160px 70px 150px;
+      gap: 0 10px; padding: 11px 12px;
+      border-bottom: 1px solid var(--border2);
+      align-items: center; border-left: 3px solid transparent;
+      opacity: 0; transform: translateX(-10px);
+      animation: rowIn .4s ease forwards;
+    }
+    .row.rank-1 { border-left-color: var(--gold);   background: rgba(240,192,64,.04); }
+    .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
+    .row.rank-3 { border-left-color: var(--bronze); }
+
+    @keyframes rowIn { to { opacity:1; transform:translateX(0); } }
+    @keyframes barGrow { from { width:0; } }
+    .bar-fill { animation: barGrow .8s cubic-bezier(.16,1,.3,1) both; }
+
+    .rank-num { font-size: 15px; font-weight: 800; text-align: center; color: var(--faint); }
+    .rank-num.r1 { font-size: 20px; color: var(--gold); }
+    .rank-num.r2 { font-size: 18px; color: var(--silver); }
+    .rank-num.r3 { font-size: 17px; color: var(--bronze); }
+
+    /* City cell */
+    .city-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .city-flag { font-size: 16px; line-height: 1; }
+    .city-name { font-size: 14px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; }
+    .region-tag { font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; }
+    .stadium-name { font-size: 10px; color: #3a4560; margin-top: 3px; font-family: 'Barlow',sans-serif; }
+    .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
+    .wiki-link:hover { color: var(--gold); }
+
+    /* Economic Interest cell — PRIMARY */
+    .econ-badge { text-align: right; }
+    .econ-num { font-size: 24px; font-weight: 900; line-height: 1; }
+    .econ-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
+    .econ-breakdown { font-size: 9px; color: #4a5568; margin-top: 3px; font-family: 'Barlow',sans-serif; }
+    .econ-baseline { font-size: 9px; color: #2d3448; margin-top: 2px; font-family: 'Barlow',sans-serif; }
+    .low-conf { font-size: 8px; color: #6b4c00; background: rgba(245,158,11,.1); padding: 1px 4px; border-radius: 2px; margin-left: 4px; }
+
+    /* Points cell — SECONDARY */
+    .pts-badge { text-align: right; }
+    .pts-num { font-size: 18px; font-weight: 800; color: var(--faint); line-height: 1; }
+    .pts-num.scoring { color: var(--gold); font-size: 20px; }
+    .pts-label { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #333; margin-top: 1px; }
+
+    /* Bar */
+    .bar-cell { }
+    .bar-track { height: 7px; background: #141928; border-radius: 4px; overflow: hidden; }
+    .country-label { font-size: 9px; color: #2d3448; margin-top: 3px; text-align: right; letter-spacing: .05em; }
+
+    /* Notes */
+    .notes { max-width: 980px; margin: 0 auto; padding: 0 32px 48px; }
+    .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; }
+    .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
+    .note-h { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px; }
+    .note-b { font-size: 12px; color: #4a5568; line-height: 1.6; font-family: 'Barlow',sans-serif; }
+    .legend-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .swatch { width: 16px; height: 5px; border-radius: 2px; }
+    .legend-label { font-size: 10px; color: #444; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+
+    .state-msg { text-align: center; padding: 60px 0; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #444; }
+
+    @media (max-width: 640px) {
+      .header,.controls,.week-bar,.unavail-panel,.table-wrap,.notes,.explainer { padding-left: 14px; padding-right: 14px; }
+      .col-headers, .row { grid-template-columns: 30px 1fr 100px 44px 0px; gap: 0 6px; }
+      .col-headers .hide-sm, .row .hide-sm { display: none; }
+      .econ-num { font-size: 18px; }
+      .city-name { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="eyebrow">&#9917; Wikipedia &amp; Wikivoyage Intelligence</div>
+      <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
+      <p class="subtitle">Economic interest index vs 12-month baseline &middot; Stadium 50% · Wikivoyage 30% · City Wikipedia 20% &middot; Updated Saturdays</p>
+    </div>
+    <div><div id="updated-badge" class="updated-badge"></div></div>
+  </div>
+</header>
+
+<div class="explainer">
+  <div class="explainer-inner">
+    <strong>How to read this:</strong>
+    The <strong>Economic Interest</strong> index shows how much more global attention each host city is receiving vs its normal weekly average — combining stadium awareness, travel planning intent, and destination interest.
+    <strong>1.0x = normal &middot; 3.0x = triple normal interest &middot; 8.5x = major spike.</strong>
+    Smaller cities showing high multiples tell the most compelling economic story — the World Cup is creating attention that wouldn't otherwise exist.
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner" id="tab-row"></div>
+</div>
+
+<div class="week-bar" id="week-bar"></div>
+<div id="unavail-panel"></div>
+
+<div class="table-wrap" id="table-wrap">
+  <div class="col-headers">
+    <span class="col-center">#</span>
+    <span>City &amp; Stadium</span>
+    <span class="col-right">Economic Interest</span>
+    <span class="col-right">Points</span>
+    <span class="hide-sm">Interest bar</span>
+  </div>
+  <div id="table-body"><div class="state-msg">Loading...</div></div>
+</div>
+
+<div class="notes">
+  <div class="notes-box">
+    <div class="notes-title">Methodology</div>
+    <div class="notes-grid">
+      <div>
+        <div class="note-h">Three signals</div>
+        <div class="note-b">
+          <strong style="color:var(--muted)">Stadium Wikipedia (50%)</strong> — event-specific awareness, cleanest signal.<br>
+          <strong style="color:var(--muted)">City Wikivoyage (30%)</strong> — travel planning intent, highest economic relevance.<br>
+          <strong style="color:var(--muted)">City Wikipedia (20%)</strong> — general destination awareness.
+        </div>
+      </div>
+      <div>
+        <div class="note-h">Economic Interest index</div>
+        <div class="note-b">Weekly views &divide; 12-month average weekly baseline &times; 100. Expressed as a multiplier: 1.0x = normal, 5.0x = 5&times; usual attention. Wikivoyage clamped 1.0x&ndash;10.0x to smooth noise from smaller sample sizes.</div>
+      </div>
+      <div>
+        <div class="note-h">Why uplift not raw views</div>
+        <div class="note-b">Raw views favour megacities regardless of the World Cup. Uplift reveals which cities are experiencing the biggest incremental change — the additional global attention directly created by hosting.</div>
+      </div>
+      <div>
+        <div class="note-h">Points</div>
+        <div class="note-b">Cities ranked by Economic Interest index each week. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. First 4 Weeks = cumulative sum of W1&ndash;W4 points.</div>
+      </div>
+      <div>
+        <div class="note-h">Baseline</div>
+        <div class="note-b">Jun 2025 &ndash; May 2026 (52 weeks pre-tournament). Fetched once, stored and reused each Saturday. <span style="color:#6b4c00;background:rgba(245,158,11,.1);padding:1px 4px;border-radius:2px;font-size:10px;">~ low conf</span> flags baselines below 150 views/week where the multiplier is less reliable.</div>
+      </div>
+      <div>
+        <div class="note-h">Week windows</div>
+        <div class="note-b">W1: Jun 11&ndash;17 &middot; W2: Jun 18&ndash;24 &middot; W3: Jun 25&ndash;Jul 1 &middot; W4: Jul 2&ndash;8.<br>Last Week = rolling 7-day window, refreshed every Saturday at 08:00 UTC.</div>
+      </div>
+    </div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="dot" style="background:var(--east)"></div><span class="legend-label">East</span></div>
+      <div class="legend-item"><div class="dot" style="background:var(--west)"></div><span class="legend-label">West</span></div>
+      <div class="legend-item"><div class="dot" style="background:var(--central)"></div><span class="legend-label">Central</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--usa)"></div><span class="legend-label">USA</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
+      <div class="legend-item"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COUNTRY_COLOR = { USA:'#4f8ef7', MEX:'#f59e0b', CAN:'#2dd4bf' };
+const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
+const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
+
+const WEEKS = [
+  { id:'w1', label:'Week 1', desc:'Jun 11–17',    start:'2026-06-11', end:'2026-06-17' },
+  { id:'w2', label:'Week 2', desc:'Jun 18–24',    start:'2026-06-18', end:'2026-06-24' },
+  { id:'w3', label:'Week 3', desc:'Jun 25–Jul 1', start:'2026-06-25', end:'2026-07-01' },
+  { id:'w4', label:'Week 4', desc:'Jul 2–8',      start:'2026-07-02', end:'2026-07-08' },
+];
+
+let allCities  = [];
+let activeView = 'lastweek';
+const today    = new Date();
+
+function weekAvailable(w) { return today >= new Date(w.start); }
+function anyWeekAvailable() { return WEEKS.some(weekAvailable); }
+
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n/1000).toFixed(1) + 'k';
+  return String(Math.round(n));
+}
+
+function econColor(u) {
+  if (!u || u <= 0) return 'var(--faint)';
+  if (u >= 500) return '#f0c040';
+  if (u >= 300) return '#22c55e';
+  if (u >= 150) return '#60a5fa';
+  if (u >= 100) return 'var(--muted)';
+  return 'var(--faint)';
+}
+
+// ── Tab building ──────────────────────────────────────────────────────────────
+function buildTabs() {
+  const row = document.getElementById('tab-row');
+  row.innerHTML = '';
+  const sep = () => { const d=document.createElement('div'); d.className='tab-separator'; return d; };
+
+  // Order: Last Week | W1 W2 W3 W4 | First 4 Weeks
+  const tabs = [
+    { id:'lastweek', label:'Last Week', always: true },
+  ];
+  row.appendChild(sep());
+  tabs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (activeView===t.id?' active':'');
+    btn.textContent = t.label;
+    btn.onclick = () => setView(t.id);
+    row.appendChild(btn);
+  });
+
+  row.appendChild(sep());
+  WEEKS.forEach(w => {
+    const avail = weekAvailable(w);
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (activeView===w.id?' active':'') + (avail?'':' disabled');
+    btn.textContent = w.label;
+    btn.title = avail ? w.desc : 'Available from ' + w.start;
+    btn.onclick = () => setView(w.id);  // always clickable — shows unavail message
+    row.appendChild(btn);
+  });
+
+  row.appendChild(sep());
+  const f4btn = document.createElement('button');
+  f4btn.className = 'tab-btn' + (activeView==='first4'?' active':'') + (anyWeekAvailable()?'':' disabled');
+  f4btn.textContent = 'First 4 Weeks';
+  f4btn.title = 'Cumulative points from W1–W4';
+  f4btn.onclick = () => setView('first4');
+  row.appendChild(f4btn);
+  row.appendChild(sep());
+}
+
+function setView(v) { activeView=v; buildTabs(); render(); }
+
+// ── Get data for current view ─────────────────────────────────────────────────
+function getViewData(city) {
+  if (activeView === 'lastweek') {
+    return { combined: city.lastWeekCombined, pts: city.lastWeekPts,
+             stadium: city.lastWeekStadium, city_u: city.lastWeekCity,
+             voyage: city.lastWeekVoyage, avail: true };
+  }
+  if (activeView === 'first4') {
+    return { combined: null, pts: city.first4Pts,
+             stadium: null, city_u: null, voyage: null,
+             avail: anyWeekAvailable() };
+  }
+  const wmap = { w1:'Week 1', w2:'Week 2', w3:'Week 3', w4:'Week 4' };
+  const lbl  = wmap[activeView];
+  if (!lbl) return { combined:0, pts:0, stadium:null, city_u:null, voyage:null, avail:false };
+  const pts      = city.weekPoints  && city.weekPoints[lbl];
+  const combined = city.weekCombined && city.weekCombined[lbl];
+  const avail    = pts !== null && pts !== undefined;
+  return {
+    combined: avail ? combined : null,
+    pts:      avail ? pts      : 0,
+    stadium:  avail && city.weekStadium  ? city.weekStadium[lbl]  : null,
+    city_u:   avail && city.weekCity     ? city.weekCity[lbl]     : null,
+    voyage:   avail && city.weekVoyage   ? city.weekVoyage[lbl]   : null,
+    avail,
+  };
+}
+
+// ── Week bar + unavailable panel ──────────────────────────────────────────────
+function updateWeekBar() {
+  const bar    = document.getElementById('week-bar');
+  const panel  = document.getElementById('unavail-panel');
+  panel.innerHTML = '';
+
+  if (activeView === 'lastweek') {
+    bar.innerHTML =
+      '<span class="week-label-text">Last 7 Days</span>' +
+      '<span class="week-dates-text">Rolling window &middot; refreshed Saturdays</span>' +
+      '<span class="week-status rolling">Rolling</span>';
+    return;
+  }
+
+  if (activeView === 'first4') {
+    const done = WEEKS.filter(weekAvailable).length;
+    if (done === 0) {
+      bar.innerHTML =
+        '<span class="week-label-text">First 4 Weeks</span>' +
+        '<span class="week-status upcoming">Not yet available</span>';
+      panel.innerHTML = unavailHTML(
+        'First 4 Weeks — Not Yet Available',
+        'This view shows the cumulative points total across all four tournament weeks (W1–W4). It will populate as each week completes.',
+        WEEKS
+      );
+    } else {
+      bar.innerHTML =
+        '<span class="week-label-text">First 4 Weeks</span>' +
+        '<span class="week-dates-text">Cumulative points from ' + done + ' of 4 weeks</span>' +
+        '<span class="week-status live">Live</span>';
+    }
+    return;
+  }
+
+  const w = WEEKS.find(x => x.id === activeView);
+  if (!w) return;
+  const avail = weekAvailable(w);
+  bar.innerHTML =
+    '<span class="week-label-text">' + w.label + '</span>' +
+    '<span class="week-dates-text">' + w.desc + '</span>' +
+    '<span class="week-status ' + (avail?'live':'upcoming') + '">' +
+    (avail ? 'Available' : 'Not yet available') + '</span>';
+
+  if (!avail) {
+    panel.innerHTML = unavailHTML(
+      w.label + ' — Not Yet Available',
+      'Data for this week will be fetched automatically on the first Saturday after ' + w.start + '.',
+      [w]
+    );
+  }
+}
+
+function unavailHTML(title, body, weeks) {
+  const dateRows = weeks.map(w =>
+    '<div class="unavail-date-item">' +
+      '<span class="unavail-date-label">' + w.label + '</span>' +
+      '<span class="unavail-date-val">' + w.desc + ' &nbsp;(' + w.start + ' &ndash; ' + w.end + ')</span>' +
+    '</div>'
+  ).join('');
+  return '<div class="unavail-panel"><div class="unavail-box">' +
+    '<div class="unavail-title">&#128337; ' + title + '</div>' +
+    '<div class="unavail-body">' + body +
+    '<div class="unavail-dates">' + dateRows + '</div>' +
+    '</div></div></div>';
+}
+
+// ── Render table ──────────────────────────────────────────────────────────────
+function render() {
+  updateWeekBar();
+
+  const sorted = [...allCities].sort((a,b) => {
+    const da = getViewData(a), db = getViewData(b);
+    if (db.pts !== da.pts) return db.pts - da.pts;
+    return (db.combined||0) - (da.combined||0);
+  });
+
+  const maxCombined = Math.max(...sorted.map(c => getViewData(c).combined || 0), 1);
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+
+  // Hide/show table header Economic Interest col depending on view
+  document.querySelector('.col-headers').style.display = 'grid';
+
+  sorted.forEach((city, i) => {
+    const rank  = i + 1;
+    const vd    = getViewData(city);
+    const pct   = ((vd.combined||0) / maxCombined * 100).toFixed(1);
+    const cc    = COUNTRY_COLOR[city.country] || '#888';
+    const rc    = REGION_COLOR[city.region]   || '#888';
+    const delay = i * 35;
+    const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+
+    // Economic Interest cell
+    let econHTML;
+    if (activeView === 'first4') {
+      econHTML = '<div class="econ-badge"><div class="econ-num" style="color:var(--faint);font-size:13px">—</div><div class="econ-label">n/a for total</div></div>';
+    } else if (!vd.avail || vd.combined === null) {
+      econHTML = '<div class="econ-badge"><div class="econ-num" style="color:var(--faint);font-size:13px">—</div></div>';
+    } else {
+      const mult  = (vd.combined / 100).toFixed(1);
+      const ecol  = econColor(vd.combined);
+      const sLabel = vd.stadium !== null ? (vd.stadium/100).toFixed(1)+'x' : '—';
+      const vLabel = vd.voyage  !== null ? (vd.voyage/100).toFixed(1)+'x'  + (city.wikivoyageLowConf ? '~' : '') : '—';
+      const cLabel = vd.city_u  !== null ? (vd.city_u/100).toFixed(1)+'x'  : '—';
+      econHTML =
+        '<div class="econ-badge">' +
+          '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;' + '</div>' +
+          '<div class="econ-label">vs baseline</div>' +
+          '<div class="econ-breakdown">&#127967;' + sLabel + ' &middot; &#9973;' + vLabel + ' &middot; &#128218;' + cLabel + '</div>' +
+          '<div class="econ-baseline">Stadium baseline: ' + fmt(city.baselineStadiumAvgWeekly) + '/wk</div>' +
+        '</div>';
+    }
+
+    // Points cell
+    const hasPoints = vd.pts > 0;
+    const ptsHTML =
+      '<div class="pts-badge">' +
+        '<div class="pts-num ' + (hasPoints?'scoring':'') + '">' + (vd.avail ? vd.pts : '—') + '</div>' +
+        '<div class="pts-label">pts</div>' +
+      '</div>';
+
+    const row = document.createElement('div');
+    row.className = 'row ' + (rank<=3?'rank-'+rank:'');
+    row.style.animationDelay = delay + 'ms';
+    row.innerHTML =
+      '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
+      '<div>' +
+        '<div class="city-name-row">' +
+          '<span class="city-flag">' + (FLAG[city.flag]||city.flag) + '</span>' +
+          '<span class="city-name">' + city.name + '</span>' +
+          '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
+        '</div>' +
+        '<div class="stadium-name">' + (city.stadium||'') + '</div>' +
+        '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
+      '</div>' +
+      econHTML +
+      ptsHTML +
+      '<div class="bar-cell hide-sm">' +
+        '<div class="bar-track"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '88,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div></div>' +
+        '<div class="country-label">' + city.country + '</div>' +
+      '</div>';
+
+    body.appendChild(row);
+  });
+}
+
+// ── Load data ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res  = await fetch('data/data.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    allCities  = json.cities || [];
+    const badge = document.getElementById('updated-badge');
+    if (json.updatedDisplay) badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
+    buildTabs();
+    render();
+  } catch(err) {
+    document.getElementById('table-body').innerHTML =
+      '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
