@@ -1,177 +1,99 @@
 #!/usr/bin/env python3
 """
-fetch_trends.py  —  Wikipedia + Wikivoyage Uplift Tracker
+fetch_trends.py  —  Wikipedia + Wikivoyage Uplift Tracker (Last Week only)
 
-Combined uplift index vs same-period baseline (avg of 2019, 2022, 2023):
-  combined = (stadium_wikipedia * 0.50) + (wikivoyage_city * 0.30) + (city_wikipedia * 0.20)
+Fetches rolling last-7-days Wikipedia pageviews for all 16 World Cup host cities.
+Compares against same 7-day window averaged across 2019, 2022, 2023 (clean baseline years).
 
-Wikivoyage uplift is clamped to [1.0x, 10.0x] to smooth noise from small sample sizes.
-Stadium and city Wikipedia are uncapped (large baselines, noise-resistant).
+Combined uplift = (stadium_wikipedia * 0.50) + (wikivoyage * 0.30) + (city_wikipedia * 0.20)
+Wikivoyage clamped to [1.0x, 10.0x] to smooth noise from smaller sample sizes.
 
-Low-confidence flag: Wikivoyage baseline < 150 views/week -> flagged in output.
-Baseline years: 2019, 2022, 2023 (fully clean - no Copa America, Club WC, or COVID).
+Weekly discrete periods (W1-W4) removed until tournament begins.
 """
 
-import json, time, os, urllib.request, urllib.error
+import json, time, os, subprocess, urllib.request, urllib.error
 from datetime import datetime, timezone, date, timedelta
 
 CITIES = [
-    {
-        "name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "MetLife Stadium",
-        "stadium_article":    "MetLife_Stadium",
-        "city_article":       "New_York_City",
-        "wikivoyage_article": "New_York_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium",
-    },
-    {
-        "name": "Los Angeles", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "SoFi Stadium",
-        "stadium_article":    "SoFi_Stadium",
-        "city_article":       "Los_Angeles",
-        "wikivoyage_article": "Los_Angeles",
-        "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium",
-    },
-    {
-        "name": "Dallas", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "AT&T Stadium",
-        "stadium_article":    "AT%26T_Stadium",
-        "city_article":       "Dallas",
-        "wikivoyage_article": "Dallas",
-        "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium",
-    },
-    {
-        "name": "Mexico City", "country": "MEX", "flag": "MX", "region": "Central",
-        "stadium": "Estadio Azteca",
-        "stadium_article":    "Estadio_Azteca",
-        "city_article":       "Mexico_City",
-        "wikivoyage_article": "Mexico_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca",
-    },
-    {
-        "name": "Miami", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Hard Rock Stadium",
-        "stadium_article":    "Hard_Rock_Stadium",
-        "city_article":       "Miami",
-        "wikivoyage_article": "Miami",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium",
-    },
-    {
-        "name": "Atlanta", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "Mercedes-Benz Stadium",
-        "stadium_article":    "Mercedes-Benz_Stadium",
-        "city_article":       "Atlanta",
-        "wikivoyage_article": "Atlanta",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium",
-    },
-    {
-        "name": "San Francisco", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "Levi's Stadium",
-        "stadium_article":    "Levi%27s_Stadium",
-        "city_article":       "San_Francisco",
-        "wikivoyage_article": "San_Francisco",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium",
-    },
-    {
-        "name": "Seattle", "country": "USA", "flag": "US", "region": "West",
-        "stadium": "Lumen Field",
-        "stadium_article":    "Lumen_Field",
-        "city_article":       "Seattle",
-        "wikivoyage_article": "Seattle",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field",
-    },
-    {
-        "name": "Toronto", "country": "CAN", "flag": "CA", "region": "East",
-        "stadium": "BMO Field",
-        "stadium_article":    "BMO_Field",
-        "city_article":       "Toronto",
-        "wikivoyage_article": "Toronto",
-        "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field",
-    },
-    {
-        "name": "Boston", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Gillette Stadium",
-        "stadium_article":    "Gillette_Stadium",
-        "city_article":       "Boston",
-        "wikivoyage_article": "Boston",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium",
-    },
-    {
-        "name": "Guadalajara", "country": "MEX", "flag": "MX", "region": "West",
-        "stadium": "Estadio Akron",
-        "stadium_article":    "Estadio_Akron",
-        "city_article":       "Guadalajara",
-        "wikivoyage_article": "Guadalajara",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron",
-    },
-    {
-        "name": "Houston", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "NRG Stadium",
-        "stadium_article":    "NRG_Stadium",
-        "city_article":       "Houston",
-        "wikivoyage_article": "Houston",
-        "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium",
-    },
-    {
-        "name": "Philadelphia", "country": "USA", "flag": "US", "region": "East",
-        "stadium": "Lincoln Financial Field",
-        "stadium_article":    "Lincoln_Financial_Field",
-        "city_article":       "Philadelphia",
-        "wikivoyage_article": "Philadelphia",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
-    },
-    {
-        "name": "Vancouver", "country": "CAN", "flag": "CA", "region": "West",
-        "stadium": "BC Place",
-        "stadium_article":    "BC_Place",
-        "city_article":       "Vancouver",
-        "wikivoyage_article": "Vancouver",
-        "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place",
-    },
-    {
-        "name": "Monterrey", "country": "MEX", "flag": "MX", "region": "Central",
-        "stadium": "Estadio BBVA",
-        "stadium_article":    "Estadio_BBVA",
-        "city_article":       "Monterrey",
-        "wikivoyage_article": "Monterrey",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA",
-    },
-    {
-        "name": "Kansas City", "country": "USA", "flag": "US", "region": "Central",
-        "stadium": "Arrowhead Stadium",
-        "stadium_article":    "Arrowhead_Stadium",
-        "city_article":       "Kansas_City,_Missouri",
-        "wikivoyage_article": "Kansas_City",
-        "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium",
-    },
+    {"name": "New York / New Jersey", "country": "USA", "flag": "US", "region": "East",
+     "stadium": "MetLife Stadium",        "stadium_article": "MetLife_Stadium",
+     "city_article": "New_York_City",     "wikivoyage_article": "New_York_City",
+     "wikiUrl": "https://en.wikipedia.org/wiki/MetLife_Stadium"},
+    {"name": "Los Angeles",           "country": "USA", "flag": "US", "region": "West",
+     "stadium": "SoFi Stadium",           "stadium_article": "SoFi_Stadium",
+     "city_article": "Los_Angeles",       "wikivoyage_article": "Los_Angeles",
+     "wikiUrl": "https://en.wikipedia.org/wiki/SoFi_Stadium"},
+    {"name": "Dallas",                "country": "USA", "flag": "US", "region": "Central",
+     "stadium": "AT&T Stadium",           "stadium_article": "AT%26T_Stadium",
+     "city_article": "Dallas",            "wikivoyage_article": "Dallas",
+     "wikiUrl": "https://en.wikipedia.org/wiki/AT%26T_Stadium"},
+    {"name": "Mexico City",           "country": "MEX", "flag": "MX", "region": "Central",
+     "stadium": "Estadio Azteca",         "stadium_article": "Estadio_Azteca",
+     "city_article": "Mexico_City",       "wikivoyage_article": "Mexico_City",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Azteca"},
+    {"name": "Miami",                 "country": "USA", "flag": "US", "region": "East",
+     "stadium": "Hard Rock Stadium",      "stadium_article": "Hard_Rock_Stadium",
+     "city_article": "Miami",             "wikivoyage_article": "Miami",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Hard_Rock_Stadium"},
+    {"name": "Atlanta",               "country": "USA", "flag": "US", "region": "Central",
+     "stadium": "Mercedes-Benz Stadium",  "stadium_article": "Mercedes-Benz_Stadium",
+     "city_article": "Atlanta",           "wikivoyage_article": "Atlanta",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Mercedes-Benz_Stadium"},
+    {"name": "San Francisco",         "country": "USA", "flag": "US", "region": "West",
+     "stadium": "Levi's Stadium",         "stadium_article": "Levi%27s_Stadium",
+     "city_article": "San_Francisco",     "wikivoyage_article": "San_Francisco",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Levi%27s_Stadium"},
+    {"name": "Seattle",               "country": "USA", "flag": "US", "region": "West",
+     "stadium": "Lumen Field",            "stadium_article": "Lumen_Field",
+     "city_article": "Seattle",           "wikivoyage_article": "Seattle",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Lumen_Field"},
+    {"name": "Toronto",               "country": "CAN", "flag": "CA", "region": "East",
+     "stadium": "BMO Field",              "stadium_article": "BMO_Field",
+     "city_article": "Toronto",           "wikivoyage_article": "Toronto",
+     "wikiUrl": "https://en.wikipedia.org/wiki/BMO_Field"},
+    {"name": "Boston",                "country": "USA", "flag": "US", "region": "East",
+     "stadium": "Gillette Stadium",       "stadium_article": "Gillette_Stadium",
+     "city_article": "Boston",            "wikivoyage_article": "Boston",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Gillette_Stadium"},
+    {"name": "Guadalajara",           "country": "MEX", "flag": "MX", "region": "West",
+     "stadium": "Estadio Akron",          "stadium_article": "Estadio_Akron",
+     "city_article": "Guadalajara",       "wikivoyage_article": "Guadalajara",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_Akron"},
+    {"name": "Houston",               "country": "USA", "flag": "US", "region": "Central",
+     "stadium": "NRG Stadium",            "stadium_article": "NRG_Stadium",
+     "city_article": "Houston",           "wikivoyage_article": "Houston",
+     "wikiUrl": "https://en.wikipedia.org/wiki/NRG_Stadium"},
+    {"name": "Philadelphia",          "country": "USA", "flag": "US", "region": "East",
+     "stadium": "Lincoln Financial Field","stadium_article": "Lincoln_Financial_Field",
+     "city_article": "Philadelphia",      "wikivoyage_article": "Philadelphia",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field"},
+    {"name": "Vancouver",             "country": "CAN", "flag": "CA", "region": "West",
+     "stadium": "BC Place",               "stadium_article": "BC_Place",
+     "city_article": "Vancouver",         "wikivoyage_article": "Vancouver",
+     "wikiUrl": "https://en.wikipedia.org/wiki/BC_Place"},
+    {"name": "Monterrey",             "country": "MEX", "flag": "MX", "region": "Central",
+     "stadium": "Estadio BBVA",           "stadium_article": "Estadio_BBVA",
+     "city_article": "Monterrey",         "wikivoyage_article": "Monterrey",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Estadio_BBVA"},
+    {"name": "Kansas City",           "country": "USA", "flag": "US", "region": "Central",
+     "stadium": "Arrowhead Stadium",      "stadium_article": "Arrowhead_Stadium",
+     "city_article": "Kansas_City,_Missouri", "wikivoyage_article": "Kansas_City",
+     "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium"},
 ]
 
-WEEKS = [
-    {"label": "Week 1", "start": "2026-06-11", "end": "2026-06-17"},
-    {"label": "Week 2", "start": "2026-06-18", "end": "2026-06-24"},
-    {"label": "Week 3", "start": "2026-06-25", "end": "2026-07-01"},
-    {"label": "Week 4", "start": "2026-07-02", "end": "2026-07-08"},
-]
-
-# Same-period baseline: average of equivalent weeks in 2019, 2022, 2023.
-# These three years are fully clean for all 16 venues (no Copa America,
-# Club World Cup, or COVID anomalies in the Jun 11 - Jul 8 window).
-# 2024 excluded: Copa America ran Jun 20-Jul 14 in 8 of our venues.
-# 2025 excluded: Club World Cup ran Jun 15-Jul 13 in 6+ of our venues.
-# 2020/2021 excluded: COVID lockdowns distort all traffic patterns.
+# Clean baseline years — no Copa America, Club WC, or COVID in Jun-Jul window
 BASELINE_YEARS       = [2019, 2022, 2023]
-BASELINE_DESCRIPTION = "Same-period average: 2019, 2022, 2023 (clean pre-tournament years)"
-WIKIVOYAGE_LOW_CONF_ABSOLUTE = 150  # baseline views/week below this = low confidence
+BASELINE_DESCRIPTION = "Same 7-day window averaged across 2019, 2022, 2023"
 
 # Weights
 STADIUM_WEIGHT    = 0.50
 WIKIVOYAGE_WEIGHT = 0.30
 CITY_WIKI_WEIGHT  = 0.20
 
-# Wikivoyage noise controls (as index values: 100 = 1x, 1000 = 10x)
-WIKIVOYAGE_FLOOR      = 100.0   # 1.0x minimum — no downward drag from noise
-WIKIVOYAGE_CAP        = 1000.0  # 10.0x maximum — prevents outlier spikes from tiny baselines
-WIKIVOYAGE_LOW_CONF   = WIKIVOYAGE_LOW_CONF_ABSOLUTE
+# Wikivoyage noise controls
+WIKIVOYAGE_FLOOR    = 100.0   # 1.0x minimum
+WIKIVOYAGE_CAP      = 1000.0  # 10.0x maximum
+WIKIVOYAGE_LOW_CONF = 150     # avg views/week below this = flag as low confidence
 
 WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
@@ -179,17 +101,11 @@ WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 # ── API ────────────────────────────────────────────────────────────────────────
 
 def get_pageviews(project, article, start_date, end_date, retries=4):
-    """
-    Fetch total pageviews from Wikimedia for any project (wikipedia or wikivoyage).
-    project: e.g. 'en.wikipedia' or 'en.wikivoyage'
-    """
     start = start_date.replace("-", "")
     end   = end_date.replace("-", "")
-    url = (
-        "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-        + project + "/all-access/all-agents/"
-        + article + "/daily/" + start + "/" + end
-    )
+    url = ("https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
+           + project + "/all-access/all-agents/"
+           + article + "/daily/" + start + "/" + end)
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
@@ -202,7 +118,7 @@ def get_pageviews(project, article, start_date, end_date, retries=4):
                 print("    429 rate limit - waiting " + str(wait) + "s...")
                 time.sleep(wait)
             elif e.code == 404:
-                print("    404 not found: " + project + "/" + article)
+                print("    404 not found: " + article)
                 return 0
             else:
                 print("    HTTP " + str(e.code) + ": " + article)
@@ -213,124 +129,95 @@ def get_pageviews(project, article, start_date, end_date, retries=4):
     print("    All retries failed: " + article)
     return 0
 
-
 def wiki(article, start, end):
-    """Shorthand for English Wikipedia."""
     return get_pageviews("en.wikipedia", article, start, end)
 
-
 def voyage(article, start, end):
-    """Shorthand for English Wikivoyage."""
     return get_pageviews("en.wikivoyage", article, start, end)
 
 
-# ── Uplift calculation ─────────────────────────────────────────────────────────
+# ── Uplift ─────────────────────────────────────────────────────────────────────
 
 def uplift(views, avg_weekly, week_fraction=1.0):
-    """Raw uplift index. Returns 0.0 if baseline missing."""
     if avg_weekly <= 0:
         return 0.0
-    weekly_equiv = views / week_fraction
-    return round(weekly_equiv / avg_weekly * 100, 1)
+    return round((views / week_fraction) / avg_weekly * 100, 1)
 
+def clamp_wikivoyage(raw, low_conf=False):
+    cap = 500.0 if low_conf else WIKIVOYAGE_CAP
+    return round(max(WIKIVOYAGE_FLOOR, min(cap, raw)), 1)
 
-def clamp_wikivoyage(raw_uplift, low_conf=False):
-    """
-    Apply floor and cap to Wikivoyage uplift.
-    Floor: 100 (1.0x) — prevents noisy below-baseline weeks from dragging score down.
-    Cap:  1000 (10.0x) — prevents outlier spikes on small samples inflating score.
-    Low-confidence baseline (<150 views/week): cap reduced to 500 (5x) for extra caution.
-    """
-    effective_cap = 500.0 if low_conf else WIKIVOYAGE_CAP
-    return round(max(WIKIVOYAGE_FLOOR, min(effective_cap, raw_uplift)), 1)
+def combined(su, vu, cu):
+    return round(su * STADIUM_WEIGHT + vu * WIKIVOYAGE_WEIGHT + cu * CITY_WIKI_WEIGHT, 1)
 
-
-def combined(stadium_u, wikivoyage_u, city_u):
-    """Weighted combination of three uplift signals."""
-    return round(
-        stadium_u    * STADIUM_WEIGHT +
-        wikivoyage_u * WIKIVOYAGE_WEIGHT +
-        city_u       * CITY_WIKI_WEIGHT,
-        1
-    )
-
-
-def to_points(combined_scores):
-    """1st=10pts ... 10th=1pt, 11th-16th=0pts. No points if all zero."""
-    if not combined_scores or max(combined_scores.values()) == 0:
-        return {n: 0 for n in combined_scores}
-    ranked = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
+def to_points(scores):
+    if not scores or max(scores.values()) == 0:
+        return {n: 0 for n in scores}
+    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     return {name: max(0, 10 - i) for i, (name, _) in enumerate(ranked)}
+
+
+# ── Git helper ─────────────────────────────────────────────────────────────────
+
+def git_commit(message):
+    """Commit and push data.json. Non-fatal if git not configured."""
+    try:
+        subprocess.run(["git", "add", "data/data.json"], check=True)
+        result = subprocess.run(["git", "diff", "--cached", "--quiet"])
+        if result.returncode != 0:  # there are changes to commit
+            subprocess.run(["git", "commit", "-m", message], check=True)
+            subprocess.run(["git", "push"], check=True)
+            print("    Committed: " + message)
+        else:
+            print("    No changes to commit.")
+    except subprocess.CalledProcessError as e:
+        print("    Git commit failed (non-fatal): " + str(e))
 
 
 # ── Baseline ───────────────────────────────────────────────────────────────────
 
-def baseline_window_for_period(start_date, end_date, year):
-    """
-    Return the equivalent date window in a prior year.
-    e.g. 2026-06-11 -> 2026-06-17 in year 2019 = 2019-06-11 -> 2019-06-17
-    We use the same calendar dates (not the same day-of-week) so the
-    comparison is always the same seasonal window.
-    """
+def baseline_dates(start_date, end_date, year):
+    """Return equivalent window in a prior year (same calendar dates)."""
     s = date.fromisoformat(start_date)
     e = date.fromisoformat(end_date)
-    return (
-        s.replace(year=year).strftime("%Y-%m-%d"),
-        e.replace(year=year).strftime("%Y-%m-%d"),
-    )
+    return s.replace(year=year).strftime("%Y-%m-%d"), e.replace(year=year).strftime("%Y-%m-%d")
 
-
-def fetch_period_views(article, project, start_date, end_date):
-    """Fetch views for one article over one period. Returns total int."""
-    if project == "wikipedia":
-        return wiki(article, start_date, end_date)
-    else:
-        return voyage(article, start_date, end_date)
-
-
-def fetch_baseline_for_period(start_date, end_date, period_label,
-                               all_period_baselines, save_fn):
+def fetch_baselines(l7_start, l7_end, existing_baselines):
     """
-    Fetch baseline views for all 16 cities across all three baseline years
-    for a specific date window. Saves progress after EACH CITY so the repo
-    is updated every ~14 seconds rather than every ~4 minutes.
-
-    Resumes from partially-completed city data if a prior run was interrupted.
+    Fetch same-period baseline for the last-7-days window across BASELINE_YEARS.
+    Saves and commits after each city so progress is never lost.
+    Resumes from partial progress if a prior run was interrupted.
     """
-    days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
-    week_fraction = days / 7.0
+    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
+    wf   = days / 7.0
     n_years = len(BASELINE_YEARS)
 
-    print("\n  Baseline: same window in " + str(BASELINE_YEARS))
+    print("\n=== Fetching baselines (" + l7_start + " to " + l7_end + " in " + str(BASELINE_YEARS) + ") ===")
 
-    # Resume: load any cities already fetched for this period
-    baselines = all_period_baselines.get(period_label, {})
+    baselines = existing_baselines.copy() if existing_baselines else {}
     already_done = set(baselines.keys())
     if already_done:
-        print("  Resuming " + period_label + ": " +
-              str(len(already_done)) + " cities already fetched")
+        print("  Resuming: " + str(len(already_done)) + "/16 cities already done")
 
-    for city in CITIES:
+    for i, city in enumerate(CITIES):
         n = city["name"]
-
-        # Skip cities already fetched in a previous interrupted run
         if n in already_done:
-            print("    Skipping " + n + " (already fetched)")
+            print("  [" + str(i+1) + "/16] Skipping " + n + " (cached)")
             continue
 
+        print("  [" + str(i+1) + "/16] " + n)
         s_total = c_total = v_total = 0
-        for year in BASELINE_YEARS:
-            bs, be = baseline_window_for_period(start_date, end_date, year)
-            sv = wiki(city["stadium_article"],      bs, be); time.sleep(1.0)
-            cv = wiki(city["city_article"],          bs, be); time.sleep(1.0)
-            vv = voyage(city["wikivoyage_article"],  bs, be); time.sleep(1.0)
-            s_total += sv
-            c_total += cv
-            v_total += vv
 
-        s_avg = round((s_total / n_years) / week_fraction, 1)
-        c_avg = round((c_total / n_years) / week_fraction, 1)
-        v_avg = round((v_total / n_years) / week_fraction, 1)
+        for year in BASELINE_YEARS:
+            bs, be = baseline_dates(l7_start, l7_end, year)
+            sv = wiki(city["stadium_article"],       bs, be); time.sleep(1.0)
+            cv = wiki(city["city_article"],           bs, be); time.sleep(1.0)
+            vv = voyage(city["wikivoyage_article"],   bs, be); time.sleep(1.0)
+            s_total += sv; c_total += cv; v_total += vv
+
+        s_avg = round((s_total / n_years) / wf, 1)
+        c_avg = round((c_total / n_years) / wf, 1)
+        v_avg = round((v_total / n_years) / wf, 1)
         v_low = v_avg < WIKIVOYAGE_LOW_CONF
 
         baselines[n] = {
@@ -342,230 +229,119 @@ def fetch_baseline_for_period(start_date, end_date, period_label,
             "wikivoyage_total":      v_total,
             "wikivoyage_low_conf":   v_low,
         }
-        print("    " + n.ljust(25)
-              + " stadium=" + str(s_avg) + "/wk"
-              + "  city=" + str(c_avg) + "/wk"
-              + "  voyage=" + str(v_avg) + "/wk"
-              + (" [LOW CONF]" if v_low else ""))
+        print("    stadium=" + str(s_avg) + "/wk  city=" + str(c_avg) +
+              "/wk  voyage=" + str(v_avg) + "/wk" + (" [LOW CONF]" if v_low else ""))
 
-        # Save after every city — progress committed to repo immediately
-        all_period_baselines[period_label] = baselines
-        save_fn(all_period_baselines)
+        # Save and commit after every city
+        save_baselines_progress(baselines, l7_start, l7_end)
+        git_commit("chore: baseline progress (" + str(len(baselines)) + "/16 cities)")
 
     return baselines
 
-
-def fetch_baselines():
-    """
-    Fetch same-period baselines for all weeks + last-7-days window.
-    Each period gets its own baseline from the equivalent window in
-    BASELINE_YEARS (2019, 2022, 2023), averaged.
-
-    Returns dict keyed by period label:
-      {"Week 1": {city_name: baseline_dict}, "last7": {...}, ...}
-    """
-    print("\n=== Fetching same-period baselines ===")
-    print("    Years: " + str(BASELINE_YEARS))
-    print("    (Stored in data.json and reused on future runs)")
-
-    # Load any partially-completed baselines from a previous interrupted run
-    period_baselines = {}
+def save_baselines_progress(baselines, l7_start, l7_end):
+    """Write baselines to data.json immediately (preserves any existing city data)."""
+    os.makedirs("data", exist_ok=True)
+    existing = {}
     if os.path.exists("data/data.json"):
         try:
             with open("data/data.json") as f:
                 existing = json.load(f)
-            saved = existing.get("periodBaselines", {})
-            if saved:
-                period_baselines = saved
-                print("  Resuming from partial baseline save (" +
-                      str(len(period_baselines)) + " periods already fetched)")
         except Exception:
             pass
+    existing["baselines"]           = baselines
+    existing["baselineWindow"]      = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
+    existing["_baselineInProgress"] = True
+    with open("data/data.json", "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
 
-    def save_progress(pb):
-        """
-        Write periodBaselines to data.json AND commit to the repo immediately.
-        This means progress is visible in the repo even if the run is cancelled,
-        and the next run can resume from the last saved period.
-        """
-        import subprocess
-        os.makedirs("data", exist_ok=True)
-        try:
-            existing_data = {}
-            if os.path.exists("data/data.json"):
-                with open("data/data.json") as f:
-                    existing_data = json.load(f)
-        except Exception:
-            existing_data = {}
-        existing_data["periodBaselines"] = pb
-        existing_data["baselineYears"]   = BASELINE_YEARS
-        existing_data["baselineMethod"]  = BASELINE_DESCRIPTION
-        existing_data["_baselineInProgress"] = True
-        with open("data/data.json", "w", encoding="utf-8") as f:
-            json.dump(existing_data, f, ensure_ascii=False, indent=2)
-        # Commit to repo so progress survives a cancelled run
-        try:
-            subprocess.run(["git", "add", "data/data.json"], check=True)
-            # Count total cities fetched across all periods
-            total_cities = sum(len(v) for v in pb.values() if isinstance(v, dict))
-            total_expected = len(CITIES) * (len(WEEKS) + 1)
-            subprocess.run(["git", "commit", "-m",
-                "chore: baseline progress (" + str(total_cities) + "/" +
-                str(total_expected) + " cities)"], check=True)
-            subprocess.run(["git", "push"], check=True)
-            print("    Committed to repo.")
-        except subprocess.CalledProcessError as e:
-            print("    Git commit failed (non-fatal): " + str(e))
-
-    # One baseline set per discrete tournament week — skip already-fetched periods
-    for week in WEEKS:
-        if week["label"] in period_baselines:
-            print("  Skipping " + week["label"] + " (already fetched)")
-            continue
-        print("\n  " + week["label"] + " (" + week["start"] + " to " + week["end"] + ")")
-        fetch_baseline_for_period(
-            week["start"], week["end"],
-            week["label"], period_baselines, save_progress
-        )
-        save_progress(period_baselines)
-        print("  Progress saved (" + str(len(period_baselines)) + "/" +
-              str(len(WEEKS) + 1) + " periods complete)")
-
-    # Last-7-days baseline
-    if "last7" not in period_baselines:
-        today = date.today()
-        tournament_start = date(2026, 6, 11)
-        if today >= tournament_start:
-            l7_end   = today.strftime("%Y-%m-%d")
-            l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
-        else:
-            l7_end   = "2026-06-17"
-            l7_start = "2026-06-11"
-        print("\n  Last 7 days baseline window: " + l7_start + " to " + l7_end)
-        fetch_baseline_for_period(
-            l7_start, l7_end,
-            "last7", period_baselines, save_progress
-        )
-        save_progress(period_baselines)
-        print("  All baseline periods complete.")
-    else:
-        print("  Skipping last7 (already fetched)")
-
-    return period_baselines
-
-
-def load_baselines(existing_data):
+def load_baselines(existing_data, l7_start, l7_end):
     """
-    Reuse per-period baselines from data.json if valid.
-    Returns (period_baselines_dict, needs_full_refetch: bool).
-    The per-period structure is: {period_label: {city_name: baseline_dict}}
+    Load cached baselines from data.json if they cover the same window.
+    Returns (baselines_dict_or_None, is_complete).
     """
     if not existing_data:
-        return None, True
-    pb = existing_data.get("periodBaselines")
-    if not pb:
-        print("  No period baselines found in data.json - full fetch required.")
-        return None, True
+        return None, False
 
-    # If a previous run was interrupted mid-baseline, resume it
-    if existing_data.get("_baselineInProgress"):
-        print("  Previous baseline fetch was interrupted - resuming...")
-        return pb, True  # triggers fetch_baselines() which will skip completed periods
+    bl = existing_data.get("baselines", {})
+    cached_window = existing_data.get("baselineWindow", "")
+    in_progress   = existing_data.get("_baselineInProgress", False)
+    expected_window = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
 
-    # Validate: check all expected periods are present and no zero values
-    expected = [w["label"] for w in WEEKS] + ["last7"]
-    missing  = [p for p in expected if p not in pb]
-    if missing:
-        print("  Missing periods: " + str(missing) + " - full fetch required.")
-        return None, True
+    if not bl:
+        print("  No baselines in data.json - fetching fresh.")
+        return None, False
 
-    zero_found = False
-    for period, city_bl in pb.items():
-        for city_name, bl in city_bl.items():
-            if bl.get("stadium_avg_weekly", 0) == 0:
-                print("  Zero stadium baseline: " + city_name + " in " + period)
-                zero_found = True
+    if cached_window != expected_window:
+        print("  Baseline window changed (" + cached_window + ") - fetching fresh.")
+        return None, False
 
-    if zero_found:
-        print("  Zero baselines found - full fetch required.")
-        return None, True
+    if in_progress:
+        n_done = len(bl)
+        print("  Partial baselines found (" + str(n_done) + "/16) - will resume.")
+        return bl, False
 
-    # Restore low_conf flag in case threshold changed
-    for period in pb:
-        for city_name in pb[period]:
-            v = pb[period][city_name].get("wikivoyage_avg_weekly", 0)
-            pb[period][city_name]["wikivoyage_low_conf"] = v < WIKIVOYAGE_LOW_CONF
+    if len(bl) < len(CITIES):
+        print("  Incomplete baselines (" + str(len(bl)) + "/16) - will resume.")
+        return bl, False
 
-    print("  All period baselines valid - reusing from data.json.")
-    return pb, False
+    print("  Baselines complete and current - reusing.")
+    return bl, True
 
 
-# (refetch_baselines removed - with per-period baselines, any failure
-#  triggers a full re-fetch via fetch_baselines() which is cleaner)
+# ── Current week fetch ─────────────────────────────────────────────────────────
 
+def fetch_current_week(l7_start, l7_end, baselines):
+    """Fetch actual last-7-days views and compute uplift + points."""
+    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
+    wf   = days / 7.0
 
-# ── Period fetch ───────────────────────────────────────────────────────────────
+    print("\n=== Fetching last 7 days (" + l7_start + " to " + l7_end + ") ===")
 
-def fetch_period(label, start_date, end_date, baselines):
-    """Fetch all three signals, compute uplifts and points for one time window."""
-    days = (date.fromisoformat(end_date) - date.fromisoformat(start_date)).days + 1
-    wf   = days / 7.0  # week fraction for normalisation
-    print("\n  [" + label + "] " + start_date + " to " + end_date)
-
-    stadium_u  = {}
-    city_u     = {}
-    voyage_u   = {}
-    combined_u = {}
+    stadium_u = {}; city_u = {}; voyage_u = {}; combined_u = {}
 
     for city in CITIES:
         n  = city["name"]
-        bl = baselines[n]
+        bl = baselines.get(n, {})
 
-        sv = wiki(city["stadium_article"],      start_date, end_date); time.sleep(1.5)
-        cv = wiki(city["city_article"],          start_date, end_date); time.sleep(1.5)
-        vv = voyage(city["wikivoyage_article"],  start_date, end_date); time.sleep(1.5)
+        sv = wiki(city["stadium_article"],     l7_start, l7_end); time.sleep(1.5)
+        cv = wiki(city["city_article"],         l7_start, l7_end); time.sleep(1.5)
+        vv = voyage(city["wikivoyage_article"], l7_start, l7_end); time.sleep(1.5)
 
-        # Warn on zero views where baseline exists
-        if sv == 0 and bl["stadium_avg_weekly"]    > 0: print("    WARNING: " + n + " stadium=0 (baseline=" + str(bl["stadium_avg_weekly"]) + ")")
-        if cv == 0 and bl["city_avg_weekly"]        > 0: print("    WARNING: " + n + " city=0 (baseline=" + str(bl["city_avg_weekly"]) + ")")
-        if vv == 0 and bl["wikivoyage_avg_weekly"]  > 0: print("    WARNING: " + n + " voyage=0 (baseline=" + str(bl["wikivoyage_avg_weekly"]) + ")")
+        if sv == 0 and bl.get("stadium_avg_weekly", 0) > 0:
+            print("    WARNING: " + n + " stadium=0")
+        if cv == 0 and bl.get("city_avg_weekly", 0) > 0:
+            print("    WARNING: " + n + " city=0")
 
-        su = uplift(sv, bl["stadium_avg_weekly"],    wf)
-        cu = uplift(cv, bl["city_avg_weekly"],       wf)
-        vu_raw = uplift(vv, bl["wikivoyage_avg_weekly"], wf)
-        vu = clamp_wikivoyage(vu_raw, bl["wikivoyage_low_conf"])
+        su     = uplift(sv, bl.get("stadium_avg_weekly",    0), wf)
+        cu     = uplift(cv, bl.get("city_avg_weekly",       0), wf)
+        vu_raw = uplift(vv, bl.get("wikivoyage_avg_weekly", 0), wf)
+        vu     = clamp_wikivoyage(vu_raw, bl.get("wikivoyage_low_conf", False))
+        wu     = combined(su, vu, cu)
 
-        wu = combined(su, vu, cu)
+        stadium_u[n] = su; city_u[n] = cu; voyage_u[n] = vu; combined_u[n] = wu
 
-        stadium_u[n]  = su
-        city_u[n]     = cu
-        voyage_u[n]   = vu
-        combined_u[n] = wu
-
-        print("  " + n.ljust(25)
-              + " stadium=" + str(su) + "x"
-              + "  voyage=" + str(vu) + "x" + (" [clamped from " + str(vu_raw) + "]" if vu != vu_raw else "")
-              + ("~" if bl["wikivoyage_low_conf"] else "")
+        print("  " + n.ljust(25) + " stadium=" + str(su) + "x"
+              + "  voyage=" + str(vu) + "x"
               + "  city=" + str(cu) + "x"
               + "  combined=" + str(wu) + "x")
 
     pts = to_points(combined_u)
-    top3 = sorted(combined_u.items(), key=lambda x: x[1], reverse=True)[:3]
-    print("  Top 3: " + " | ".join(n + " (" + str(v) + "x)" for n, v in top3))
-    return {"stadium": stadium_u, "city": city_u, "voyage": voyage_u,
-            "combined": combined_u, "points": pts}
+    return {"stadium": stadium_u, "city": city_u,
+            "voyage": voyage_u, "combined": combined_u, "points": pts}
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    print("Wikipedia + Wikivoyage Uplift Tracker")
-    print("Weights: stadium=50% | wikivoyage=30% | city_wiki=20%")
-    print("Wikivoyage bounds: floor=1.0x  cap=10.0x (5x if low-confidence baseline)")
+    print("Wikipedia + Wikivoyage Uplift Tracker — Last 7 Days")
+    print("Weights: stadium=50%  wikivoyage=30%  city=20%")
+    print("Baseline: same window in " + str(BASELINE_YEARS))
 
-    today = date.today()
+    today    = date.today()
+    l7_end   = today.strftime("%Y-%m-%d")
+    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
 
-    # Load / build baselines
+    # Load existing data
     existing_data = None
     if os.path.exists("data/data.json"):
         try:
@@ -574,120 +350,60 @@ def main():
         except Exception:
             pass
 
-    period_baselines, needs_fetch = load_baselines(existing_data)
-    if needs_fetch:
-        period_baselines = fetch_baselines()
+    # Baselines: reuse if current, otherwise fetch (with per-city saves)
+    cached_bl, is_complete = load_baselines(existing_data, l7_start, l7_end)
 
-    # Discrete weeks - each uses its own same-period baseline
-    week_data = {}
-    for week in WEEKS:
-        if today < date.fromisoformat(week["start"]):
-            print("\nSkipping " + week["label"] + " (starts " + week["start"] + ")")
-            continue
-        print("\n=== " + week["label"] + " ===")
-        week_bl = period_baselines[week["label"]]
-        week_data[week["label"]] = fetch_period(
-            week["label"], week["start"], week["end"], week_bl)
+    if is_complete:
+        baselines = cached_bl
+    else:
+        baselines = fetch_baselines(l7_start, l7_end, cached_bl or {})
 
-    # Rolling last 7 days - uses last7 baseline
-    print("\n=== Last 7 Days (rolling) ===")
-    l7_end   = today.strftime("%Y-%m-%d")
-    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
-    l7 = fetch_period("Last 7 days", l7_start, l7_end, period_baselines["last7"])
+    # Fetch current week
+    current = fetch_current_week(l7_start, l7_end, baselines)
 
     # Build results
     results = []
     for city in CITIES:
         n  = city["name"]
-        bl = period_baselines["last7"][n]  # for baseline display in HTML
-
-        week_pts     = {}
-        week_combined = {}
-        week_stadium = {}
-        week_city    = {}
-        week_voyage  = {}
-
-        for week in WEEKS:
-            lbl = week["label"]
-            if lbl in week_data:
-                wd = week_data[lbl]
-                week_pts[lbl]      = wd["points"][n]
-                week_combined[lbl] = wd["combined"][n]
-                week_stadium[lbl]  = wd["stadium"][n]
-                week_city[lbl]     = wd["city"][n]
-                week_voyage[lbl]   = wd["voyage"][n]
-            else:
-                week_pts[lbl] = week_combined[lbl] = week_stadium[lbl] = week_city[lbl] = week_voyage[lbl] = None
-
-        # First 4 weeks total = sum of available discrete week points only
-        first4_pts = sum(v for v in week_pts.values() if v is not None)
-
+        bl = baselines.get(n, {})
         results.append({
             "name":    n, "country": city["country"],
-            "flag":    city["flag"], "region": city["region"],
+            "flag":    city["flag"], "region":  city["region"],
             "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
-            # Baselines
-            "baselineStadiumAvgWeekly":  bl["stadium_avg_weekly"],
-            "baselineCityAvgWeekly":     bl["city_avg_weekly"],
-            "baselineVoyageAvgWeekly":   bl["wikivoyage_avg_weekly"],
-            "baselineStadiumTotal":      bl["stadium_total"],
-            "baselineCityTotal":         bl["city_total"],
-            "baselineVoyageTotal":       bl["wikivoyage_total"],
-            "wikivoyageLowConf":         bl["wikivoyage_low_conf"],
-            # Last 7 days
-            "lastWeekCombined":  l7["combined"][n],
-            "lastWeekStadium":   l7["stadium"][n],
-            "lastWeekCity":      l7["city"][n],
-            "lastWeekVoyage":    l7["voyage"][n],
-            "lastWeekPts":       l7["points"][n],
-            # Discrete weeks
-            "weekPoints":        week_pts,
-            "weekCombined":      week_combined,
-            "weekStadium":       week_stadium,
-            "weekCity":          week_city,
-            "weekVoyage":        week_voyage,
-            # Aggregate
-            "first4Pts":         first4_pts,
+            "baselineStadiumAvgWeekly":  bl.get("stadium_avg_weekly",    0),
+            "baselineCityAvgWeekly":     bl.get("city_avg_weekly",       0),
+            "baselineVoyageAvgWeekly":   bl.get("wikivoyage_avg_weekly", 0),
+            "wikivoyageLowConf":         bl.get("wikivoyage_low_conf",   False),
+            "lastWeekCombined":  current["combined"][n],
+            "lastWeekStadium":   current["stadium"][n],
+            "lastWeekCity":      current["city"][n],
+            "lastWeekVoyage":    current["voyage"][n],
+            "lastWeekPts":       current["points"][n],
         })
 
-    results.sort(key=lambda x: (x["first4Pts"], x["lastWeekCombined"]), reverse=True)
+    results.sort(key=lambda x: x["lastWeekCombined"], reverse=True)
 
     print("\n=== Final Standings ===")
     for city in results:
         print("  " + city["name"].ljust(25)
               + "  combined=" + str(city["lastWeekCombined"]) + "x"
-              + "  pts=" + str(city["lastWeekPts"])
-              + "  first4=" + str(city["first4Pts"]))
+              + "  pts=" + str(city["lastWeekPts"]))
 
     now = datetime.now(timezone.utc)
     os.makedirs("data", exist_ok=True)
     with open("data/data.json", "w", encoding="utf-8") as f:
         json.dump({
-            "updated":        now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "updatedDisplay": now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":         "Uplift index: 50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs same-period baseline (2019, 2022, 2023)",
-            "weights":        {"stadium": "50%", "wikivoyage": "30%", "city_wikipedia": "20%"},
-            "wikivoyageBounds": {"floor": "1.0x", "cap": "10.0x", "low_conf_cap": "5.0x", "low_conf_threshold_weekly": WIKIVOYAGE_LOW_CONF},
-            "baselineMethod": BASELINE_DESCRIPTION,
-            "baselineYears":  BASELINE_YEARS,
-            "periodBaselines": period_baselines,
-            "weeks":          WEEKS,
-            "cities":         results,
+            "updated":          now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "updatedDisplay":   now.strftime("%d %b %Y, %H:%Mz"),
+            "metric":           "50% stadium Wikipedia + 30% Wikivoyage + 20% city Wikipedia vs same-period baseline",
+            "baselineYears":    BASELINE_YEARS,
+            "baselineWindow":   l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")",
+            "baselines":        baselines,
+            "cities":           results,
         }, f, ensure_ascii=False, indent=2)
 
-    # Remove the in-progress flag now that we have a complete successful write
-    # (re-read and re-write to clean it up)
-    try:
-        with open("data/data.json") as f:
-            final = json.load(f)
-        final.pop("_baselineInProgress", None)
-        with open("data/data.json", "w") as f:
-            json.dump(final, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
-
     print("\nDone. Top city: " + results[0]["name"]
-          + " (combined: " + str(results[0]["lastWeekCombined"]) + "x)")
+          + " (" + str(results[0]["lastWeekCombined"]) + "x)")
 
 
 main()
