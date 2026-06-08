@@ -2,7 +2,7 @@ name: Fetch Pageviews Data
 
 on:
   schedule:
-    - cron: "45 7 * * *"
+    - cron: "15 8 * * *"
   workflow_dispatch:
 
 env:
