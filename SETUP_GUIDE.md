@@ -1,7 +1,7 @@
 # FIFA World Cup 2026 — Interest Tracker
 ## Complete Setup Guide for GitHub Pages
 
----
+----
 
 ## What you're building
 
