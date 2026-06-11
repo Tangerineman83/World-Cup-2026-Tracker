@@ -20,7 +20,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: "Barlow", sans-serif; line-height: 1.7; }
 
-    /* HEADER */
     .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 28px 32px 22px; }
     .header-inner { max-width: 860px; margin: 0 auto; }
     .back-link { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; transition: color .15s; }
@@ -30,74 +29,64 @@
     h1 span { color: var(--gold); }
     .tagline { margin-top: 10px; font-size: 15px; color: var(--muted); max-width: 600px; }
 
-    /* CONTENT */
     .content { max-width: 860px; margin: 0 auto; padding: 40px 32px 80px; }
-
-    /* SECTION */
     .section { margin-bottom: 52px; }
     .section-title { font-family: "Barlow Condensed", sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--gold); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 
-    /* BIG ANSWER BOX */
     .big-answer { background: rgba(240,192,64,.07); border: 1px solid rgba(240,192,64,.25); border-left: 4px solid var(--gold); border-radius: 6px; padding: 20px 24px; margin-bottom: 24px; }
     .big-answer .label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
     .big-answer .value { font-family: "Barlow Condensed", sans-serif; font-size: 36px; font-weight: 900; color: var(--text); }
-    .big-answer .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .big-answer .sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
-    /* PLAIN EXPLAINER */
-    .explainer { font-size: 15px; color: #9ca3af; margin-bottom: 16px; }
+    .explainer { font-size: 15px; color: #9ca3af; margin-bottom: 16px; line-height: 1.7; }
     .explainer strong { color: var(--text); }
     .explainer em { color: var(--gold); font-style: normal; font-weight: 600; }
 
-    /* STEP BOXES */
     .steps { display: grid; gap: 14px; margin: 20px 0; }
     .step { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; }
     .step-num { font-family: "Barlow Condensed", sans-serif; font-size: 28px; font-weight: 900; color: var(--gold); line-height: 1; min-width: 32px; }
     .step-body { flex: 1; }
-    .step-title { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px; }
-    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-    .step-source { font-size: 11px; color: #444; margin-top: 6px; letter-spacing: .03em; }
+    .step-title { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .step-source { font-size: 11px; color: #3a4258; margin-top: 8px; }
 
-    /* ASSUMPTIONS TABLE */
     .assume-grid { display: grid; gap: 10px; margin: 16px 0; }
-    .assume-row { display: grid; grid-template-columns: 220px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; align-items: start; }
+    .assume-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; align-items: start; }
     .assume-label { font-size: 13px; font-weight: 700; color: var(--text); }
-    .assume-value { font-size: 13px; color: var(--muted); }
-    .assume-value strong { color: var(--gold); }
+    .assume-val { font-size: 13px; }
+    .assume-val strong { color: var(--gold); }
+    .assume-note { font-size: 12px; color: #4a5568; margin-top: 3px; line-height: 1.5; }
 
-    /* DISPLACEMENT TIERS */
     .tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin: 20px 0; }
     .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
-    .tier-name { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .tier-name { font-family: "Barlow Condensed", sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
     .tier-pct { font-family: "Barlow Condensed", sans-serif; font-size: 28px; font-weight: 900; color: var(--gold); line-height: 1; }
-    .tier-pct span { font-size: 13px; color: var(--muted); font-family: "Barlow", sans-serif; font-weight: 400; }
-    .tier-cities { font-size: 11px; color: #444; margin-top: 6px; line-height: 1.5; }
+    .tier-net { font-size: 11px; color: #444; margin-top: 2px; }
+    .tier-cities { font-size: 11px; color: #444; margin-top: 8px; line-height: 1.5; }
     .tier-why { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
 
-    /* CITY TABLE */
     .city-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
-    .city-table th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #444; padding: 8px 10px; border-bottom: 1px solid var(--border); }
-    .city-table th.right { text-align: right; }
-    .city-table td { padding: 10px; border-bottom: 1px solid #0d1120; vertical-align: top; }
+    .city-table th { text-align: right; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #444; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    .city-table th:first-child { text-align: left; }
+    .city-table td { padding: 10px; border-bottom: 1px solid #0a0e1a; vertical-align: middle; }
     .city-table tr:hover td { background: rgba(255,255,255,.02); }
     .city-name-td { font-weight: 600; color: var(--text); }
-    .city-tier-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; margin-left: 6px; background: rgba(96,165,250,.12); color: #60a5fa; }
-    .city-tier-badge.gateway { background: rgba(240,192,64,.12); color: var(--gold); }
-    .city-tier-badge.regional { background: rgba(34,197,94,.10); color: var(--green); }
-    .city-tier-badge.midtier { background: rgba(96,165,250,.10); color: var(--blue); }
-    .city-tier-badge.low { background: rgba(167,139,250,.10); color: #a78bfa; }
-    .td-right { text-align: right; color: var(--muted); }
+    .city-tier-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; margin-left: 6px; }
+    .city-tier-badge.gateway  { background: rgba(240,192,64,.12); color: var(--gold); }
+    .city-tier-badge.regional { background: rgba(34,197,94,.10);  color: var(--green); }
+    .city-tier-badge.midtier  { background: rgba(96,165,250,.10);  color: var(--blue); }
+    .city-tier-badge.low      { background: rgba(167,139,250,.10); color: #a78bfa; }
+    .td-right  { text-align: right; color: var(--muted); }
     .td-impact { text-align: right; font-weight: 700; color: var(--text); }
-    .td-pct { text-align: right; font-weight: 800; font-family: "Barlow Condensed", sans-serif; font-size: 16px; }
+    .td-pct    { text-align: right; font-weight: 800; font-family: "Barlow Condensed", sans-serif; font-size: 15px; }
 
-    /* HONEST LIMITS */
-    .limits { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.2); border-left: 4px solid #ef4444; border-radius: 6px; padding: 18px 20px; margin: 20px 0; }
+    .limits { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.18); border-left: 4px solid #ef4444; border-radius: 6px; padding: 18px 20px; margin: 20px 0; }
     .limits-title { font-weight: 700; color: #f87171; font-size: 14px; margin-bottom: 10px; }
     .limits ul { padding-left: 18px; }
-    .limits li { font-size: 14px; color: var(--muted); margin-bottom: 6px; line-height: 1.6; }
+    .limits li { font-size: 14px; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
 
-    /* SOURCES */
     .source-list { list-style: none; display: grid; gap: 8px; margin-top: 12px; }
-    .source-list li { font-size: 13px; color: var(--muted); padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
+    .source-list li { font-size: 13px; color: var(--muted); padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; line-height: 1.6; }
     .source-list li strong { color: var(--text); display: block; margin-bottom: 2px; }
     .source-list a { color: #60a5fa; text-decoration: none; }
     .source-list a:hover { text-decoration: underline; }
@@ -105,7 +94,8 @@
     @media (max-width: 600px) {
       .content, .header-inner { padding-left: 16px; padding-right: 16px; }
       .assume-row { grid-template-columns: 1fr; }
-      .city-table { font-size: 12px; }
+      .city-table { font-size: 11px; }
+      .city-table th, .city-table td { padding: 6px 5px; }
     }
   </style>
 </head>
@@ -122,59 +112,66 @@
 
 <div class="content">
 
-  <!-- BIG NUMBER -->
+  <!-- THE ANSWER -->
   <div class="section">
     <div class="big-answer">
-      <div class="label">Total estimated economic impact across all 16 host cities</div>
+      <div class="label">Our estimate — extra money generated by visiting fans</div>
       <div class="value">$5.7bn</div>
-      <div class="sub">Our estimate of incremental economic activity from visitor spending — the most conservative, most directly measurable component. See below for how this relates to FIFA's broader estimates.</div>
+      <div class="sub">This is the additional economic activity created when fans travel to World Cup host cities and spend money there — on hotels, food, taxis, tickets and entertainment. It covers all 16 host cities across the USA, Canada and Mexico.</div>
     </div>
-    <p class="explainer">Think of it this way: when a fan flies from Japan to watch a match in Kansas City, buys a hotel room, eats out, and takes a taxi — that's money the city wouldn't have seen otherwise. Multiply that by millions of fans across 104 matches in 16 cities, and you get a very large number. But not all of it is truly <em>extra</em> — which is where our methodology gets interesting.</p>
+    <p class="explainer">Imagine a fan flying from South Korea to watch their team play in Kansas City. They book a hotel for four nights, eat at local restaurants, take taxis, buy souvenirs and spend at the stadium. Every dollar they spend goes into the local economy — paying wages for hotel workers, restaurant staff, and taxi drivers, who then spend some of that money locally too. Our model counts up all that extra spending, across millions of fans and 104 matches, to arrive at a total economic impact for each city.</p>
+    <p class="explainer">The key word is <em>extra</em>. Not all World Cup visitors are truly additional — some replace regular tourists who decided to avoid the city during the tournament. We account for this carefully, and it makes a big difference to the final numbers.</p>
   </div>
 
   <!-- HOW WE CALCULATE IT -->
   <div class="section">
-    <div class="section-title">How We Calculate It</div>
-    <p class="explainer" style="margin-bottom:20px">We work through five steps for each city. The maths is straightforward — the interesting part is the assumptions we make along the way (which we explain fully below).</p>
+    <div class="section-title">The Five Steps</div>
+    <p class="explainer" style="margin-bottom:20px">We follow the same five steps for every city. Each step involves a key assumption — we explain all of them below.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <div class="step-title">Count the visitors</div>
-          <div class="step-desc">We calculate how many incremental fans attend each match using each venue's actual FIFA-confirmed capacity at <strong>95% occupancy</strong> (FIFA's projected attendance rate). Of those occupied seats: <strong>25% are international visitors</strong> (flew in from abroad) and <strong>35% are domestic away fans</strong> (travelled within the country). The remaining 40% are local city residents whose spending is largely substitution rather than genuinely new economic activity. This means smaller venues like Toronto's BMO Field (45,000) generate fewer incremental visitors than Dallas's AT&T Stadium (94,000) — even hosting the same number of matches.</div>
-          <div class="step-source">Sources: FIFA official net capacities per venue (confirmed October 2025). FIFA projected 95% occupancy. FIFA 2022 World Cup attendance surveys for international/domestic visitor split.</div>
+          <div class="step-title">How many fans visit?</div>
+          <div class="step-desc">We start with each stadium's official FIFA capacity and assume <strong>95% of seats are filled</strong> — FIFA's own attendance projection. Of those fans, we count <strong>25% as international visitors</strong> (people who flew in from another country) and <strong>35% as domestic away fans</strong> (people who travelled from elsewhere in the same country). The remaining 40% are locals from the host city itself — their spending is mostly money they would have spent anyway, so we leave it out.<br><br>
+          This means bigger stadiums generate more economic impact. Dallas's AT&T Stadium holds 94,000 people, so 9 matches there produces far more visitor spending than Toronto's BMO Field, which holds only 45,000.</div>
+          <div class="step-source">&#128203; Sources: FIFA official stadium capacities (confirmed October 2025). FIFA 2022 World Cup attendance surveys for the 25%/35% visitor splits.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <div class="step-title">Estimate what they spend</div>
-          <div class="step-desc">Spending is adjusted for each city's cost of living using Numbeo's Restaurant Price Index (NYC = 100 baseline). A fan visiting Guadalajara (index: 46) spends far less on food and activities than one visiting San Francisco (index: 100). We also apply a <strong>20% World Cup price spike</strong> on top of normal city prices for food, drink and entertainment — reflecting confirmed stadium pricing and broader hospitality inflation reported ahead of the tournament. Accommodation pricing uses the city-specific hotel rates and match-day premiums from Lighthouse data. International fans average <strong>$285–$437/day</strong> depending on the city; domestic fans spend 35% of that.</div>
-          <div class="step-source">Sources: LendingTree 2026 World Cup Fan Cost Analysis. Numbeo Cost of Living Index by City (June 2026) for city-specific adjustment. SoFi/GiveMeSport for WC price spike estimates. Lighthouse for hotel rates and match-day premiums.</div>
+          <div class="step-title">How much does each fan spend?</div>
+          <div class="step-desc">International fans spend <strong>$285–$437 per day</strong> depending on which city they're in — because a restaurant meal in Guadalajara costs far less than the same meal in San Francisco. We adjust each city's spending using <strong>Numbeo's Restaurant Price Index</strong>, which measures eating-out costs city by city (New York = 100).<br><br>
+          On top of that, we add a <strong>20% World Cup premium</strong> — prices for food, drink and entertainment are inflated during major sporting events. Domestic fans spend about <strong>35% of what international fans spend</strong>, because they don't pay for international flights and tend to know better where to find good value.<br><br>
+          We also separately count the extra hotel spend on match nights — some cities see hotel prices double on game days (Monterrey: +104%, Boston: +42%), while others barely move (Atlanta: +2%, Dallas: +3%).</div>
+          <div class="step-source">&#128203; Sources: LendingTree 2026 World Cup Fan Cost Analysis. Numbeo Cost of Living Index by City (June 2026). GiveMeSport/SeatPick stadium beer prices. Lighthouse Hospitality hotel rate and match-day premium data.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <div class="step-title">Deduct displacement</div>
-          <div class="step-desc">Not every World Cup visitor is truly <em>extra</em>. In a city like New York that already attracts millions of tourists, some World Cup fans replace regular tourists who chose to avoid the city during the tournament. We call this "displacement" and deduct it. Crucially, <strong>the displacement rate varies by city</strong> — see our tier system below.</div>
-          <div class="step-source">Sources: Oxford Economics mega-event studies; Zimbalist &amp; Matheson NFL Super Bowl displacement research (20–40% for major US cities); FIFA 2014 Brazil secondary city analysis (~15%); UK Sport/DCMS mega-event evaluation framework.</div>
+          <div class="step-title">Subtract the visitors who would have come anyway</div>
+          <div class="step-desc">This is the most important step — and what most optimistic economic forecasts get wrong by ignoring it. In a city like New York or Miami that already draws millions of international tourists every year, some World Cup fans simply replace regular tourists who chose to stay away. The city is busy either way, so the World Cup isn't truly creating new economic activity for every visitor.<br><br>
+          We call this <em>displacement</em>, and we vary the deduction by city type. Cities like Kansas City or Guadalajara that rarely see international tourists get almost full credit for every World Cup visitor — they're genuinely additional. Cities like New York or Los Angeles that are always packed with tourists lose more credit.</div>
+          <div class="step-source">&#128203; Sources: Zimbalist &amp; Matheson NFL Super Bowl studies (20–40% displacement for major US cities). FIFA 2014 Brazil secondary city research (~15%). UK Sport/DCMS mega-event evaluation framework (10–35%).</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Apply the economic multiplier</div>
-          <div class="step-desc">When a tourist spends $100 at a hotel, that hotel pays wages to staff, who spend at local restaurants, who buy from local suppliers. The money circulates. We use a multiplier of <strong>1.75×</strong> — meaning every $1 of visitor spend generates $1.75 of total economic activity.</div>
-          <div class="step-source">Sources: Deloitte Canada Sport Business Advisory Practice (2024): $1.09 GDP per CAD spent for Canadian host cities — the anchor for Vancouver (1.10×) and Toronto (1.15×). US multipliers from Tourism Economics/Oxford Economics literature: 1.6–1.9× for large US metros, 1.5–1.7× for mid-size, 1.3–1.5× for smaller cities. World Bank tourism multiplier guidance for Mexico: 1.2–1.5×.</div>
+          <div class="step-desc">When a fan spends $100 at a hotel, that doesn't just benefit the hotel. The hotel pays wages to housekeepers and receptionists. Those workers spend their wages at local shops and restaurants. Those shops buy supplies from local wholesalers. The original $100 circulates through the local economy, creating more economic activity than the initial amount.<br><br>
+          We use a <strong>city-specific multiplier</strong> — larger, more self-sufficient cities like New York (1.85×) generate more local circulation, while smaller or more import-dependent cities like Vancouver (1.10×) see more money leak out to suppliers in other cities or countries. The Canadian cities use a lower multiplier anchored to Deloitte Canada's published research finding of $1.09 generated per dollar spent.</div>
+          <div class="step-source">&#128203; Sources: Deloitte Canada Sport Business Advisory (2024). Tourism Economics/Oxford Economics multiplier literature. World Bank tourism guidance for Latin American economies.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
-          <div class="step-title">Express as % of city GDP</div>
-          <div class="step-desc">A $500m impact means very different things to Kansas City ($180bn economy) and New York ($2.1tn economy). Expressing impact as a <strong>percentage of annual GDP</strong> puts every city on a level playing field — and reveals which cities are experiencing the biggest World Cup effect relative to their normal economic size.</div>
-          <div class="step-source">Sources: US Bureau of Economic Analysis (BEA) Metropolitan Statistical Area GDP; Statistics Canada Census Metropolitan Area GDP; Mexico INEGI metropolitan area GDP. All converted to USD.</div>
+          <div class="step-title">Show it as a % of each city's economy</div>
+          <div class="step-desc">A $500m impact sounds huge — but it means something very different for Kansas City (annual economy: $180bn) versus New York (annual economy: $2,100bn). For Kansas City it's 0.23% of their whole annual economy. For New York it's barely a rounding error at 0.03%.<br><br>
+          By expressing impact as a <strong>percentage of annual GDP</strong> we put every city on an equal footing. This reveals the real story: smaller cities with lower international tourism see a proportionally <em>far bigger</em> World Cup effect than the big-name cities that dominate the headlines.</div>
+          <div class="step-source">&#128203; Sources: US Bureau of Economic Analysis (BEA) Metropolitan Statistical Area GDP data. Statistics Canada CMA GDP. Mexico INEGI metropolitan area GDP. All figures converted to USD.</div>
         </div>
       </div>
     </div>
@@ -182,113 +179,167 @@
 
   <!-- FORMULA -->
   <div class="section">
-    <div class="section-title">The Formula</div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px 24px;font-family:monospace;font-size:13px;color:#9ca3af;line-height:2;">
-      <span style="color:var(--gold)">Gross visitor spend</span> =<br>
-      &nbsp;&nbsp;matches &times; (18,000 intl fans &times; $390/day + 32,000 domestic fans &times; $137/day) &times; 4 days<br>
-      &nbsp;&nbsp;+ hotel match-day premium spend<br><br>
-      <span style="color:var(--gold)">Incremental spend</span> = gross spend &times; (1 &minus; displacement rate)<br><br>
-      <span style="color:var(--gold)">GDP impact</span> = incremental spend &times; 1.75 multiplier<br><br>
-      <span style="color:var(--gold)">% of annual GDP</span> = GDP impact &divide; city metro GDP &times; 100
+    <div class="section-title">The Formula (In Plain Numbers)</div>
+    <p class="explainer">For each city, the calculation looks like this:</p>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px 24px;font-family:monospace;font-size:13px;color:#6b7280;line-height:2.2;">
+      <span style="color:var(--gold)">Step 1 — Fan count per match:</span><br>
+      &nbsp;&nbsp;Stadium capacity × 95% occupancy × (25% intl + 35% domestic)<br><br>
+      <span style="color:var(--gold)">Step 2 — What they spend:</span><br>
+      &nbsp;&nbsp;Fan count × city-adjusted daily spend × 4 days stay<br>
+      &nbsp;&nbsp;+ hotel match-night premium spend<br><br>
+      <span style="color:var(--gold)">Step 3 — Remove displacement:</span><br>
+      &nbsp;&nbsp;Total spend × (100% minus displacement rate)<br><br>
+      <span style="color:var(--gold)">Step 4 — Multiplier effect:</span><br>
+      &nbsp;&nbsp;Incremental spend × city multiplier (1.10× to 1.85×)<br><br>
+      <span style="color:var(--gold)">Step 5 — Divide by city GDP:</span><br>
+      &nbsp;&nbsp;GDP impact ÷ annual city GDP × 100 = <span style="color:var(--green)">% impact</span>
     </div>
   </div>
 
   <!-- GLOBAL ASSUMPTIONS -->
   <div class="section">
-    <div class="section-title">Global Assumptions</div>
-    <p class="explainer">These numbers apply to every city equally. We take the median estimate wherever a range exists.</p>
+    <div class="section-title">The Numbers We Assume</div>
+    <p class="explainer">Some numbers in our model come from published data. Others are our best estimates based on research. Here's every assumption we make, and where it comes from.</p>
     <div class="assume-grid">
       <div class="assume-row">
-        <div class="assume-label">International visitors per match</div>
-        <div class="assume-value"><strong style="color:var(--gold)">18,000</strong><br><span style="font-size:12px;color:#555">~25% of average stadium capacity. Based on FIFA 2022 survey: international fans comprised ~25% of total attendance at group stage matches.</span></div>
+        <div class="assume-label">Stadium occupancy</div>
+        <div>
+          <div class="assume-val"><strong>95%</strong> of capacity</div>
+          <div class="assume-note">FIFA's own attendance projection for the 2026 tournament. Actual World Cup matches routinely sell out or near-sell out.</div>
+        </div>
       </div>
       <div class="assume-row">
-        <div class="assume-label">Domestic visitors per match</div>
-        <div class="assume-value"><strong style="color:var(--gold)">32,000</strong><br><span style="font-size:12px;color:#555">~45% of average stadium capacity. Remaining ~30% are local city residents whose spending is largely substitution rather than incremental.</span></div>
+        <div class="assume-label">International fan share</div>
+        <div>
+          <div class="assume-val"><strong>25%</strong> of occupied seats</div>
+          <div class="assume-note">Based on FIFA 2022 Qatar attendance surveys. Means Dallas (94,000 capacity) hosts about 22,325 international fans per match; Toronto (45,000) hosts about 10,688.</div>
+        </div>
       </div>
       <div class="assume-row">
-        <div class="assume-label">International daily spend</div>
-        <div class="assume-value"><strong style="color:var(--gold)">$390/day</strong><br><span style="font-size:12px;color:#555">LendingTree estimates $2,100 total trip cost ÷ 4 days + hotel premium adjustment. Covers flights, accommodation, tickets, food, transport.</span></div>
+        <div class="assume-label">Domestic away fan share</div>
+        <div>
+          <div class="assume-val"><strong>35%</strong> of occupied seats</div>
+          <div class="assume-note">Fans who travelled from elsewhere in the same country. They spend less than international visitors (no flights) but are still incremental to the host city.</div>
+        </div>
+      </div>
+      <div class="assume-row">
+        <div class="assume-label">Base international daily spend</div>
+        <div>
+          <div class="assume-val"><strong>$390/day</strong> at NYC prices</div>
+          <div class="assume-note">Derived from LendingTree's $2,100 total trip cost estimate. Adjusted down or up for each city's actual cost of living using Numbeo's Restaurant Price Index — so a fan in Guadalajara spends around $285/day while one in San Francisco spends ~$437/day.</div>
+        </div>
       </div>
       <div class="assume-row">
         <div class="assume-label">Domestic daily spend</div>
-        <div class="assume-value"><strong style="color:var(--gold)">$137/day (35% of international)</strong><br><span style="font-size:12px;color:#555">Domestic fans skip international flights (the biggest cost driver) and tend to spend more efficiently with local knowledge. 35% multiplier applied.</span></div>
+        <div>
+          <div class="assume-val"><strong>35%</strong> of international rate</div>
+          <div class="assume-note">Domestic fans skip the international airfare (often the biggest single cost) and tend to be more cost-savvy in familiar surroundings. Same city-specific cost-of-living adjustment applied.</div>
+        </div>
+      </div>
+      <div class="assume-row">
+        <div class="assume-label">World Cup price spike</div>
+        <div>
+          <div class="assume-val"><strong>+20%</strong> on food, drink &amp; entertainment</div>
+          <div class="assume-note">Prices for food, drinks and entertainment rise during major sporting events. Stadium beer prices alone average $9–$13 per pint in the US, double normal pub prices. Applied on top of the city's normal cost level.</div>
+        </div>
+      </div>
+      <div class="assume-row">
+        <div class="assume-label">Hotel match-night premium</div>
+        <div>
+          <div class="assume-val"><strong>City-specific</strong> — 2% to 104%</div>
+          <div class="assume-note">From Lighthouse Hospitality Intelligence data. Ranges from barely-noticeable in Atlanta (+2%) and Dallas (+3%) to prices doubling in Monterrey (+104%) and Vancouver (+55%). Reflects genuine supply scarcity in smaller markets.</div>
+        </div>
       </div>
       <div class="assume-row">
         <div class="assume-label">Average length of stay</div>
-        <div class="assume-value"><strong style="color:var(--gold)">4.0 days</strong><br><span style="font-size:12px;color:#555">FIFA 2022 Qatar: average 4.2 days for international visitors. Shorter for domestic. Median 4.0 days applied uniformly. Subject to monitoring.</span></div>
+        <div>
+          <div class="assume-val"><strong>4 days</strong> per visit</div>
+          <div class="assume-note">FIFA 2022 Qatar data showed international visitors stayed an average of 4.2 days. We use 4 days as a conservative round number. This assumption is monitored — real data from 2026 may lead to a revision.</div>
+        </div>
       </div>
       <div class="assume-row">
         <div class="assume-label">Economic multiplier</div>
-        <div class="assume-value"><strong style="color:var(--gold)">1.75×</strong><br><span style="font-size:12px;color:#555">Tourism literature range 1.5–2.0×. Larger cities generate higher multipliers (less economic leakage) and smaller cities lower — but we apply the median 1.75× uniformly for now. Variable multiplier is a planned Phase 2 refinement.</span></div>
+        <div>
+          <div class="assume-val"><strong>1.10× to 1.85×</strong> — city-specific</div>
+          <div class="assume-note">How much each $1 of tourist spending ultimately generates in the local economy. Large US cities like New York (1.85×) score higher because money circulates more locally. Canadian cities score lower (1.10–1.15×) anchored to Deloitte Canada's published finding of $1.09 per dollar spent.</div>
+        </div>
       </div>
       <div class="assume-row">
         <div class="assume-label">Displacement deduction</div>
-        <div class="assume-value"><strong style="color:var(--gold)">City-specific (8%–35%)</strong><br><span style="font-size:12px;color:#555">See tier system below. Key innovation of this methodology — recognises that a World Cup visit to Kansas City is far more incremental than one to New York.</span></div>
+        <div>
+          <div class="assume-val"><strong>8% to 35%</strong> — city-specific</div>
+          <div class="assume-note">The share of World Cup visitors who replace tourists that would have visited anyway. Higher in tourism-heavy cities like New York (35%) and Miami (35%). Much lower in cities like Kansas City (8%) and Guadalajara (8%) where international tourism is rare.</div>
+        </div>
       </div>
       <div class="assume-row">
-        <div class="assume-label">GDP data year</div>
-        <div class="assume-value"><strong style="color:var(--gold)">2025 estimate</strong><br><span style="font-size:12px;color:#555">BEA/Stats Canada/INEGI 2023 actuals projected forward at city-specific CAGR (3–5% depending on metro growth rate).</span></div>
+        <div class="assume-label">City GDP figures</div>
+        <div>
+          <div class="assume-val"><strong>2025 estimates</strong></div>
+          <div class="assume-note">US cities: Bureau of Economic Analysis (BEA) 2023 actuals, grown at each city's historical rate to estimate 2025. Canada: Statistics Canada, converted to USD at $0.72. Mexico: INEGI, converted at MXN 17.5 to $1.</div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- DISPLACEMENT TIERS -->
   <div class="section">
-    <div class="section-title">City Displacement Tiers</div>
-    <p class="explainer">This is where our methodology differs from most economic impact studies, which apply a single displacement rate to every city. We use <strong>four tiers based on how tourism-dependent each city already is</strong>. The more tourists a city normally gets, the more World Cup visitors are simply replacing those tourists rather than adding to the economy.</p>
+    <div class="section-title">Why Displacement Varies by City</div>
+    <p class="explainer">Think about two extremes. New York City welcomes 9 million international visitors every year — it's one of the most visited cities on earth. When the World Cup is in town, some of those regular tourists simply don't come: they avoid the crowds, the high prices, and the disruption. The World Cup replaces some normal tourism rather than adding to it.<br><br>
+    Kansas City, by contrast, gets around 120,000 international visitors in a normal year. When 18,000 international fans show up for a single match, those people are genuinely new to the city. There's almost nobody being replaced.</p>
     <div class="tier-grid">
       <div class="tier-card" style="border-top:3px solid #f0c040">
         <div class="tier-name" style="color:#f0c040">Global Gateway</div>
-        <div class="tier-pct">35% <span>displaced</span></div>
-        <div style="font-size:12px;color:#444;margin-top:2px">65% incremental</div>
+        <div class="tier-pct">35%</div>
+        <div class="tier-net" style="color:#555">displaced — 65% is truly extra</div>
         <div class="tier-cities">NYC, LA, Miami, Vancouver, Mexico City</div>
-        <div class="tier-why">These cities are international tourism hubs year-round. A significant share of World Cup fans substitute for regular visitors who chose to stay away during the tournament.</div>
+        <div class="tier-why">World-class tourist destinations year-round. A significant number of regular visitors avoid these cities during the tournament, offsetting some of the World Cup boost.</div>
       </div>
       <div class="tier-card" style="border-top:3px solid #22c55e">
         <div class="tier-name" style="color:#22c55e">Major Regional Hub</div>
-        <div class="tier-pct">25% <span>displaced</span></div>
-        <div style="font-size:12px;color:#444;margin-top:2px">75% incremental</div>
+        <div class="tier-pct">25%</div>
+        <div class="tier-net" style="color:#555">displaced — 75% is truly extra</div>
         <div class="tier-cities">Boston, SF, Toronto, Seattle, Houston</div>
-        <div class="tier-why">Large cities with meaningful but not dominant tourism. Some crowding-out occurs but the city can absorb additional demand.</div>
+        <div class="tier-why">Large cities with strong tourism, but more capacity to absorb the additional demand. Some regular visitors stay away, but less than in the global gateways.</div>
       </div>
       <div class="tier-card" style="border-top:3px solid #60a5fa">
         <div class="tier-name" style="color:#60a5fa">Mid-tier Host</div>
-        <div class="tier-pct">15% <span>displaced</span></div>
-        <div style="font-size:12px;color:#444;margin-top:2px">85% incremental</div>
+        <div class="tier-pct">15%</div>
+        <div class="tier-net" style="color:#555">displaced — 85% is truly extra</div>
         <div class="tier-cities">Dallas, Atlanta, Philadelphia</div>
-        <div class="tier-why">Tourism exists but isn't the economic driver. Hotel data confirms minimal match-day premiums (2–3%) — plenty of room to absorb visitors.</div>
+        <div class="tier-why">Hotels in these cities barely increase prices on match days (2–3% premium), which tells us there's plenty of room to absorb visitors. Very little regular tourism is being crowded out.</div>
       </div>
       <div class="tier-card" style="border-top:3px solid #a78bfa">
         <div class="tier-name" style="color:#a78bfa">Low-tourism City</div>
-        <div class="tier-pct">8% <span>displaced</span></div>
-        <div style="font-size:12px;color:#444;margin-top:2px">92% incremental</div>
+        <div class="tier-pct">8%</div>
+        <div class="tier-net" style="color:#555">displaced — 92% is truly extra</div>
         <div class="tier-cities">Kansas City, Guadalajara, Monterrey</div>
-        <div class="tier-why">Minimal pre-existing international tourism. World Cup visitors are almost entirely additional — no meaningful counterfactual tourist is being displaced.</div>
+        <div class="tier-why">These cities see very little international tourism in normal years. Almost every World Cup visitor is genuinely new economic activity — there's no pool of regular tourists being displaced.</div>
       </div>
     </div>
-    <p class="explainer" style="margin-top:16px;font-size:13px;">Academic grounding: NFL Super Bowl studies (Zimbalist, Matheson) find 20–40% displacement for major US cities. FIFA 2014 Brazil secondary city analysis found ~15%. UK Sport/DCMS mega-event framework uses 10–35%. Our range of 8–35% is consistent with this body of research.</p>
+    <p class="explainer" style="font-size:13px;margin-top:16px;">These tiers are calibrated against published academic research. NFL Super Bowl studies by economists Zimbalist and Matheson find 20–40% displacement for major US cities. FIFA's own Brazil 2014 research found around 15% for secondary cities. Our 8–35% range sits comfortably within these established findings.</p>
   </div>
 
-  <!-- PER CITY TABLE -->
+  <!-- PER CITY RESULTS -->
   <div class="section">
     <div class="section-title">Results by City</div>
-    <p class="explainer">All 16 host cities ranked by percentage of annual city GDP — the most meaningful comparison because it normalises for city size. A smaller city showing a high percentage is experiencing a proportionally bigger World Cup effect than a larger city showing a big dollar figure.</p>
+    <p class="explainer">All 16 host cities ranked by <strong>% of annual city GDP</strong> — this is the fairest comparison because it adjusts for city size. A small city generating 0.2% of GDP from the World Cup is experiencing a much bigger economic effect than a huge city generating 0.03%, even if the dollar figure looks similar.</p>
     <table class="city-table">
       <thead>
         <tr>
           <th>City</th>
-          <th class="right">Matches</th>
-          <th class="right">Metro GDP</th>
-          <th class="right">Multiplier</th>
-          <th class="right">WC Impact</th>
-          <th class="right">% of GDP</th>
+          <th>Matches</th>
+          <th>Stadium</th>
+          <th>City GDP</th>
+          <th>Multiplier</th>
+          <th>WC Impact</th>
+          <th>% of GDP</th>
         </tr>
       </thead>
-                  <tbody>
+      <tbody>
         <tr>
           <td class="city-name-td">Monterrey<span class="city-tier-badge low">Low-tourism</span></td>
           <td class="td-right">4</td>
+          <td class="td-right">53,500</td>
           <td class="td-right">$85bn</td>
           <td class="td-right" style="color:#555">1.25×</td>
           <td class="td-impact">$224m</td>
@@ -297,6 +348,7 @@
         <tr>
           <td class="city-name-td">Kansas City<span class="city-tier-badge low">Low-tourism</span></td>
           <td class="td-right">6</td>
+          <td class="td-right">76,416</td>
           <td class="td-right">$180bn</td>
           <td class="td-right" style="color:#555">1.55×</td>
           <td class="td-impact">$414m</td>
@@ -305,6 +357,7 @@
         <tr>
           <td class="city-name-td">Guadalajara<span class="city-tier-badge low">Low-tourism</span></td>
           <td class="td-right">4</td>
+          <td class="td-right">48,000</td>
           <td class="td-right">$68bn</td>
           <td class="td-right" style="color:#555">1.30×</td>
           <td class="td-impact">$151m</td>
@@ -313,6 +366,7 @@
         <tr>
           <td class="city-name-td">Vancouver<span class="city-tier-badge gateway">Gateway</span></td>
           <td class="td-right">7</td>
+          <td class="td-right">54,500</td>
           <td class="td-right">$130bn</td>
           <td class="td-right" style="color:#555">1.10×</td>
           <td class="td-impact">$239m</td>
@@ -321,6 +375,7 @@
         <tr>
           <td class="city-name-td">Atlanta<span class="city-tier-badge midtier">Mid-tier</span></td>
           <td class="td-right">8</td>
+          <td class="td-right">75,000</td>
           <td class="td-right">$450bn</td>
           <td class="td-right" style="color:#555">1.65×</td>
           <td class="td-impact">$469m</td>
@@ -329,6 +384,7 @@
         <tr>
           <td class="city-name-td">Boston<span class="city-tier-badge regional">Regional</span></td>
           <td class="td-right">7</td>
+          <td class="td-right">65,878</td>
           <td class="td-right">$530bn</td>
           <td class="td-right" style="color:#555">1.80×</td>
           <td class="td-impact">$492m</td>
@@ -337,6 +393,7 @@
         <tr>
           <td class="city-name-td">Seattle<span class="city-tier-badge regional">Regional</span></td>
           <td class="td-right">6</td>
+          <td class="td-right">69,000</td>
           <td class="td-right">$440bn</td>
           <td class="td-right" style="color:#555">1.75×</td>
           <td class="td-impact">$366m</td>
@@ -345,6 +402,7 @@
         <tr>
           <td class="city-name-td">Miami<span class="city-tier-badge gateway">Gateway</span></td>
           <td class="td-right">7</td>
+          <td class="td-right">65,326</td>
           <td class="td-right">$430bn</td>
           <td class="td-right" style="color:#555">1.75×</td>
           <td class="td-impact">$354m</td>
@@ -353,6 +411,7 @@
         <tr>
           <td class="city-name-td">Dallas<span class="city-tier-badge midtier">Mid-tier</span></td>
           <td class="td-right">9</td>
+          <td class="td-right">94,000</td>
           <td class="td-right">$815bn</td>
           <td class="td-right" style="color:#555">1.65×</td>
           <td class="td-impact">$634m</td>
@@ -361,6 +420,7 @@
         <tr>
           <td class="city-name-td">Philadelphia<span class="city-tier-badge midtier">Mid-tier</span></td>
           <td class="td-right">6</td>
+          <td class="td-right">69,328</td>
           <td class="td-right">$490bn</td>
           <td class="td-right" style="color:#555">1.65×</td>
           <td class="td-impact">$311m</td>
@@ -369,6 +429,7 @@
         <tr>
           <td class="city-name-td">Mexico City<span class="city-tier-badge gateway">Gateway</span></td>
           <td class="td-right">5</td>
+          <td class="td-right">87,500</td>
           <td class="td-right">$420bn</td>
           <td class="td-right" style="color:#555">1.40×</td>
           <td class="td-impact">$245m</td>
@@ -377,6 +438,7 @@
         <tr>
           <td class="city-name-td">Houston<span class="city-tier-badge regional">Regional</span></td>
           <td class="td-right">7</td>
+          <td class="td-right">72,220</td>
           <td class="td-right">$560bn</td>
           <td class="td-right" style="color:#555">1.65×</td>
           <td class="td-impact">$323m</td>
@@ -385,6 +447,7 @@
         <tr>
           <td class="city-name-td">San Francisco<span class="city-tier-badge regional">Regional</span></td>
           <td class="td-right">6</td>
+          <td class="td-right">71,000</td>
           <td class="td-right">$720bn</td>
           <td class="td-right" style="color:#555">1.80×</td>
           <td class="td-impact">$369m</td>
@@ -393,6 +456,7 @@
         <tr>
           <td class="city-name-td">Toronto<span class="city-tier-badge regional">Regional</span></td>
           <td class="td-right">6</td>
+          <td class="td-right">45,000</td>
           <td class="td-right">$320bn</td>
           <td class="td-right" style="color:#555">1.15×</td>
           <td class="td-impact">$145m</td>
@@ -401,6 +465,7 @@
         <tr>
           <td class="city-name-td">Los Angeles<span class="city-tier-badge gateway">Gateway</span></td>
           <td class="td-right">8</td>
+          <td class="td-right">70,240</td>
           <td class="td-right">$1,150bn</td>
           <td class="td-right" style="color:#555">1.80×</td>
           <td class="td-impact">$398m</td>
@@ -409,105 +474,98 @@
         <tr>
           <td class="city-name-td">New York / New Jersey<span class="city-tier-badge gateway">Gateway</span></td>
           <td class="td-right">8</td>
+          <td class="td-right">82,500</td>
           <td class="td-right">$2,100bn</td>
           <td class="td-right" style="color:#555">1.85×</td>
           <td class="td-impact">$557m</td>
           <td class="td-pct" style="color:var(--gold)">0.027%</td>
         </tr>
         <tr style="border-top:2px solid var(--border)">
-          <td colspan="4" style="font-weight:700;padding:10px;color:var(--text)">Total — visitor spend component only</td>
-          <td class="td-impact" style="font-size:16px">$5.7bn</td>
+          <td colspan="5" style="font-weight:700;padding:10px;color:var(--text)">Total — visitor spend only</td>
+          <td class="td-impact" style="font-size:15px">$5.7bn</td>
           <td></td>
         </tr>
       </tbody>
-      <tfoot>
-        <tr style="border-top:2px solid var(--border)">
-          <td colspan="3" style="font-weight:700;padding:10px;color:var(--text)">Total across all 16 cities</td>
-          <td class="td-impact" style="font-size:16px">$5.7bn</td>
-          <td></td>
-        </tr>
-      </tfoot>
     </table>
   </div>
 
-
   <!-- FIFA CONTEXT -->
   <div class="section">
-    <div class="section-title">How This Relates to FIFA's Estimates</div>
-    <p class="explainer">Our <strong style="color:var(--gold)">$5.7bn</strong> figure covers one specific thing: <em>the incremental economic value generated by visiting fans spending money in host cities.</em> FIFA publishes a much larger headline number — and both figures can be right, because they're measuring different things.</p>
+    <div class="section-title">How Our Number Compares to FIFA's</div>
+    <p class="explainer">FIFA published a much larger headline figure for the economic impact of the 2026 World Cup. Our <strong style="color:var(--gold)">$5.7bn</strong> and FIFA's <strong style="color:var(--gold)">$22.3bn</strong> can both be correct — they're measuring different things.</p>
 
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:22px 24px;margin:20px 0;">
       <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">What goes into each estimate</div>
-
       <div style="display:grid;gap:10px;">
+
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:#090e1a;border-radius:4px;border-left:3px solid var(--gold)">
           <div>
-            <div style="font-weight:700;color:var(--text);font-size:14px">Our estimate — visitor footfall spend</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">Hotel, food, transport and entertainment spend by fans who travelled to attend matches. The most directly measurable, most conservative component.</div>
+            <div style="font-weight:700;color:var(--text);font-size:14px">Our estimate — fan spending only</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">Hotels, food, taxis and entertainment spent by fans who travelled to attend matches. The most directly measurable component — and the most conservative.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--gold);white-space:nowrap">$5.7bn</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:#090e1a;border-radius:4px;border-left:3px solid #374151">
           <div>
-            <div style="font-weight:700;color:#6b7280;font-size:14px">FIFA operational expenditure</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:3px">FIFA's own spending on running the tournament — prize money, broadcasting, staffing, logistics. This money flows through host-country economies too.</div>
+            <div style="font-weight:700;color:#6b7280;font-size:14px">FIFA's own spending on running the tournament</div>
+            <div style="font-size:12px;color:#4b5563;margin-top:3px">Prize money for teams, broadcasting costs, staffing, logistics and equipment. This money also flows into host-country economies.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#6b7280;white-space:nowrap">$3.8bn</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:#090e1a;border-radius:4px;border-left:3px solid #374151">
           <div>
-            <div style="font-weight:700;color:#6b7280;font-size:14px">Host city operations &amp; capital investment</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:3px">Security, transport upgrades, stadium modifications, fan zones and local operations funded by host cities and governments.</div>
+            <div style="font-weight:700;color:#6b7280;font-size:14px">Host city operations and stadium upgrades</div>
+            <div style="font-size:12px;color:#4b5563;margin-top:3px">Security, transport, stadium modifications, fan zones and infrastructure — funded by host cities and governments.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#6b7280;white-space:nowrap">$2.7bn</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:#090e1a;border-radius:4px;border-left:3px solid #374151">
           <div>
-            <div style="font-weight:700;color:#6b7280;font-size:14px">Indirect &amp; induced supply chain effects</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:3px">Tourism spend and FIFA expenditure ripple through 45 economic sectors across 76 countries via FIFA's Social Accounting Matrix model — food suppliers, manufacturers, service providers, and so on.</div>
+            <div style="font-weight:700;color:#6b7280;font-size:14px">Ripple effects through supply chains</div>
+            <div style="font-size:12px;color:#4b5563;margin-top:3px">Fan and FIFA spending triggers activity across 45 different sectors — food manufacturers, transport companies, technology suppliers and more. FIFA models this across 76 countries.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#6b7280;white-space:nowrap">~$8–10bn</div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:#090e1a;border-radius:4px;border-left:3px solid #4b5563">
           <div>
-            <div style="font-weight:700;color:#6b7280;font-size:14px">Social return on investment (FIFA/SROI)</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:3px">FIFA's estimate of health, wellbeing, social cohesion and community benefits. Methodologically distinct from GDP — not comparable on a like-for-like basis.</div>
+            <div style="font-weight:700;color:#4b5563;font-size:14px">Social benefits (health, wellbeing, community)</div>
+            <div style="font-size:12px;color:#374151;margin-top:3px">FIFA's estimate of non-financial benefits like improved public health, community pride and social cohesion. Measured separately — not directly comparable to GDP.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#4b5563;white-space:nowrap">$8.3bn</div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:rgba(240,192,64,.06);border-radius:4px;border-left:3px solid #f0c040;border:1px solid rgba(240,192,64,.2)">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;background:rgba(240,192,64,.06);border-radius:4px;border-left:3px solid var(--gold);border:1px solid rgba(240,192,64,.2)">
           <div>
-            <div style="font-weight:700;color:var(--text);font-size:14px">FIFA total GDP estimate (US, Canada, Mexico)</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">OpenEconomics/FIFA/WTO SAM model (March 2025). Includes all of the above except SROI. Covers all three host nations combined.</div>
+            <div style="font-weight:700;color:var(--text);font-size:14px">FIFA total GDP estimate — all three host countries</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">FIFA/WTO/OpenEconomics full model (March 2025). Includes all of the components above except social benefits. Covers USA, Canada and Mexico combined.</div>
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--gold);white-space:nowrap">$22.3bn</div>
         </div>
+
       </div>
     </div>
 
-    <p class="explainer" style="font-size:13px">Our estimate of <strong>$5.7bn</strong> is consistent with FIFA's own tourist-spend component (~$7.5bn globally, ~$5–6bn for the three host countries). The gap between our figure and FIFA's $22bn headline is explained by scope, not error — we deliberately exclude supply chain effects, FIFA's own operational spend, and social benefits in order to isolate the most credible, directly measurable economic signal: what happens when visiting fans actually arrive and spend money.</p>
+    <p class="explainer" style="font-size:14px;">Our <strong>$5.7bn</strong> is actually very close to FIFA's own estimate of tourist spending alone (~$7.5bn globally, ~$5–6bn across the three host countries). The extra ~$16bn in FIFA's headline figure comes from counting their own operational spending, government investment in infrastructure, and complex ripple effects through the wider economy — all legitimate, but not the same thing as fans arriving in cities and spending money.</p>
 
-    <p class="explainer" style="font-size:13px">Independent analysts are notably more sceptical of FIFA's headline figures. Goldman Sachs (June 2026) found that hosting major football tournaments has produced a "marginally positive but statistically insignificant" effect on GDP in historical data. Victor Matheson (Holy Cross College) described the US impact as "likely a fraction of what was being advertised." Our conservative approach aligns with this independent view.</p>
+    <p class="explainer" style="font-size:14px;">Independent economists are more sceptical of the headline numbers. Goldman Sachs (June 2026) studied every World Cup since 1982 and found the effect on national GDP is "marginally positive but statistically insignificant" in the long run. Professor Victor Matheson, who specialises in sports economics, said the US impact is "likely a fraction of what was being advertised." We think our conservative, footfall-focused approach gives a more honest picture of what actually lands in host-city economies.</p>
   </div>
 
-  <!-- HONEST LIMITS -->
+  <!-- WHAT WE DON'T KNOW -->
   <div class="section">
     <div class="section-title">What We Don't Know</div>
-    <p class="explainer">Good methodology means being honest about uncertainty. Here's what could make our estimates wrong:</p>
+    <p class="explainer">Any economic model involves guesswork — and it's important to be honest about where ours is least certain.</p>
     <div class="limits">
-      <div class="limits-title">&#9888; Limitations of this model</div>
+      <div class="limits-title">&#9888; The limitations of this model</div>
       <ul>
-        <li><strong>These are estimates, not measurements.</strong> We don't have access to actual hotel occupancy data, real visitor spend, or live attendance figures. The model uses reasonable assumptions based on published research.</li>
-        <li><strong>Visitor volume is assumed, not counted.</strong> We use a flat 18k international + 32k domestic per match for all venues. In reality, a Mexico vs Brazil match will draw differently to a group stage fixture between lesser-known teams.</li>
-        <li><strong>The multiplier is uniform.</strong> In reality, larger, more economically diversified cities generate higher multipliers. This is a planned refinement.</li>
-        <li><strong>Displacement is tiered, not measured.</strong> We can't directly observe how many regular tourists stayed away during the World Cup. Our tiers are calibrated against academic research but are ultimately judgement calls.</li>
-        <li><strong>Economic conditions can change.</strong> Hotel prices initially surged then dropped as demand was lower than expected (Atlanta, Dallas, Philadelphia cut rates by up to a third). Our hotel premium figures reflect pre-tournament published data.</li>
-        <li><strong>Canadian and Mexican GDP figures are estimates.</strong> BEA data for US cities is authoritative. Statistics Canada and INEGI metro GDP figures are less granular and converted at spot exchange rates.</li>
+        <li><strong>These are estimates, not measurements.</strong> We don't have access to real hotel booking data, actual visitor spending, or live attendance figures. Everything is modelled from published research and reasonable assumptions.</li>
+        <li><strong>We treat every match the same.</strong> In reality, a USA vs Mexico group game will draw very differently from a match between two smaller nations. High-profile matches will generate more international visitors; lower-profile ones fewer. A future improvement would vary visitor counts by match importance.</li>
+        <li><strong>Hotel prices came down before the tournament.</strong> Dallas, Atlanta, Miami and Philadelphia cut hotel prices by up to a third as demand was lower than expected. Our hotel premium figures come from pre-tournament published data and may overstate the actual accommodation premium.</li>
+        <li><strong>The displacement rates are judgement calls.</strong> We've calibrated them carefully against published research, but we can't directly observe how many regular tourists stayed away. They could be higher or lower than our estimates.</li>
+        <li><strong>Canadian and Mexican figures are less precise.</strong> The US Bureau of Economic Analysis publishes detailed city-level GDP data. Statistics Canada and Mexico's INEGI are less granular, and both require currency conversion at exchange rates that fluctuate.</li>
       </ul>
     </div>
   </div>
@@ -516,24 +574,24 @@
   <div class="section">
     <div class="section-title">Our Sources</div>
     <ul class="source-list">
-      <li><strong>BEA — US Bureau of Economic Analysis</strong>GDP by Metropolitan Statistical Area (MSA), 2023. Projected to 2025 using city-specific CAGR. <a href="https://www.bea.gov/data/gdp/gdp-county-metro-and-other-areas" target="_blank">bea.gov &#8599;</a></li>
-      <li><strong>Statistics Canada</strong>Census Metropolitan Area (CMA) GDP, Toronto and Vancouver. Converted CAD→USD at 0.72.</li>
-      <li><strong>INEGI</strong>Mexico — Zona Metropolitana GDP estimates for Mexico City, Guadalajara and Monterrey. Converted MXN→USD at 17.5.</li>
-      <li><strong>NTTO — National Travel &amp; Tourism Office</strong>Annual international visitor arrivals by US city, 2024. Used to calibrate displacement tier assignments. <a href="https://www.trade.gov/travel-and-tourism" target="_blank">trade.gov &#8599;</a></li>
-      <li><strong>Lighthouse Hospitality Intelligence</strong>Hotel room prices pre/post draw, match-day premiums, and market volatility analysis for all 16 host cities (January 2026). <a href="https://www.mylighthouse.com/resources/blog/fifa-world-cup-2026-hotel-prices" target="_blank">mylighthouse.com &#8599;</a></li>
-      <li><strong>LendingTree</strong>Fan cost analysis: average group-stage attendance cost by US host city (April 2026). Total per-person trip cost ~$2,100.</li>
-      <li><strong>SoFi / KNSI</strong>Stadium food and drink cost estimates based on Club World Cup 2025 pricing (June 2026).</li>
-      <li><strong>GiveMeSport / SeatPick</strong>Confirmed beer prices at every 2026 World Cup stadium (December 2025).</li>
-      <li><strong>openfootball/worldcup.json</strong>Full 2026 World Cup match schedule, venues and results. Public domain. <a href="https://github.com/openfootball/worldcup.json" target="_blank">github.com &#8599;</a></li>
-      <li><strong>Academic research</strong>Displacement and multiplier methodology informed by: Zimbalist &amp; Matheson (NFL Super Bowl economic impact); Oxford Economics mega-event studies; FIFA 2014 Brazil host city analysis; UK Sport/DCMS mega-event evaluation framework.</li>
+      <li><strong>US Bureau of Economic Analysis (BEA)</strong>GDP by Metropolitan Statistical Area, 2023. Projected to 2025 using each city's historical growth rate. <a href="https://www.bea.gov/data/gdp/gdp-county-metro-and-other-areas" target="_blank">bea.gov &#8599;</a></li>
+      <li><strong>Statistics Canada</strong>Census Metropolitan Area GDP for Toronto and Vancouver. Converted from Canadian dollars to USD at a rate of $0.72.</li>
+      <li><strong>INEGI (Mexico)</strong>Metropolitan zone GDP estimates for Mexico City, Guadalajara and Monterrey. Converted from Mexican pesos at MXN 17.5 to $1.</li>
+      <li><strong>FIFA / WTO / OpenEconomics</strong>FIFA World Cup 2026 Socioeconomic Impact Analysis (March 2025). Used for tournament-level figures and tourist spend estimates. <a href="https://digitalhub.fifa.com/m/152f754a8e1b3727/original/FIFA-World-Cup-2026-Socioeconomic-impact-analysis.pdf" target="_blank">fifa.com &#8599;</a></li>
+      <li><strong>NTTO — National Travel &amp; Tourism Office</strong>Annual international visitor arrivals by US city, 2024. Used to set displacement tier assignments. <a href="https://www.trade.gov/travel-and-tourism" target="_blank">trade.gov &#8599;</a></li>
+      <li><strong>Lighthouse Hospitality Intelligence</strong>Hotel room prices and match-day premium data for all 16 host cities (January 2026). <a href="https://www.mylighthouse.com/resources/blog/fifa-world-cup-2026-hotel-prices" target="_blank">mylighthouse.com &#8599;</a></li>
+      <li><strong>Numbeo</strong>Restaurant Price Index by city (June 2026). Used to adjust daily visitor spend for each city's cost of living. <a href="https://www.numbeo.com/cost-of-living/region_rankings_current.jsp" target="_blank">numbeo.com &#8599;</a></li>
+      <li><strong>LendingTree</strong>Fan cost analysis — average total trip cost per US host city (April 2026). Basis for the $390/day international spend figure.</li>
+      <li><strong>GiveMeSport / SeatPick</strong>Confirmed stadium beer prices at all 16 venues (December 2025). Source for the 20% World Cup price spike assumption.</li>
+      <li><strong>Deloitte Canada</strong>Sport Business Advisory Practice report (2024): $1.09 GDP contribution per Canadian dollar spent at the World Cup. Anchor for Canadian city multipliers.</li>
+      <li><strong>Academic research</strong>Methodology informed by: Zimbalist &amp; Matheson (NFL Super Bowl displacement research); Oxford Economics mega-event multiplier studies; FIFA 2014 Brazil host city impact analysis; Goldman Sachs World Cup and Economics research note (June 2026); UK Sport/DCMS mega-event evaluation framework.</li>
+      <li><strong>openfootball/worldcup.json</strong>Full match schedule and results, updated live. Public domain. <a href="https://github.com/openfootball/worldcup.json" target="_blank">github.com &#8599;</a></li>
     </ul>
   </div>
 
-  <!-- FOOTER NOTE -->
-  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:#333;text-align:center;line-height:1.8;">
-    This analysis is produced independently for research and educational purposes.<br>
-    All figures are estimates based on published data and reasonable assumptions. Not financial or economic advice.<br>
-    <a href="index.html" style="color:#60a5fa;text-decoration:none;">&#8592; Back to the tracker</a>
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:#2d3448;text-align:center;line-height:2;">
+    Independent analysis for research and educational purposes. All figures are estimates — not financial or economic advice.<br>
+    <a href="index.html" style="color:#60a5fa;text-decoration:none;font-weight:700;">&#8592; Back to the tracker</a>
   </div>
 
 </div>
