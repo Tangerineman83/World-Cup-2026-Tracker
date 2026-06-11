@@ -82,6 +82,29 @@ CITIES = [
      "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium"},
 ]
 
+
+# ── GDP Impact estimates (static — modelled, not fetched) ─────────────────────
+# Methodology: incremental visitor spend × (1 - displacement) × 1.75 multiplier
+# Full assumptions at assumptions.html
+GDP_IMPACT = {
+    "Monterrey": {"impact_usd_m": 564, "pct_annual_gdp": 0.664, "metro_gdp_usd_bn": 85, "tier": "Low-tourism City", "displacement_pct": 8, "beer_usd": 5.49, "hotel_rate_usd": 538, "hotel_premium_pct": 104},
+    "Guadalajara": {"impact_usd_m": 437, "pct_annual_gdp": 0.643, "metro_gdp_usd_bn": 68, "tier": "Low-tourism City", "displacement_pct": 8, "beer_usd": 2.58, "hotel_rate_usd": 511, "hotel_premium_pct": 58},
+    "Vancouver": {"impact_usd_m": 618, "pct_annual_gdp": 0.475, "metro_gdp_usd_bn": 130, "tier": "Global Gateway", "displacement_pct": 35, "beer_usd": 8.05, "hotel_rate_usd": 775, "hotel_premium_pct": 55},
+    "Kansas City": {"impact_usd_m": 515, "pct_annual_gdp": 0.286, "metro_gdp_usd_bn": 180, "tier": "Low-tourism City", "displacement_pct": 8, "beer_usd": 8.72, "hotel_rate_usd": 344, "hotel_premium_pct": 30},
+    "Toronto": {"impact_usd_m": 447, "pct_annual_gdp": 0.14, "metro_gdp_usd_bn": 320, "tier": "Major Regional Hub", "displacement_pct": 25, "beer_usd": 8.4, "hotel_rate_usd": 593, "hotel_premium_pct": 25},
+    "Atlanta": {"impact_usd_m": 547, "pct_annual_gdp": 0.122, "metro_gdp_usd_bn": 450, "tier": "Mid-tier Host", "displacement_pct": 15, "beer_usd": 8.05, "hotel_rate_usd": 220, "hotel_premium_pct": 2},
+    "Boston": {"impact_usd_m": 596, "pct_annual_gdp": 0.112, "metro_gdp_usd_bn": 530, "tier": "Major Regional Hub", "displacement_pct": 25, "beer_usd": 8.12, "hotel_rate_usd": 611, "hotel_premium_pct": 42},
+    "Seattle": {"impact_usd_m": 425, "pct_annual_gdp": 0.097, "metro_gdp_usd_bn": 440, "tier": "Major Regional Hub", "displacement_pct": 25, "beer_usd": 9.2, "hotel_rate_usd": 446, "hotel_premium_pct": 25},
+    "Miami": {"impact_usd_m": 408, "pct_annual_gdp": 0.095, "metro_gdp_usd_bn": 430, "tier": "Global Gateway", "displacement_pct": 35, "beer_usd": 11.35, "hotel_rate_usd": 378, "hotel_premium_pct": 20},
+    "Philadelphia": {"impact_usd_m": 422, "pct_annual_gdp": 0.086, "metro_gdp_usd_bn": 490, "tier": "Mid-tier Host", "displacement_pct": 15, "beer_usd": 10.65, "hotel_rate_usd": 376, "hotel_premium_pct": 6},
+    "Mexico City": {"impact_usd_m": 356, "pct_annual_gdp": 0.085, "metro_gdp_usd_bn": 420, "tier": "Global Gateway", "displacement_pct": 35, "beer_usd": 2.58, "hotel_rate_usd": 597, "hotel_premium_pct": 38},
+    "Houston": {"impact_usd_m": 430, "pct_annual_gdp": 0.077, "metro_gdp_usd_bn": 560, "tier": "Major Regional Hub", "displacement_pct": 25, "beer_usd": 12.1, "hotel_rate_usd": 205, "hotel_premium_pct": 8},
+    "Dallas": {"impact_usd_m": 619, "pct_annual_gdp": 0.076, "metro_gdp_usd_bn": 815, "tier": "Mid-tier Host", "displacement_pct": 15, "beer_usd": 9.2, "hotel_rate_usd": 272, "hotel_premium_pct": 3},
+    "San Francisco": {"impact_usd_m": 376, "pct_annual_gdp": 0.052, "metro_gdp_usd_bn": 720, "tier": "Major Regional Hub", "displacement_pct": 25, "beer_usd": 13.25, "hotel_rate_usd": 279, "hotel_premium_pct": 10},
+    "Los Angeles": {"impact_usd_m": 441, "pct_annual_gdp": 0.038, "metro_gdp_usd_bn": 1150, "tier": "Global Gateway", "displacement_pct": 35, "beer_usd": 13.25, "hotel_rate_usd": 383, "hotel_premium_pct": 10},
+    "New York / New Jersey": {"impact_usd_m": 481, "pct_annual_gdp": 0.023, "metro_gdp_usd_bn": 2100, "tier": "Global Gateway", "displacement_pct": 35, "beer_usd": 12.3, "hotel_rate_usd": 645, "hotel_premium_pct": 15},
+}
+
 # Clean baseline years — no Copa America, Club WC, or COVID in Jun-Jul window
 BASELINE_YEARS       = [2019, 2022, 2023]
 BASELINE_DESCRIPTION = "Same 7-day window averaged across 2019, 2022, 2023"
@@ -490,10 +513,19 @@ def main():
         n  = city["name"]
         bl = baselines.get(n, {})
         mc = match_counts.get(n, {"total": 0, "played": 0})
+        g = GDP_IMPACT.get(n, {})
         results.append({
             "name":    n, "country": city["country"],
             "flag":    city["flag"], "region":  city["region"],
             "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
+            "gdpImpactUsdM":   g.get("impact_usd_m", 0),
+            "gdpPctAnnual":    g.get("pct_annual_gdp", 0),
+            "metroGdpUsdBn":   g.get("metro_gdp_usd_bn", 0),
+            "displacementTier":g.get("tier", ""),
+            "displacementPct": g.get("displacement_pct", 25),
+            "beerPriceUsd":    g.get("beer_usd", 0),
+            "hotelRateUsd":    g.get("hotel_rate_usd", 0),
+            "hotelPremiumPct": g.get("hotel_premium_pct", 0),
             "baselineStadiumAvgWeekly":  bl.get("stadium_avg_weekly",    0),
             "baselineVoyageAvgWeekly":   bl.get("wikivoyage_avg_weekly", 0),
             "wikivoyageLowConf":         bl.get("wikivoyage_low_conf",   False),
