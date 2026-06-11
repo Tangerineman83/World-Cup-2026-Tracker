@@ -47,7 +47,7 @@
     .table-wrap { max-width: 960px; margin: 20px auto 0; padding: 0 32px 48px; }
     .col-headers {
       display: grid;
-      grid-template-columns: 38px 1fr 68px 160px 68px 130px;
+      grid-template-columns: 38px 1fr 68px 110px 160px 68px 130px;
       gap: 0 10px; padding: 0 12px 10px;
       border-bottom: 1px solid var(--border); margin-bottom: 2px;
     }
@@ -56,7 +56,7 @@
 
     .row {
       display: grid;
-      grid-template-columns: 38px 1fr 68px 160px 68px 130px;
+      grid-template-columns: 38px 1fr 68px 110px 160px 68px 130px;
       gap: 0 10px; padding: 11px 12px;
       border-bottom: 1px solid var(--border2);
       align-items: center; border-left: 3px solid transparent;
@@ -84,6 +84,14 @@
     .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
     .wiki-link:hover { color: var(--gold); }
 
+    /* GDP Impact column */
+    .gdp-badge { text-align: right; }
+    .gdp-impact { font-size: 16px; font-weight: 800; color: var(--green); line-height: 1; font-family: "Barlow Condensed",sans-serif; }
+    .gdp-pct { font-size: 18px; font-weight: 900; color: var(--gold); line-height: 1; font-family: "Barlow Condensed",sans-serif; }
+    .gdp-label { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3448; margin-top: 2px; }
+    .gdp-tier { font-size: 9px; color: #444; margin-top: 3px; }
+    --green: #22c55e;
+
     /* Match column */
     .match-badge { text-align: right; }
     .match-played { font-size: 20px; font-weight: 900; line-height: 1; color: var(--gold); }
@@ -92,7 +100,7 @@
     .match-total { font-size: 14px; font-weight: 700; color: #3a4258; }
     .match-label { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3448; margin-top: 2px; }
 
-    /* Economic Interest — primary column */
+    /* Economic Buzz — primary column */
     .econ-badge { text-align: right; }
     .econ-num { font-size: 24px; font-weight: 900; line-height: 1; }
     .econ-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
@@ -126,7 +134,7 @@
 
     @media (max-width: 640px) {
       .header, .table-wrap, .notes, .explainer { padding-left: 14px; padding-right: 14px; }
-      .col-headers, .row { grid-template-columns: 30px 1fr 52px 80px 38px; gap: 0 6px; }
+      .col-headers, .row { grid-template-columns: 30px 1fr 44px 70px 80px 32px; gap: 0 4px; }
       .col-headers .hide-sm, .row .hide-sm { display: none; }
       .econ-num { font-size: 18px; }
       .city-name { font-size: 12px; }
@@ -140,16 +148,16 @@
     <div>
       <div class="eyebrow">&#9917; Wikipedia &amp; Wikivoyage Intelligence</div>
       <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Rolling 7-day economic interest index &middot; Stadium 50% + Wikivoyage 50% vs 2019/2022/2023 baseline &middot; Updated nightly</p>
+      <p class="subtitle">Economic Buzz Index &middot; Estimated GDP impact &middot; Updated nightly</p>
     </div>
-    <div><div id="updated-badge" class="updated-badge"></div></div>
+    <div style="text-align:right"><div id="updated-badge" class="updated-badge"></div><a href="assumptions.html" style="display:inline-block;margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4a6fa5;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#f0c040'" onmouseout="this.style.color='#4a6fa5'">&#128203; Methodology &amp; Assumptions &#8599;</a></div>
   </div>
 </header>
 
 <div class="explainer">
   <div class="explainer-inner">
     <strong>How to read this:</strong>
-    The <strong>Economic Interest</strong> index shows how much more global attention each host city is receiving compared to the same period in clean prior years (2019, 2022, 2023).
+    The <strong>Economic Buzz</strong> index shows how much more global attention each host city is receiving compared to the same period in clean prior years (2019, 2022, 2023).
     <strong>1.0x = normal &middot; 3.0x = triple normal interest &middot; 8.0x = major spike.</strong>
     Combining stadium awareness (50%) and travel planning intent via Wikivoyage (50%)
     — smaller cities showing high multiples tell the most compelling economic story.
@@ -161,7 +169,8 @@
     <span></span>
     <span>City &amp; Stadium</span>
     <span class="col-right" title="Matches played / total scheduled at this venue">Matches</span>
-    <span class="col-right">Economic Interest</span>
+    <span class="col-right" title="Estimated total GDP impact of hosting the World Cup">GDP Impact</span>
+    <span class="col-right">Economic Buzz</span>
     <span class="col-right">Points</span>
     <span class="hide-sm">Interest bar</span>
   </div>
@@ -184,7 +193,7 @@
         </div>
       </div>
       <div>
-        <div class="note-h">Economic Interest index</div>
+        <div class="note-h">Economic Buzz index</div>
         <div class="note-b">Views this 7-day window &divide; average views in the same calendar window in 2019, 2022 &amp; 2023. Index of 1.0x = normal. 5.0x = 5&times; typical interest. Stadium floored at 1.0x (transient fetch failures never collapse rankings). Wikivoyage clamped 1.0x&ndash;10.0x.</div>
       </div>
       <div>
@@ -193,7 +202,7 @@
       </div>
       <div>
         <div class="note-h">Points</div>
-        <div class="note-b">Ranked by Economic Interest index. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. Reflects this week's relative performance.</div>
+        <div class="note-b">Ranked by Economic Buzz index. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. Reflects this week's relative performance.</div>
       </div>
       <div>
         <div class="note-h">Data refresh</div>
@@ -259,6 +268,19 @@ function render(cities) {
     const row = document.createElement('div');
     row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
     row.style.animationDelay = delay + 'ms';
+    // GDP column
+    const g = GDP_DATA[city.name] || {};
+    const gdpImpact = g.impact ? '$' + (g.impact >= 1000 ? (g.impact/1000).toFixed(1)+'bn' : g.impact+'m') : '—';
+    const gdpPct    = g.pct   ? g.pct.toFixed(3) + '%' : '—';
+    const tierShort = (g.tier || '').replace('Global Gateway','Gateway').replace('Major Regional Hub','Regional').replace('Mid-tier Host','Mid-tier').replace('Low-tourism City','Low-tourism');
+    const gdpHTML =
+      '<div class="gdp-badge">' +
+        '<div class="gdp-pct">' + gdpPct + '</div>' +
+        '<div class="gdp-label">of city GDP</div>' +
+        '<div class="gdp-impact">' + gdpImpact + '</div>' +
+        '<div class="gdp-tier">' + tierShort + '</div>' +
+      '</div>';
+
     // Match column: played / total
     const played = city.matchesPlayed || 0;
     const total  = city.matchesTotal  || 0;
@@ -280,6 +302,7 @@ function render(cities) {
         '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
       '</div>' +
       '<div class="match-badge">' + matchDisplay + '</div>' +
+      gdpHTML +
       '<div class="econ-badge">' +
         '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;</div>' +
         '<div class="econ-label">vs baseline</div>' +
@@ -298,6 +321,26 @@ function render(cities) {
     body.appendChild(row);
   });
 }
+
+
+const GDP_DATA = {
+  "Monterrey": {impact:564,pct:0.664,metroGdp:85,tier:"Low-tourism City",disp:8,beer:5.49,hotel:538,hotelPrem:104},
+  "Guadalajara": {impact:437,pct:0.643,metroGdp:68,tier:"Low-tourism City",disp:8,beer:2.58,hotel:511,hotelPrem:58},
+  "Vancouver": {impact:618,pct:0.475,metroGdp:130,tier:"Global Gateway",disp:35,beer:8.05,hotel:775,hotelPrem:55},
+  "Kansas City": {impact:515,pct:0.286,metroGdp:180,tier:"Low-tourism City",disp:8,beer:8.72,hotel:344,hotelPrem:30},
+  "Toronto": {impact:447,pct:0.14,metroGdp:320,tier:"Major Regional Hub",disp:25,beer:8.4,hotel:593,hotelPrem:25},
+  "Atlanta": {impact:547,pct:0.122,metroGdp:450,tier:"Mid-tier Host",disp:15,beer:8.05,hotel:220,hotelPrem:2},
+  "Boston": {impact:596,pct:0.112,metroGdp:530,tier:"Major Regional Hub",disp:25,beer:8.12,hotel:611,hotelPrem:42},
+  "Seattle": {impact:425,pct:0.097,metroGdp:440,tier:"Major Regional Hub",disp:25,beer:9.2,hotel:446,hotelPrem:25},
+  "Miami": {impact:408,pct:0.095,metroGdp:430,tier:"Global Gateway",disp:35,beer:11.35,hotel:378,hotelPrem:20},
+  "Philadelphia": {impact:422,pct:0.086,metroGdp:490,tier:"Mid-tier Host",disp:15,beer:10.65,hotel:376,hotelPrem:6},
+  "Mexico City": {impact:356,pct:0.085,metroGdp:420,tier:"Global Gateway",disp:35,beer:2.58,hotel:597,hotelPrem:38},
+  "Houston": {impact:430,pct:0.077,metroGdp:560,tier:"Major Regional Hub",disp:25,beer:12.1,hotel:205,hotelPrem:8},
+  "Dallas": {impact:619,pct:0.076,metroGdp:815,tier:"Mid-tier Host",disp:15,beer:9.2,hotel:272,hotelPrem:3},
+  "San Francisco": {impact:376,pct:0.052,metroGdp:720,tier:"Major Regional Hub",disp:25,beer:13.25,hotel:279,hotelPrem:10},
+  "Los Angeles": {impact:441,pct:0.038,metroGdp:1150,tier:"Global Gateway",disp:35,beer:13.25,hotel:383,hotelPrem:10},
+  "New York / New Jersey": {impact:481,pct:0.023,metroGdp:2100,tier:"Global Gateway",disp:35,beer:12.3,hotel:645,hotelPrem:15},
+};
 
 async function loadData() {
   try {
