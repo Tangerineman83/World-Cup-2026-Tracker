@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FIFA World Cup 2026 — Host City Interest Tracker</title>
+  <title>FIFA World Cup 2026 — Host City Economic Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -14,130 +14,137 @@
       --border2: #111828;
       --gold:    #f0c040;
       --silver:  #9ca3af;
-      --bronze:  #b87333;
+      --bronze:  #cd7f32;
       --text:    #e8eaf0;
       --muted:   #6b7280;
       --faint:   #2d3448;
-      --usa:     #4f8ef7;
-      --mex:     #f59e0b;
-      --can:     #2dd4bf;
-      --east:    #60a5fa;
-      --west:    #34d399;
-      --central: #f59e0b;
+      --green:   #22c55e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed','Arial Narrow',sans-serif; min-height: 100vh; }
 
     /* HEADER */
     .header { background: linear-gradient(135deg,#0d1322,#111827); border-bottom: 2px solid var(--border); padding: 24px 32px 20px; }
-    .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .header-inner { max-width: 920px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-    h1 { font-size: clamp(20px,4vw,34px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
+    h1 { font-size: clamp(20px,4vw,32px); font-weight: 900; letter-spacing: -.01em; line-height: 1.1; text-transform: uppercase; }
     h1 span { color: var(--gold); }
     .subtitle { margin-top: 8px; font-size: 13px; color: var(--muted); font-family: 'Barlow',sans-serif; }
-    .updated-badge { font-size: 10px; color: #444; letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; text-align: right; }
+    .header-links { text-align: right; }
+    .updated-badge { font-size: 10px; color: #444; letter-spacing: .06em; text-transform: uppercase; }
     .updated-badge strong { color: var(--muted); }
+    .method-link { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4a6fa5; text-decoration: none; transition: color .15s; }
+    .method-link:hover { color: var(--gold); }
 
-    /* EXPLAINER */
+    /* EXPLAINER BANNER */
     .explainer { background: rgba(34,197,94,.06); border-bottom: 1px solid rgba(34,197,94,.15); padding: 12px 32px; }
-    .explainer-inner { max-width: 960px; margin: 0 auto; font-size: 12px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.6; }
+    .explainer-inner { max-width: 920px; margin: 0 auto; font-size: 13px; font-family: 'Barlow',sans-serif; color: #4a7c5a; line-height: 1.7; }
     .explainer-inner strong { color: #22c55e; }
 
-    /* TABLE */
-    .table-wrap { max-width: 960px; margin: 20px auto 0; padding: 0 32px 48px; }
+    /* TABLE WRAPPER */
+    .table-wrap { max-width: 920px; margin: 20px auto 0; padding: 0 32px 48px; }
+
+    /* 5-column grid: rank | city | matches | gdp | buzz+pts */
     .col-headers {
       display: grid;
-      grid-template-columns: 38px 1fr 68px 110px 160px 68px 130px;
-      gap: 0 10px; padding: 0 12px 10px;
-      border-bottom: 1px solid var(--border); margin-bottom: 2px;
+      grid-template-columns: 44px 1fr 68px 120px 190px;
+      gap: 0 8px; padding: 0 14px 10px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 4px;
+      align-items: end;
     }
-    .col-headers span { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #3a4258; }
+    .col-headers span {
+      font-size: 9px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #3a4258;
+    }
     .col-right { text-align: right; }
 
+    /* ROW */
     .row {
       display: grid;
-      grid-template-columns: 38px 1fr 68px 110px 160px 68px 130px;
-      gap: 0 10px; padding: 11px 12px;
+      grid-template-columns: 44px 1fr 68px 120px 190px;
+      gap: 0 8px; padding: 14px 14px;
       border-bottom: 1px solid var(--border2);
-      align-items: center; border-left: 3px solid transparent;
-      opacity: 0; transform: translateX(-10px);
-      animation: rowIn .4s ease forwards;
+      align-items: center;
+      border-left: 3px solid transparent;
+      opacity: 0; transform: translateX(-8px);
+      animation: rowIn .35s ease forwards;
+      border-radius: 2px;
+      margin-bottom: 2px;
     }
-    .row.rank-1 { border-left-color: var(--gold);   background: rgba(240,192,64,.04); }
-    .row.rank-2 { border-left-color: var(--silver); background: rgba(156,163,175,.02); }
-    .row.rank-3 { border-left-color: var(--bronze); }
 
-    @keyframes rowIn  { to { opacity:1; transform:translateX(0); } }
+    /* Top 3 background tints */
+    .row.rank-1 {
+      border-left-color: var(--gold);
+      background: linear-gradient(90deg, rgba(240,192,64,.10) 0%, rgba(240,192,64,.03) 60%, transparent 100%);
+    }
+    .row.rank-2 {
+      border-left-color: var(--silver);
+      background: linear-gradient(90deg, rgba(156,163,175,.08) 0%, rgba(156,163,175,.02) 60%, transparent 100%);
+    }
+    .row.rank-3 {
+      border-left-color: var(--bronze);
+      background: linear-gradient(90deg, rgba(205,127,50,.07) 0%, rgba(205,127,50,.02) 60%, transparent 100%);
+    }
+
+    @keyframes rowIn { to { opacity:1; transform:translateX(0); } }
     @keyframes barGrow { from { width:0; } }
-    .bar-fill { animation: barGrow .8s cubic-bezier(.16,1,.3,1) both; }
 
+    /* RANK NUMBER */
     .rank-num { font-size: 15px; font-weight: 800; text-align: center; color: var(--faint); }
-    .rank-num.r1 { font-size: 20px; color: var(--gold); }
-    .rank-num.r2 { font-size: 18px; color: var(--silver); }
-    .rank-num.r3 { font-size: 17px; color: var(--bronze); }
+    .rank-num.r1 { font-size: 22px; color: var(--gold); }
+    .rank-num.r2 { font-size: 20px; color: var(--silver); }
+    .rank-num.r3 { font-size: 18px; color: var(--bronze); }
 
-    .city-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-    .city-flag { font-size: 16px; line-height: 1; }
-    .city-name { font-size: 14px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; }
-    .region-tag { font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 5px; border-radius: 2px; }
-    .stadium-name { font-size: 10px; color: #3a4560; margin-top: 3px; font-family: 'Barlow',sans-serif; }
-    .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #4a6fa5; transition: color .15s; margin-top: 2px; }
+    /* MEDALS for top 3 */
+    .medal { display: inline-block; font-size: 16px; line-height: 1; }
+
+    /* CITY CELL */
+    .city-cell {}
+    .city-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .city-flag { font-size: 18px; line-height: 1; }
+    .city-name { font-size: 15px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; }
+    .country-name { font-size: 10px; color: var(--muted); font-family: 'Barlow',sans-serif; font-weight: 500; margin-top: 3px; }
+    .stadium-name { font-size: 11px; color: #3a4560; margin-top: 2px; font-family: 'Barlow',sans-serif; }
+    .wiki-link { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #3a5070; transition: color .15s; margin-top: 3px; }
     .wiki-link:hover { color: var(--gold); }
 
-    /* GDP Impact column */
-    .gdp-badge { text-align: right; }
-    .gdp-impact { font-size: 16px; font-weight: 800; color: var(--green); line-height: 1; font-family: "Barlow Condensed",sans-serif; }
-    .gdp-pct { font-size: 18px; font-weight: 900; color: var(--gold); line-height: 1; font-family: "Barlow Condensed",sans-serif; }
-    .gdp-label { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3448; margin-top: 2px; }
-    .gdp-tier { font-size: 9px; color: #444; margin-top: 3px; }
-    --green: #22c55e;
-
-    /* Match column */
+    /* MATCH CELL */
     .match-badge { text-align: right; }
-    .match-played { font-size: 20px; font-weight: 900; line-height: 1; color: var(--gold); }
-    .match-played.zero { color: var(--faint); font-size: 16px; }
-    .match-divider { font-size: 11px; color: #3a4258; font-weight: 700; margin: 0 1px; }
-    .match-total { font-size: 14px; font-weight: 700; color: #3a4258; }
-    .match-label { font-size: 8px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #2d3448; margin-top: 2px; }
+    .match-fraction { font-size: 18px; font-weight: 900; color: var(--gold); line-height: 1; font-family: 'Barlow Condensed',sans-serif; }
+    .match-fraction.zero { color: var(--faint); }
+    .match-label { font-size: 9px; color: #3a4258; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; margin-top: 2px; }
 
-    /* Economic Buzz — primary column */
-    .econ-badge { text-align: right; }
-    .econ-num { font-size: 24px; font-weight: 900; line-height: 1; }
-    .econ-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
-    .econ-breakdown { font-size: 9px; color: #4a5568; margin-top: 3px; font-family: 'Barlow',sans-serif; }
-    .econ-baseline { font-size: 9px; color: #2d3448; margin-top: 2px; font-family: 'Barlow',sans-serif; }
+    /* GDP CELL */
+    .gdp-badge { text-align: right; }
+    .gdp-pct { font-size: 20px; font-weight: 900; color: var(--gold); line-height: 1; font-family: 'Barlow Condensed',sans-serif; }
+    .gdp-dollars { font-size: 13px; font-weight: 700; color: var(--green); margin-top: 2px; font-family: 'Barlow Condensed',sans-serif; }
+    .gdp-label { font-size: 9px; color: #3a4258; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; margin-top: 2px; }
 
-    /* Points — secondary */
-    .pts-badge { text-align: right; }
-    .pts-num { font-size: 18px; font-weight: 800; color: var(--faint); line-height: 1; }
-    .pts-num.scoring { color: var(--gold); font-size: 20px; }
-    .pts-label { font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #333; margin-top: 1px; }
-
-    /* Bar */
-    .bar-track { height: 7px; background: #141928; border-radius: 4px; overflow: hidden; }
-    .country-label { font-size: 9px; color: #2d3448; margin-top: 3px; text-align: right; letter-spacing: .05em; }
-
-    /* Notes */
-    .notes { max-width: 960px; margin: 0 auto; padding: 0 32px 48px; }
-    .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; }
-    .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
-    .note-h { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px; }
-    .note-b { font-size: 12px; color: #4a5568; line-height: 1.6; font-family: 'Barlow',sans-serif; }
-    .legend-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .swatch { width: 16px; height: 5px; border-radius: 2px; }
-    .legend-label { font-size: 10px; color: #444; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    /* BUZZ+PTS CELL — combined in one column for compactness */
+    .buzz-cell { text-align: right; }
+    .buzz-num { font-size: 26px; font-weight: 900; line-height: 1; }
+    .buzz-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #444; margin-top: 1px; }
+    .buzz-breakdown { font-size: 10px; color: #4a5568; margin-top: 4px; font-family: 'Barlow',sans-serif; }
+    .buzz-pts { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .buzz-pts.scoring { color: var(--gold); font-weight: 700; }
 
     .state-msg { text-align: center; padding: 60px 0; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #444; }
 
+    /* NOTES */
+    .notes { max-width: 920px; margin: 0 auto; padding: 0 32px 60px; }
+    .notes-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 22px 26px; }
+    .notes-title { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 16px; }
+    .note-h { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .note-b { font-size: 13px; color: #4a5568; line-height: 1.6; font-family: 'Barlow',sans-serif; }
+
     @media (max-width: 640px) {
       .header, .table-wrap, .notes, .explainer { padding-left: 14px; padding-right: 14px; }
-      .col-headers, .row { grid-template-columns: 30px 1fr 44px 70px 80px 32px; gap: 0 4px; }
+      .col-headers, .row { grid-template-columns: 36px 1fr 54px 90px; gap: 0 6px; }
       .col-headers .hide-sm, .row .hide-sm { display: none; }
-      .econ-num { font-size: 18px; }
-      .city-name { font-size: 12px; }
+      .city-name { font-size: 13px; }
+      .buzz-num { font-size: 20px; }
     }
   </style>
 </head>
@@ -146,182 +153,71 @@
 <header class="header">
   <div class="header-inner">
     <div>
-      <div class="eyebrow">&#9917; Wikipedia &amp; Wikivoyage Intelligence</div>
-      <h1>2026 World Cup<br><span>Host City Interest Tracker</span></h1>
-      <p class="subtitle">Economic Buzz Index &middot; Estimated GDP impact &middot; Updated nightly</p>
+      <div class="eyebrow">&#9917; FIFA World Cup 2026</div>
+      <h1>Host City <span>Economic Tracker</span></h1>
+      <p class="subtitle">How much global attention is each World Cup city getting — and what does it mean for their economy?</p>
     </div>
-    <div style="text-align:right"><div id="updated-badge" class="updated-badge"></div><a href="assumptions.html" style="display:inline-block;margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4a6fa5;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#f0c040'" onmouseout="this.style.color='#4a6fa5'">&#128203; Methodology &amp; Assumptions &#8599;</a></div>
+    <div class="header-links">
+      <div id="updated-badge" class="updated-badge"></div>
+      <a href="assumptions.html" class="method-link">&#128203; How we work it out &#8599;</a>
+    </div>
   </div>
 </header>
 
 <div class="explainer">
   <div class="explainer-inner">
-    <strong>How to read this:</strong>
-    The <strong>Economic Buzz</strong> index shows how much more global attention each host city is receiving compared to the same period in clean prior years (2019, 2022, 2023).
-    <strong>1.0x = normal &middot; 3.0x = triple normal interest &middot; 8.0x = major spike.</strong>
-    Combining stadium awareness (50%) and travel planning intent via Wikivoyage (50%)
-    — smaller cities showing high multiples tell the most compelling economic story.
+    <strong>How to read this table:</strong>
+    Each row is a World Cup host city, ranked by how much extra attention it's getting online right now.
+    The <strong>Economic Buzz</strong> score compares Wikipedia and Wikivoyage views this week against the same week in 2019, 2022 and 2023 — so 3.5&times; means the city is getting 3.5 times its normal level of global interest.
+    The <strong>GDP Impact</strong> column shows our estimate of the total extra money the World Cup will bring to each city across the whole tournament — expressed as a percentage of the city's annual economy so you can fairly compare a small city like Guadalajara with a giant like New York.
+    <a href="assumptions.html" style="color:var(--green);font-weight:700;text-decoration:none;">Full explanation &#8599;</a>
   </div>
 </div>
 
 <div class="table-wrap">
   <div class="col-headers">
     <span></span>
-    <span>City &amp; Stadium</span>
-    <span class="col-right" title="Matches played / total scheduled at this venue">Matches</span>
-    <span class="col-right" title="Estimated total GDP impact of hosting the World Cup">GDP Impact</span>
-    <span class="col-right">Economic Buzz</span>
-    <span class="col-right">Points</span>
-    <span class="hide-sm">Interest bar</span>
+    <span>City</span>
+    <span class="col-right">Matches</span>
+    <span class="col-right">GDP Impact</span>
+    <span class="col-right">Economic Buzz &amp; Points</span>
   </div>
   <div id="table-body"><div class="state-msg">Loading...</div></div>
 </div>
 
 <div class="notes">
   <div class="notes-box">
-    <div class="notes-title">Methodology</div>
+    <div class="notes-title">What the columns mean</div>
     <div class="notes-grid">
       <div>
-        <div class="note-h">Match columns</div>
-        <div class="note-b"><strong style="color:var(--gold)">Played / Total</strong> — official World Cup matches played at this venue out of total scheduled (e.g. 2&thinsp;/&thinsp;7). Updates nightly as the tournament progresses. Source: openfootball/worldcup.json (public domain, no API key).</div>
+        <div class="note-h">Matches (played / scheduled)</div>
+        <div class="note-b">How many World Cup matches have been played at this venue, and how many are scheduled in total. Updates every night as the tournament progresses.</div>
       </div>
       <div>
-        <div class="note-h">Two signals</div>
-        <div class="note-b">
-          <strong style="color:var(--muted)">Stadium Wikipedia (50%)</strong> — event-specific awareness. Spikes almost exclusively due to the World Cup, minimal background noise.<br>
-          <strong style="color:var(--muted)">City Wikivoyage (50%)</strong> — travel planning intent. People researching a destination to visit — the strongest proxy for economic activity.
-        </div>
+        <div class="note-h">GDP Impact</div>
+        <div class="note-b">Our estimate of the total extra money the World Cup brings to this city — from fans visiting, staying in hotels and spending locally. Shown as a % of the city's annual economy so big and small cities can be compared fairly. <a href="assumptions.html" style="color:#60a5fa">Full methodology &#8599;</a></div>
       </div>
       <div>
-        <div class="note-h">Economic Buzz index</div>
-        <div class="note-b">Views this 7-day window &divide; average views in the same calendar window in 2019, 2022 &amp; 2023. Index of 1.0x = normal. 5.0x = 5&times; typical interest. Stadium floored at 1.0x (transient fetch failures never collapse rankings). Wikivoyage clamped 1.0x&ndash;10.0x.</div>
-      </div>
-      <div>
-        <div class="note-h">Why prior-year same period</div>
-        <div class="note-b">Compares like-for-like — same calendar window controls for seasonal patterns. 2019, 2022 and 2023 are fully clean years with no major football events in these cities during June&ndash;July.</div>
+        <div class="note-h">Economic Buzz score</div>
+        <div class="note-b">This week's Wikipedia and Wikivoyage traffic for this city's stadium and destination pages, compared to the same week in 2019, 2022 and 2023. A score of 4.0&times; means the city is getting four times its normal level of global interest. Updated every night.</div>
       </div>
       <div>
         <div class="note-h">Points</div>
-        <div class="note-b">Ranked by Economic Buzz index. 1st = 10pts, 2nd = 9pts &hellip; 10th = 1pt, 11th&ndash;16th = 0pts. Reflects this week's relative performance.</div>
+        <div class="note-b">Cities ranked by Economic Buzz each week earn points: 1st = 10 pts, 2nd = 9 pts, down to 10th = 1 pt. Cities ranked 11th–16th score zero. Points update every night.</div>
       </div>
       <div>
-        <div class="note-h">Data refresh</div>
-        <div class="note-b">Updated automatically every night at 07:00 UTC (midnight Pacific). Baselines recalculated weekly as the 7-day window shifts, ensuring the comparison always reflects the same seasonal period.</div>
+        <div class="note-h">Why compare to prior years?</div>
+        <div class="note-b">Wikipedia traffic goes up every summer anyway. By comparing to the same week in 2019, 2022 and 2023, we remove that seasonal effect and isolate the genuine World Cup impact. Those years were chosen because no other major football events were held in these cities during June–July.</div>
       </div>
       <div>
-        <div class="note-h">Why uplift not raw views</div>
-        <div class="note-b">Raw views favour megacities. Uplift reveals which cities are experiencing the biggest <em>incremental</em> change — additional attention directly attributable to the World Cup.</div>
+        <div class="note-h">Two signals combined</div>
+        <div class="note-b"><strong style="color:var(--muted)">Stadium Wikipedia (50%)</strong> — how often people are searching for the stadium itself. This spikes almost exclusively due to football events.<br><strong style="color:var(--muted)">City Wikivoyage (50%)</strong> — how often people are researching the city as a travel destination, which is a strong indicator of visitors planning to spend money there.</div>
       </div>
-    </div>
-    <div class="legend-row">
-      <div class="legend-item"><div class="dot" style="background:var(--east)"></div><span class="legend-label">East</span></div>
-      <div class="legend-item"><div class="dot" style="background:var(--west)"></div><span class="legend-label">West</span></div>
-      <div class="legend-item"><div class="dot" style="background:var(--central)"></div><span class="legend-label">Central</span></div>
-      <div class="legend-item"><div class="swatch" style="background:var(--usa)"></div><span class="legend-label">USA</span></div>
-      <div class="legend-item"><div class="swatch" style="background:var(--mex)"></div><span class="legend-label">Mexico</span></div>
-      <div class="legend-item"><div class="swatch" style="background:var(--can)"></div><span class="legend-label">Canada</span></div>
     </div>
   </div>
 </div>
 
 <script>
-const COUNTRY_COLOR = { USA:'#4f8ef7', MEX:'#f59e0b', CAN:'#2dd4bf' };
-const REGION_COLOR  = { East:'#60a5fa', West:'#34d399', Central:'#f59e0b' };
-const FLAG          = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
-
-function fmt(n) {
-  if (!n && n !== 0) return '—';
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000)    return (n/1000).toFixed(1) + 'k';
-  return String(Math.round(n));
-}
-
-function econColor(u) {
-  if (!u || u <= 0) return 'var(--faint)';
-  if (u >= 500) return '#f0c040';
-  if (u >= 300) return '#22c55e';
-  if (u >= 150) return '#60a5fa';
-  if (u >= 100) return 'var(--muted)';
-  return 'var(--faint)';
-}
-
-function render(cities) {
-  const maxCombined = Math.max(...cities.map(c => c.lastWeekCombined || 0), 1);
-  const body = document.getElementById('table-body');
-  body.innerHTML = '';
-
-  cities.forEach((city, i) => {
-    const rank  = i + 1;
-    const wu    = city.lastWeekCombined || 0;
-    const pts   = city.lastWeekPts || 0;
-    const pct   = (wu / maxCombined * 100).toFixed(1);
-    const cc    = COUNTRY_COLOR[city.country] || '#888';
-    const rc    = REGION_COLOR[city.region]   || '#888';
-    const ecol  = econColor(wu);
-    const delay = i * 35;
-    const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
-
-    const mult   = (wu / 100).toFixed(1);
-    const sLabel = ((city.lastWeekStadium || 0) / 100).toFixed(1) + 'x';
-    const vLabel = ((city.lastWeekVoyage  || 0) / 100).toFixed(1) + 'x' + (city.wikivoyageLowConf ? '~' : '');
-
-    const row = document.createElement('div');
-    row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
-    row.style.animationDelay = delay + 'ms';
-    // GDP column
-    const g = GDP_DATA[city.name] || {};
-    const gdpImpact = g.impact ? '$' + (g.impact >= 1000 ? (g.impact/1000).toFixed(1)+'bn' : g.impact+'m') : '—';
-    const gdpPct    = g.pct   ? g.pct.toFixed(3) + '%' : '—';
-    const tierShort = (g.tier || '').replace('Global Gateway','Gateway').replace('Major Regional Hub','Regional').replace('Mid-tier Host','Mid-tier').replace('Low-tourism City','Low-tourism');
-    const gdpHTML =
-      '<div class="gdp-badge">' +
-        '<div class="gdp-pct">' + gdpPct + '</div>' +
-        '<div class="gdp-label">of city GDP</div>' +
-        '<div class="gdp-impact">' + gdpImpact + '</div>' +
-        '<div class="gdp-tier">' + tierShort + '</div>' +
-      '</div>';
-
-    // Match column: played / total
-    const played = city.matchesPlayed || 0;
-    const total  = city.matchesTotal  || 0;
-    const matchDisplay =
-      '<div class="match-played' + (played === 0 ? ' zero' : '') + '">' + played + '</div>' +
-      '<div class="match-divider">/</div>' +
-      '<div class="match-total">' + total + '</div>' +
-      '<div class="match-label">played</div>';
-
-    row.innerHTML =
-      '<div class="rank-num ' + rankClass + '">' + rank + '</div>' +
-      '<div>' +
-        '<div class="city-name-row">' +
-          '<span class="city-flag">' + (FLAG[city.flag] || city.flag) + '</span>' +
-          '<span class="city-name">' + city.name + '</span>' +
-          '<span class="region-tag" style="background:' + rc + '22;color:' + rc + '">' + city.region + '</span>' +
-        '</div>' +
-        '<div class="stadium-name">' + (city.stadium || '') + '</div>' +
-        '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
-      '</div>' +
-      '<div class="match-badge">' + matchDisplay + '</div>' +
-      gdpHTML +
-      '<div class="econ-badge">' +
-        '<div class="econ-num" style="color:' + ecol + '">' + mult + '&times;</div>' +
-        '<div class="econ-label">vs baseline</div>' +
-        '<div class="econ-breakdown">&#127967; ' + sLabel + ' &middot; &#9973; ' + vLabel + '</div>' +
-        '<div class="econ-baseline">Stadium baseline: ' + fmt(city.baselineStadiumAvgWeekly) + '/wk</div>' +
-      '</div>' +
-      '<div class="pts-badge">' +
-        '<div class="pts-num' + (pts > 0 ? ' scoring' : '') + '">' + pts + '</div>' +
-        '<div class="pts-label">pts</div>' +
-      '</div>' +
-      '<div class="hide-sm">' +
-        '<div class="bar-track"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,' + cc + '88,' + cc + ');border-radius:4px;animation-delay:' + (delay+80) + 'ms"></div></div>' +
-        '<div class="country-label">' + city.country + '</div>' +
-      '</div>';
-
-    body.appendChild(row);
-  });
-}
-
 
 const GDP_DATA = {
   "Monterrey": {impact:224,pct:0.264,metroGdp:85,tier:"Low-tourism City",disp:8,mult:1.25,capacity:53500,intlPerMatch:12706,domPerMatch:17789,colFactor:0.533,intlDaily:306.0,beer:5.49,hotel:538,hotelPrem:104},
@@ -342,6 +238,105 @@ const GDP_DATA = {
   "New York / New Jersey": {impact:557,pct:0.027,metroGdp:2100,tier:"Global Gateway",disp:35,mult:1.85,capacity:82500,intlPerMatch:19594,domPerMatch:27431,colFactor:1.0,intlDaily:437.0,beer:12.3,hotel:645,hotelPrem:15},
 };
 
+const FLAG = { US:'&#127482;&#127480;', MX:'&#127474;&#127485;', CA:'&#127464;&#127462;' };
+const COUNTRY_NAME = { USA:'United States', MEX:'Mexico', CAN:'Canada' };
+
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n/1000).toFixed(1) + 'k';
+  return String(Math.round(n));
+}
+
+function buzzColor(u) {
+  if (!u || u <= 0) return 'var(--faint)';
+  if (u >= 500) return '#f0c040';
+  if (u >= 300) return '#22c55e';
+  if (u >= 150) return '#60a5fa';
+  if (u >= 100) return 'var(--muted)';
+  return 'var(--faint)';
+}
+
+function render(cities) {
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+
+  cities.forEach((city, i) => {
+    const rank  = i + 1;
+    const wu    = city.lastWeekCombined || 0;
+    const pts   = city.lastWeekPts || 0;
+    const delay = i * 40;
+    const rankClass = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+    const medal = rank===1?'&#129351;':rank===2?'&#129352;':rank===3?'&#129353;':'';
+
+    // ── Matches cell ──────────────────────────────────────────────────────────
+    const played = city.matchesPlayed || 0;
+    const total  = city.matchesTotal  || 0;
+    const matchHTML =
+      '<div class="match-badge">' +
+        '<div class="match-fraction' + (played===0?' zero':'') + '">' +
+          played + '<span style="color:#3a4258;font-size:14px;font-weight:600"> / </span>' + total +
+        '</div>' +
+        '<div class="match-label">played</div>' +
+      '</div>';
+
+    // ── GDP cell ──────────────────────────────────────────────────────────────
+    const g = GDP_DATA[city.name] || {};
+    const gdpPctStr    = g.pct    ? g.pct.toFixed(3) + '%' : '—';
+    const gdpImpactStr = g.impact ? '$' + (g.impact >= 1000 ? (g.impact/1000).toFixed(1)+'bn' : g.impact+'m') : '—';
+    const gdpHTML =
+      '<div class="gdp-badge">' +
+        '<div class="gdp-pct">' + gdpPctStr + '</div>' +
+        '<div class="gdp-dollars">' + gdpImpactStr + '</div>' +
+        '<div class="gdp-label">of city GDP</div>' +
+      '</div>';
+
+    // ── Buzz cell ─────────────────────────────────────────────────────────────
+    const mult   = (wu / 100).toFixed(1);
+    const bcol   = buzzColor(wu);
+    const sLabel = ((city.lastWeekStadium || 0) / 100).toFixed(1) + '&times;';
+    const vLabel = ((city.lastWeekVoyage  || 0) / 100).toFixed(1) + '&times;' + (city.wikivoyageLowConf ? '~' : '');
+    const buzzHTML =
+      '<div class="buzz-cell">' +
+        '<div class="buzz-num" style="color:' + bcol + '">' + mult + '&times;</div>' +
+        '<div class="buzz-label">vs normal</div>' +
+        '<div class="buzz-breakdown">&#127967; ' + sLabel + ' &nbsp;&#9973; ' + vLabel + '</div>' +
+        '<div class="buzz-pts' + (pts > 0 ? ' scoring' : '') + '">' +
+          (pts > 0 ? pts + ' pts this week' : '0 pts') +
+        '</div>' +
+      '</div>';
+
+    // ── Row ───────────────────────────────────────────────────────────────────
+    const row = document.createElement('div');
+    row.className = 'row' + (rank <= 3 ? ' rank-' + rank : '');
+    row.style.animationDelay = delay + 'ms';
+
+    row.innerHTML =
+      // Rank
+      '<div class="rank-num ' + rankClass + '">' +
+        (medal ? '<span class="medal">' + medal + '</span>' : rank) +
+      '</div>' +
+      // City
+      '<div class="city-cell">' +
+        '<div class="city-top">' +
+          '<span class="city-flag">' + (FLAG[city.flag] || '') + '</span>' +
+          '<span class="city-name">' + city.name + '</span>' +
+        '</div>' +
+        '<div class="country-name">' + (COUNTRY_NAME[city.country] || city.country) + '</div>' +
+        '<div class="stadium-name">' + (city.stadium || '') + '</div>' +
+        '<a class="wiki-link" href="' + city.wikiUrl + '" target="_blank" rel="noopener">&#8599; Wikipedia</a>' +
+      '</div>' +
+      // Matches
+      matchHTML +
+      // GDP
+      gdpHTML +
+      // Buzz + pts
+      buzzHTML;
+
+    body.appendChild(row);
+  });
+}
+
 async function loadData() {
   try {
     const res  = await fetch('data/data.json?v=' + Date.now());
@@ -350,7 +345,7 @@ async function loadData() {
 
     const badge = document.getElementById('updated-badge');
     if (json.updatedDisplay) {
-      badge.innerHTML = 'Last updated: <strong>' + json.updatedDisplay + '</strong>';
+      badge.innerHTML = 'Updated: <strong>' + json.updatedDisplay + '</strong>';
     }
 
     const cities = (json.cities || []).sort((a, b) =>
@@ -359,7 +354,7 @@ async function loadData() {
     render(cities);
   } catch(err) {
     document.getElementById('table-body').innerHTML =
-      '<div class="state-msg">Could not load data.json &mdash; ' + err.message + '</div>';
+      '<div class="state-msg">Could not load data — ' + err.message + '</div>';
   }
 }
 
