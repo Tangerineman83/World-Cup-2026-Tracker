@@ -324,22 +324,22 @@ function render(cities) {
 
 
 const GDP_DATA = {
-  "Monterrey": {impact:564,pct:0.664,metroGdp:85,tier:"Low-tourism City",disp:8,beer:5.49,hotel:538,hotelPrem:104},
-  "Guadalajara": {impact:437,pct:0.643,metroGdp:68,tier:"Low-tourism City",disp:8,beer:2.58,hotel:511,hotelPrem:58},
-  "Vancouver": {impact:618,pct:0.475,metroGdp:130,tier:"Global Gateway",disp:35,beer:8.05,hotel:775,hotelPrem:55},
-  "Kansas City": {impact:515,pct:0.286,metroGdp:180,tier:"Low-tourism City",disp:8,beer:8.72,hotel:344,hotelPrem:30},
-  "Toronto": {impact:447,pct:0.14,metroGdp:320,tier:"Major Regional Hub",disp:25,beer:8.4,hotel:593,hotelPrem:25},
-  "Atlanta": {impact:547,pct:0.122,metroGdp:450,tier:"Mid-tier Host",disp:15,beer:8.05,hotel:220,hotelPrem:2},
-  "Boston": {impact:596,pct:0.112,metroGdp:530,tier:"Major Regional Hub",disp:25,beer:8.12,hotel:611,hotelPrem:42},
-  "Seattle": {impact:425,pct:0.097,metroGdp:440,tier:"Major Regional Hub",disp:25,beer:9.2,hotel:446,hotelPrem:25},
-  "Miami": {impact:408,pct:0.095,metroGdp:430,tier:"Global Gateway",disp:35,beer:11.35,hotel:378,hotelPrem:20},
-  "Philadelphia": {impact:422,pct:0.086,metroGdp:490,tier:"Mid-tier Host",disp:15,beer:10.65,hotel:376,hotelPrem:6},
-  "Mexico City": {impact:356,pct:0.085,metroGdp:420,tier:"Global Gateway",disp:35,beer:2.58,hotel:597,hotelPrem:38},
-  "Houston": {impact:430,pct:0.077,metroGdp:560,tier:"Major Regional Hub",disp:25,beer:12.1,hotel:205,hotelPrem:8},
-  "Dallas": {impact:619,pct:0.076,metroGdp:815,tier:"Mid-tier Host",disp:15,beer:9.2,hotel:272,hotelPrem:3},
-  "San Francisco": {impact:376,pct:0.052,metroGdp:720,tier:"Major Regional Hub",disp:25,beer:13.25,hotel:279,hotelPrem:10},
-  "Los Angeles": {impact:441,pct:0.038,metroGdp:1150,tier:"Global Gateway",disp:35,beer:13.25,hotel:383,hotelPrem:10},
-  "New York / New Jersey": {impact:481,pct:0.023,metroGdp:2100,tier:"Global Gateway",disp:35,beer:12.3,hotel:645,hotelPrem:15},
+  "Monterrey": {impact:314,pct:0.369,metroGdp:85,tier:"Low-tourism City",disp:8,capacity:53500,intlPerMatch:12706,domPerMatch:17789,colFactor:0.533,intlDaily:306.0,beer:5.49,hotel:538,hotelPrem:104},
+  "Guadalajara": {impact:203,pct:0.299,metroGdp:68,tier:"Low-tourism City",disp:8,capacity:48000,intlPerMatch:11400,domPerMatch:15960,colFactor:0.459,intlDaily:285.0,beer:2.58,hotel:511,hotelPrem:58},
+  "Vancouver": {impact:379,pct:0.292,metroGdp:130,tier:"Global Gateway",disp:35,capacity:54500,intlPerMatch:12944,domPerMatch:18121,colFactor:0.726,intlDaily:360.0,beer:8.05,hotel:775,hotelPrem:55},
+  "Kansas City": {impact:467,pct:0.259,metroGdp:180,tier:"Low-tourism City",disp:8,capacity:76416,intlPerMatch:18149,domPerMatch:25408,colFactor:0.814,intlDaily:385.0,beer:8.72,hotel:344,hotelPrem:30},
+  "Atlanta": {impact:497,pct:0.11,metroGdp:450,tier:"Mid-tier Host",disp:15,capacity:75000,intlPerMatch:17812,domPerMatch:24938,colFactor:0.835,intlDaily:390.0,beer:8.05,hotel:220,hotelPrem:2},
+  "Boston": {impact:479,pct:0.09,metroGdp:530,tier:"Major Regional Hub",disp:25,capacity:65878,intlPerMatch:15646,domPerMatch:21904,colFactor:0.881,intlDaily:403.0,beer:8.12,hotel:611,hotelPrem:42},
+  "Seattle": {impact:366,pct:0.083,metroGdp:440,tier:"Major Regional Hub",disp:25,capacity:69000,intlPerMatch:16388,domPerMatch:22942,colFactor:0.899,intlDaily:408.0,beer:9.2,hotel:446,hotelPrem:25},
+  "Dallas": {impact:672,pct:0.082,metroGdp:815,tier:"Mid-tier Host",disp:15,capacity:94000,intlPerMatch:22325,domPerMatch:31255,colFactor:0.769,intlDaily:372.0,beer:9.2,hotel:272,hotelPrem:3},
+  "Miami": {impact:354,pct:0.082,metroGdp:430,tier:"Global Gateway",disp:35,capacity:65326,intlPerMatch:15515,domPerMatch:21721,colFactor:0.993,intlDaily:435.0,beer:11.35,hotel:378,hotelPrem:20},
+  "Mexico City": {impact:306,pct:0.073,metroGdp:420,tier:"Global Gateway",disp:35,capacity:87500,intlPerMatch:20781,domPerMatch:29094,colFactor:0.504,intlDaily:298.0,beer:2.58,hotel:597,hotelPrem:38},
+  "Toronto": {impact:221,pct:0.069,metroGdp:320,tier:"Major Regional Hub",disp:25,capacity:45000,intlPerMatch:10688,domPerMatch:14962,colFactor:0.693,intlDaily:351.0,beer:8.4,hotel:593,hotelPrem:25},
+  "Philadelphia": {impact:329,pct:0.067,metroGdp:490,tier:"Mid-tier Host",disp:15,capacity:69328,intlPerMatch:16465,domPerMatch:23052,colFactor:0.734,intlDaily:362.0,beer:10.65,hotel:376,hotelPrem:6},
+  "Houston": {impact:342,pct:0.061,metroGdp:560,tier:"Major Regional Hub",disp:25,capacity:72220,intlPerMatch:17152,domPerMatch:24013,colFactor:0.706,intlDaily:354.0,beer:12.1,hotel:205,hotelPrem:8},
+  "San Francisco": {impact:359,pct:0.05,metroGdp:720,tier:"Major Regional Hub",disp:25,capacity:71000,intlPerMatch:16862,domPerMatch:23608,colFactor:0.998,intlDaily:436.0,beer:13.25,hotel:279,hotelPrem:10},
+  "Los Angeles": {impact:387,pct:0.034,metroGdp:1150,tier:"Global Gateway",disp:35,capacity:70240,intlPerMatch:16682,domPerMatch:23355,colFactor:0.885,intlDaily:405.0,beer:13.25,hotel:383,hotelPrem:10},
+  "New York / New Jersey": {impact:527,pct:0.025,metroGdp:2100,tier:"Global Gateway",disp:35,capacity:82500,intlPerMatch:19594,domPerMatch:27431,colFactor:1.0,intlDaily:437.0,beer:12.3,hotel:645,hotelPrem:15},
 };
 
 async function loadData() {
