@@ -2,7 +2,12 @@ name: Fetch Pageviews Data
 
 on:
   schedule:
+    # Two runs per day to keep "matches played" lag under ~9 hours:
+    #  - 08:15 UTC: catches matches finishing overnight (late US kickoffs)
+    #  - 23:15 UTC: catches matches finishing during the day (afternoon/evening US kickoffs)
+    # Times offset from the hour to avoid GitHub Actions top-of-hour congestion.
     - cron: "15 8 * * *"
+    - cron: "15 23 * * *"
   workflow_dispatch:
 
 env:
@@ -39,5 +44,5 @@ jobs:
       - name: Commit updated data
         run: |
           git add data/data.json
-          git diff --cached --quiet || git commit -m "chore: update pageviews data $(date -u '+%Y-%m-%d')"
+          git diff --cached --quiet || git commit -m "chore: update pageviews data $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
