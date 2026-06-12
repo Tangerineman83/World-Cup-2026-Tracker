@@ -124,395 +124,57 @@ WIKIVOYAGE_LOW_CONF = 150     # avg views/week below this = flag as low confiden
 WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
 # Full 2026 World Cup schedule — static lookup, no API calls required.
-# 104 matches, all dates and venues confirmed through to the Final (19 July 2026).
-# A match counts as "played" once its scheduled date is in the past (strictly
-# before today). This gives a predictable one-day lag rather than depending on
-# any live results feed - the nightly run always reflects results through
-# yesterday.
-CITY_MATCH_DATES = {
-    "Mexico City": ["2026-06-11", "2026-06-17", "2026-06-24", "2026-06-30", "2026-07-05"],
-    "Guadalajara": ["2026-06-11", "2026-06-18", "2026-06-23", "2026-06-26"],
-    "Monterrey": ["2026-06-14", "2026-06-20", "2026-06-24", "2026-06-29"],
-    "Atlanta": ["2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-07-01", "2026-07-07", "2026-07-15"],
-    "Boston": ["2026-06-13", "2026-06-16", "2026-06-19", "2026-06-23", "2026-06-26", "2026-06-29", "2026-07-09"],
-    "Dallas": ["2026-06-14", "2026-06-17", "2026-06-22", "2026-06-25", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-14"],
-    "Houston": ["2026-06-14", "2026-06-17", "2026-06-20", "2026-06-23", "2026-06-26", "2026-06-29", "2026-07-04"],
-    "Kansas City": ["2026-06-16", "2026-06-20", "2026-06-25", "2026-06-27", "2026-07-03", "2026-07-11"],
-    "Los Angeles": ["2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-25", "2026-06-28", "2026-07-02", "2026-07-10"],
-    "Miami": ["2026-06-15", "2026-06-21", "2026-06-24", "2026-06-27", "2026-07-03", "2026-07-11", "2026-07-18"],
-    "New York / New Jersey": ["2026-06-13", "2026-06-16", "2026-06-22", "2026-06-25", "2026-06-27", "2026-06-30", "2026-07-05", "2026-07-19"],
-    "Philadelphia": ["2026-06-14", "2026-06-19", "2026-06-22", "2026-06-25", "2026-06-27", "2026-07-04"],
-    "San Francisco": ["2026-06-13", "2026-06-16", "2026-06-19", "2026-06-22", "2026-06-25", "2026-07-01"],
-    "Seattle": ["2026-06-15", "2026-06-19", "2026-06-24", "2026-06-26", "2026-07-01", "2026-07-06"],
-    "Toronto": ["2026-06-12", "2026-06-17", "2026-06-20", "2026-06-23", "2026-06-26", "2026-07-02"],
-    "Vancouver": ["2026-06-13", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-26", "2026-07-02", "2026-07-07"],
+# All 104 matches with UTC kickoff datetimes, confirmed through to the Final
+# (19 July 2026). Source: FIFA official schedule via kickoffclock.com.
+#
+# A match counts as "played" once its kickoff time plus a buffer for match
+# duration (2.5 hours, covering 90 minutes + stoppage/halftime/extra time
+# margin) is in the past relative to the script's run time (UTC). This lets
+# the script run more than once per day and pick up same-day results as soon
+# as they're realistically available, while group-stage groups of 3
+# simultaneous matches per city are each tracked individually.
+CITY_MATCH_KICKOFFS = {
+    "Mexico City": ["2026-06-11T19:00:00", "2026-06-18T02:00:00", "2026-06-25T01:00:00", "2026-07-01T01:00:00", "2026-07-06T00:00:00"],
+    "Guadalajara": ["2026-06-12T02:00:00", "2026-06-19T01:00:00", "2026-06-24T02:00:00", "2026-06-27T00:00:00"],
+    "Toronto": ["2026-06-12T19:00:00", "2026-06-17T23:00:00", "2026-06-20T20:00:00", "2026-06-23T23:00:00", "2026-06-26T19:00:00", "2026-07-02T23:00:00"],
+    "Los Angeles": ["2026-06-13T01:00:00", "2026-06-16T01:00:00", "2026-06-18T19:00:00", "2026-06-21T19:00:00", "2026-06-26T02:00:00", "2026-06-28T19:00:00", "2026-07-02T19:00:00", "2026-07-10T19:00:00"],
+    "San Francisco": ["2026-06-13T19:00:00", "2026-06-17T04:00:00", "2026-06-20T03:00:00", "2026-06-23T03:00:00", "2026-06-26T02:00:00", "2026-07-02T00:00:00"],
+    "New York / New Jersey": ["2026-06-13T22:00:00", "2026-06-16T19:00:00", "2026-06-23T00:00:00", "2026-06-25T20:00:00", "2026-06-27T21:00:00", "2026-06-30T21:00:00", "2026-07-05T20:00:00", "2026-07-19T19:00:00"],
+    "Boston": ["2026-06-14T01:00:00", "2026-06-16T22:00:00", "2026-06-19T22:00:00", "2026-06-23T20:00:00", "2026-06-26T19:00:00", "2026-06-29T20:30:00", "2026-07-09T20:00:00"],
+    "Vancouver": ["2026-06-14T16:00:00", "2026-06-18T22:00:00", "2026-06-22T01:00:00", "2026-06-24T19:00:00", "2026-06-27T03:00:00", "2026-07-03T03:00:00", "2026-07-07T20:00:00"],
+    "Houston": ["2026-06-14T17:00:00", "2026-06-17T17:00:00", "2026-06-20T17:00:00", "2026-06-23T17:00:00", "2026-06-27T00:00:00", "2026-06-29T17:00:00", "2026-07-04T17:00:00"],
+    "Dallas": ["2026-06-14T20:00:00", "2026-06-17T20:00:00", "2026-06-22T17:00:00", "2026-06-25T23:00:00", "2026-06-28T02:00:00", "2026-06-30T17:00:00", "2026-07-03T18:00:00", "2026-07-06T19:00:00", "2026-07-14T19:00:00"],
+    "Philadelphia": ["2026-06-14T23:00:00", "2026-06-20T00:30:00", "2026-06-22T21:00:00", "2026-06-25T20:00:00", "2026-06-27T21:00:00", "2026-07-04T21:00:00"],
+    "Monterrey": ["2026-06-15T02:00:00", "2026-06-21T04:00:00", "2026-06-25T01:00:00", "2026-06-30T01:00:00"],
+    "Atlanta": ["2026-06-15T16:00:00", "2026-06-18T16:00:00", "2026-06-21T16:00:00", "2026-06-24T22:00:00", "2026-06-27T23:30:00", "2026-07-01T16:00:00", "2026-07-07T16:00:00", "2026-07-15T19:00:00"],
+    "Seattle": ["2026-06-15T19:00:00", "2026-06-19T19:00:00", "2026-06-24T19:00:00", "2026-06-27T03:00:00", "2026-07-01T20:00:00", "2026-07-07T00:00:00"],
+    "Miami": ["2026-06-15T22:00:00", "2026-06-21T22:00:00", "2026-06-24T22:00:00", "2026-06-27T23:30:00", "2026-07-03T22:00:00", "2026-07-11T21:00:00", "2026-07-18T21:00:00"],
+    "Kansas City": ["2026-06-17T01:00:00", "2026-06-21T00:00:00", "2026-06-25T23:00:00", "2026-06-28T02:00:00", "2026-07-04T01:30:00", "2026-07-12T01:00:00"],
 }
 
+MATCH_DURATION_BUFFER = timedelta(hours=2, minutes=30)
 
-# ── API ────────────────────────────────────────────────────────────────────────
-
-def get_pageviews(project, article, start_date, end_date, retries=4):
-    start = start_date.replace("-", "")
-    end   = end_date.replace("-", "")
-    url = ("https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
-           + project + "/all-access/all-agents/"
-           + article + "/daily/" + start + "/" + end)
-    for attempt in range(retries):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
-            with urllib.request.urlopen(req, timeout=15) as r:
-                data = json.loads(r.read())
-                return sum(item["views"] for item in data.get("items", []))
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                wait = 5 * (2 ** attempt)
-                print("    429 rate limit - waiting " + str(wait) + "s...")
-                time.sleep(wait)
-            elif e.code == 404:
-                print("    404 not found: " + article)
-                return 0
-            else:
-                print("    HTTP " + str(e.code) + ": " + article)
-                return 0
-        except Exception as e:
-            print("    Error (" + article + "): " + str(e))
-            return 0
-    print("    All retries failed: " + article)
-    return 0
-
-def wiki(article, start, end):
-    return get_pageviews("en.wikipedia", article, start, end)
-
-def voyage(article, start, end):
-    return get_pageviews("en.wikivoyage", article, start, end)
-
-
-# ── Uplift ─────────────────────────────────────────────────────────────────────
-
-def uplift(views, avg_weekly, week_fraction=1.0):
-    if avg_weekly <= 0:
-        return 0.0
-    return round((views / week_fraction) / avg_weekly * 100, 1)
-
-def clamp_wikivoyage(raw, low_conf=False):
-    cap = 500.0 if low_conf else WIKIVOYAGE_CAP
-    return round(max(WIKIVOYAGE_FLOOR, min(cap, raw)), 1)
-
-def combined(su, vu):
-    """50% stadium (floored at 1.0x) + 50% Wikivoyage."""
-    su_floored = max(100.0, su)  # 1.0x floor — fetch failures never collapse ranking
-    return round(su_floored * STADIUM_WEIGHT + vu * WIKIVOYAGE_WEIGHT, 1)
-
-def to_points(scores):
-    if not scores or max(scores.values()) == 0:
-        return {n: 0 for n in scores}
-    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    return {name: max(0, 10 - i) for i, (name, _) in enumerate(ranked)}
-
-
-# ── Git helper ─────────────────────────────────────────────────────────────────
-
-def git_commit(message):
-    """Commit and push data.json. Non-fatal if git not configured."""
-    try:
-        subprocess.run(["git", "add", "data/data.json"], check=True)
-        result = subprocess.run(["git", "diff", "--cached", "--quiet"])
-        if result.returncode != 0:  # there are changes to commit
-            subprocess.run(["git", "commit", "-m", message], check=True)
-            subprocess.run(["git", "push"], check=True)
-            print("    Committed: " + message)
-        else:
-            print("    No changes to commit.")
-    except subprocess.CalledProcessError as e:
-        print("    Git commit failed (non-fatal): " + str(e))
-
-
-# ── Baseline ───────────────────────────────────────────────────────────────────
 
 def get_match_counts():
     """
     Static schedule lookup: for each city, count matches scheduled and matches
-    played (scheduled date strictly before today). No network call required.
+    played. A match is "played" once kickoff time + 2.5hrs has passed (UTC).
+    No network call required - works correctly however many times per day
+    the script runs.
     """
-    today_str = date.today().strftime("%Y-%m-%d")
+    now = datetime.now(timezone.utc)
     counts = {}
-    for city, dates in CITY_MATCH_DATES.items():
-        total  = len(dates)
-        played = sum(1 for d in dates if d < today_str)
+    for city, kickoffs in CITY_MATCH_KICKOFFS.items():
+        total  = len(kickoffs)
+        played = 0
+        for ko_str in kickoffs:
+            kickoff = datetime.fromisoformat(ko_str).replace(tzinfo=timezone.utc)
+            if kickoff + MATCH_DURATION_BUFFER < now:
+                played += 1
         counts[city] = {"total": total, "played": played}
 
     total_scheduled = sum(c["total"]  for c in counts.values())
     total_played    = sum(c["played"] for c in counts.values())
     print("  Schedule (static): " + str(total_scheduled) + " scheduled, "
-          + str(total_played) + " played (as of " + today_str + ")")
+          + str(total_played) + " played (as of " + now.strftime("%Y-%m-%d %H:%M UTC") + ")")
     return counts
-
-def baseline_dates(start_date, end_date, year):
-    """Return equivalent window in a prior year (same calendar dates)."""
-    s = date.fromisoformat(start_date)
-    e = date.fromisoformat(end_date)
-    return s.replace(year=year).strftime("%Y-%m-%d"), e.replace(year=year).strftime("%Y-%m-%d")
-
-def fetch_baselines(l7_start, l7_end, existing_baselines):
-    """
-    Fetch same-period baseline for the last-7-days window across BASELINE_YEARS.
-    Saves and commits after each city so progress is never lost.
-    Resumes from partial progress if a prior run was interrupted.
-    """
-    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
-    wf   = days / 7.0
-    n_years = len(BASELINE_YEARS)
-
-    print("\n=== Fetching baselines (" + l7_start + " to " + l7_end + " in " + str(BASELINE_YEARS) + ") ===")
-
-    baselines = existing_baselines.copy() if existing_baselines else {}
-    already_done = set(baselines.keys())
-    if already_done:
-        print("  Resuming: " + str(len(already_done)) + "/16 cities already done")
-
-    for i, city in enumerate(CITIES):
-        n = city["name"]
-        if n in already_done:
-            print("  [" + str(i+1) + "/16] Skipping " + n + " (cached)")
-            continue
-
-        print("  [" + str(i+1) + "/16] " + n)
-        s_total = c_total = v_total = 0
-
-        for year in BASELINE_YEARS:
-            bs, be = baseline_dates(l7_start, l7_end, year)
-            sv = wiki(city["stadium_article"],       bs, be); time.sleep(1.0)
-            vv = voyage(city["wikivoyage_article"],  bs, be); time.sleep(1.0)
-            s_total += sv; v_total += vv
-
-        s_avg = round((s_total / n_years) / wf, 1)
-        v_avg = round((v_total / n_years) / wf, 1)
-        v_low = v_avg < WIKIVOYAGE_LOW_CONF
-
-        baselines[n] = {
-            "stadium_avg_weekly":    s_avg,
-            "wikivoyage_avg_weekly": v_avg,
-            "stadium_total":         s_total,
-            "wikivoyage_total":      v_total,
-            "wikivoyage_low_conf":   v_low,
-        }
-        print("    stadium=" + str(s_avg) + "/wk  voyage=" + str(v_avg) +
-              "/wk" + (" [LOW CONF]" if v_low else ""))
-
-        # Save and commit after every city
-        save_baselines_progress(baselines, l7_start, l7_end)
-        git_commit("chore: baseline progress (" + str(len(baselines)) + "/16 cities)")
-
-    return baselines
-
-def save_baselines_progress(baselines, l7_start, l7_end):
-    """Write baselines to data.json immediately (preserves any existing city data)."""
-    os.makedirs("data", exist_ok=True)
-    existing = {}
-    if os.path.exists("data/data.json"):
-        try:
-            with open("data/data.json") as f:
-                existing = json.load(f)
-        except Exception:
-            pass
-    existing["baselines"]           = baselines
-    existing["baselineWindow"]      = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
-    existing["_baselineInProgress"] = True
-    with open("data/data.json", "w", encoding="utf-8") as f:
-        json.dump(existing, f, ensure_ascii=False, indent=2)
-
-def load_baselines(existing_data, l7_start, l7_end):
-    """
-    Load cached baselines from data.json if they cover the same window.
-    Returns (baselines_dict_or_None, is_complete).
-    """
-    if not existing_data:
-        return None, False
-
-    bl = existing_data.get("baselines", {})
-    cached_window = existing_data.get("baselineWindow", "")
-    in_progress   = existing_data.get("_baselineInProgress", False)
-    expected_window = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
-
-    if not bl:
-        print("  No baselines in data.json - fetching fresh.")
-        return None, False
-
-    if cached_window != expected_window:
-        print("  Baseline window changed (" + cached_window + ") - fetching fresh.")
-        return None, False
-
-    if in_progress:
-        n_done = len(bl)
-        print("  Partial baselines found (" + str(n_done) + "/16) - will resume.")
-        return bl, False
-
-    if len(bl) < len(CITIES):
-        print("  Incomplete baselines (" + str(len(bl)) + "/16) - will resume.")
-        return bl, False
-
-    print("  Baselines complete and current - reusing.")
-    return bl, True
-
-
-# ── Current week fetch ─────────────────────────────────────────────────────────
-
-def fetch_article_with_zero_retry(fetch_fn, article, start, end, label, baseline_avg):
-    """
-    Fetch an article with an extra retry if zero views are returned
-    but a non-zero baseline exists (indicates a transient 429, not genuine zero traffic).
-    """
-    views = fetch_fn(article, start, end)
-    time.sleep(1.5)
-    if views == 0 and baseline_avg > 0:
-        print("    Zero views for " + label + " (baseline=" + str(baseline_avg) +
-              "/wk) — retrying in 20s...")
-        time.sleep(20)
-        views = fetch_fn(article, start, end)
-        time.sleep(1.5)
-        if views == 0:
-            print("    Still zero after retry — applying 1.0x floor")
-        else:
-            print("    Retry succeeded: " + str(views) + " views")
-    return views
-
-
-def fetch_current_week(l7_start, l7_end, baselines):
-    """
-    Fetch last-7-days views for stadium + Wikivoyage only (city Wikipedia removed).
-    Applies a 1.0x floor to stadium uplift to prevent transient fetch failures
-    from collapsing a city's ranking. Retries zero returns once before flooring.
-    """
-    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
-    wf   = days / 7.0
-
-    print("\n=== Fetching last 7 days (" + l7_start + " to " + l7_end + ") ===")
-    print("    Signals: stadium Wikipedia (50%) + Wikivoyage (50%)")
-
-    stadium_u = {}; voyage_u = {}; combined_u = {}
-
-    for city in CITIES:
-        n  = city["name"]
-        bl = baselines.get(n, {})
-        s_base = bl.get("stadium_avg_weekly", 0)
-        v_base = bl.get("wikivoyage_avg_weekly", 0)
-
-        # Stadium — with zero-retry
-        sv = fetch_article_with_zero_retry(
-            wiki, city["stadium_article"], l7_start, l7_end, n + " stadium", s_base)
-
-        # Wikivoyage — with zero-retry
-        vv = fetch_article_with_zero_retry(
-            voyage, city["wikivoyage_article"], l7_start, l7_end, n + " wikivoyage", v_base)
-
-        su     = uplift(sv, s_base, wf)
-        vu_raw = uplift(vv, v_base, wf)
-        vu     = clamp_wikivoyage(vu_raw, bl.get("wikivoyage_low_conf", False))
-        wu     = combined(su, vu)  # stadium floor applied inside combined()
-
-        stadium_u[n]  = su
-        voyage_u[n]   = vu
-        combined_u[n] = wu
-
-        su_display = max(100.0, su)  # show floored value in logs
-        print("  " + n.ljust(25) +
-              " stadium=" + str(round(su_display/100, 2)) + "x" +
-              ("(floored)" if su < 100 else "") +
-              "  voyage=" + str(round(vu/100, 2)) + "x" +
-              "  combined=" + str(round(wu/100, 2)) + "x")
-
-    pts = to_points(combined_u)
-    return {"stadium": stadium_u, "voyage": voyage_u, "combined": combined_u, "points": pts}
-
-
-# ── Main ───────────────────────────────────────────────────────────────────────
-
-def main():
-    print("Wikipedia + Wikivoyage Uplift Tracker — Last 7 Days")
-    print("Weights: stadium=50%  wikivoyage=50%  (city Wikipedia removed)")
-    print("Baseline: same window in " + str(BASELINE_YEARS))
-
-    today    = date.today()
-    l7_end   = today.strftime("%Y-%m-%d")
-    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
-
-    # Load existing data
-    existing_data = None
-    if os.path.exists("data/data.json"):
-        try:
-            with open("data/data.json") as f:
-                existing_data = json.load(f)
-        except Exception:
-            pass
-
-    # Baselines: reuse if current, otherwise fetch (with per-city saves)
-    cached_bl, is_complete = load_baselines(existing_data, l7_start, l7_end)
-
-    if is_complete:
-        baselines = cached_bl
-    else:
-        baselines = fetch_baselines(l7_start, l7_end, cached_bl or {})
-
-    # Fetch match schedule counts
-    print("\nLooking up match schedule...")
-    match_counts = get_match_counts()
-
-    # Fetch current week
-    current = fetch_current_week(l7_start, l7_end, baselines)
-
-    # Build results
-    results = []
-    for city in CITIES:
-        n  = city["name"]
-        bl = baselines.get(n, {})
-        mc = match_counts.get(n, {"total": 0, "played": 0})
-        g = GDP_IMPACT.get(n, {})
-        results.append({
-            "name":    n, "country": city["country"],
-            "flag":    city["flag"], "region":  city["region"],
-            "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
-            "gdpImpactUsdM":   g.get("impact_usd_m", 0),
-            "gdpPctAnnual":    g.get("pct_annual_gdp", 0),
-            "metroGdpUsdBn":   g.get("metro_gdp_usd_bn", 0),
-            "displacementTier":g.get("tier", ""),
-            "displacementPct": g.get("displacement_pct", 25),
-            "beerPriceUsd":    g.get("beer_usd", 0),
-            "hotelRateUsd":    g.get("hotel_rate_usd", 0),
-            "hotelPremiumPct": g.get("hotel_premium_pct", 0),
-            "baselineStadiumAvgWeekly":  bl.get("stadium_avg_weekly",    0),
-            "baselineVoyageAvgWeekly":   bl.get("wikivoyage_avg_weekly", 0),
-            "wikivoyageLowConf":         bl.get("wikivoyage_low_conf",   False),
-            "lastWeekCombined":  current["combined"][n],
-            "lastWeekStadium":   current["stadium"][n],
-            "lastWeekVoyage":    current["voyage"][n],
-            "lastWeekPts":       current["points"][n],
-            "matchesTotal":      mc["total"],
-            "matchesPlayed":     mc["played"],
-        })
-
-    results.sort(key=lambda x: x["lastWeekCombined"], reverse=True)
-
-    print("\n=== Final Standings ===")
-    for city in results:
-        print("  " + city["name"].ljust(25)
-              + "  combined=" + str(city["lastWeekCombined"]) + "x"
-              + "  pts=" + str(city["lastWeekPts"]))
-
-    now = datetime.now(timezone.utc)
-    os.makedirs("data", exist_ok=True)
-    with open("data/data.json", "w", encoding="utf-8") as f:
-        json.dump({
-            "updated":          now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "updatedDisplay":   now.strftime("%d %b %Y, %H:%Mz"),
-            "metric":           "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | Match counts from openfootball/worldcup.json",
-            "baselineYears":    BASELINE_YEARS,
-            "baselineWindow":   l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")",
-            "baselines":        baselines,
-            "cities":           results,
-        }, f, ensure_ascii=False, indent=2)
-
-    print("\nDone. Top city: " + results[0]["name"]
-          + " (" + str(results[0]["lastWeekCombined"]) + "x)")
-
-
-main()
