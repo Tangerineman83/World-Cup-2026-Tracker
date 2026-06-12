@@ -123,33 +123,30 @@ WIKIVOYAGE_LOW_CONF = 150     # avg views/week below this = flag as low confiden
 
 WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
 
-# Full 2026 World Cup schedule — free public domain JSON, no API key required
-# Source: https://github.com/openfootball/worldcup.json
-SCHEDULE_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
-
-# Maps ground strings in the schedule JSON to our 16 city names
-GROUND_MAP = {
-    "Mexico City":                           "Mexico City",
-    "Guadalajara (Zapopan)":                "Guadalajara",
-    "Monterrey (Guadalupe)":                "Monterrey",
-    "Atlanta":                              "Atlanta",
-    "Boston (Foxborough)":                  "Boston",
-    "Dallas (Arlington)":                   "Dallas",
-    "Houston":                              "Houston",
-    "Kansas City":                          "Kansas City",
-    "Los Angeles (Inglewood)":              "Los Angeles",
-    "Miami (Miami Gardens)":               "Miami",
-    "New York/New Jersey (East Rutherford)":"New York / New Jersey",
-    "Philadelphia":                         "Philadelphia",
-    "San Francisco Bay Area (Santa Clara)": "San Francisco",
-    "Seattle":                              "Seattle",
-    "Toronto":                              "Toronto",
-    "Vancouver":                            "Vancouver",
+# Full 2026 World Cup schedule — static lookup, no API calls required.
+# 104 matches, all dates and venues confirmed through to the Final (19 July 2026).
+# A match counts as "played" once its scheduled date is in the past (strictly
+# before today). This gives a predictable one-day lag rather than depending on
+# any live results feed - the nightly run always reflects results through
+# yesterday.
+CITY_MATCH_DATES = {
+    "Mexico City": ["2026-06-11", "2026-06-17", "2026-06-24", "2026-06-30", "2026-07-05"],
+    "Guadalajara": ["2026-06-11", "2026-06-18", "2026-06-23", "2026-06-26"],
+    "Monterrey": ["2026-06-14", "2026-06-20", "2026-06-24", "2026-06-29"],
+    "Atlanta": ["2026-06-15", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-27", "2026-07-01", "2026-07-07", "2026-07-15"],
+    "Boston": ["2026-06-13", "2026-06-16", "2026-06-19", "2026-06-23", "2026-06-26", "2026-06-29", "2026-07-09"],
+    "Dallas": ["2026-06-14", "2026-06-17", "2026-06-22", "2026-06-25", "2026-06-27", "2026-06-30", "2026-07-03", "2026-07-06", "2026-07-14"],
+    "Houston": ["2026-06-14", "2026-06-17", "2026-06-20", "2026-06-23", "2026-06-26", "2026-06-29", "2026-07-04"],
+    "Kansas City": ["2026-06-16", "2026-06-20", "2026-06-25", "2026-06-27", "2026-07-03", "2026-07-11"],
+    "Los Angeles": ["2026-06-12", "2026-06-15", "2026-06-18", "2026-06-21", "2026-06-25", "2026-06-28", "2026-07-02", "2026-07-10"],
+    "Miami": ["2026-06-15", "2026-06-21", "2026-06-24", "2026-06-27", "2026-07-03", "2026-07-11", "2026-07-18"],
+    "New York / New Jersey": ["2026-06-13", "2026-06-16", "2026-06-22", "2026-06-25", "2026-06-27", "2026-06-30", "2026-07-05", "2026-07-19"],
+    "Philadelphia": ["2026-06-14", "2026-06-19", "2026-06-22", "2026-06-25", "2026-06-27", "2026-07-04"],
+    "San Francisco": ["2026-06-13", "2026-06-16", "2026-06-19", "2026-06-22", "2026-06-25", "2026-07-01"],
+    "Seattle": ["2026-06-15", "2026-06-19", "2026-06-24", "2026-06-26", "2026-07-01", "2026-07-06"],
+    "Toronto": ["2026-06-12", "2026-06-17", "2026-06-20", "2026-06-23", "2026-06-26", "2026-07-02"],
+    "Vancouver": ["2026-06-13", "2026-06-18", "2026-06-21", "2026-06-24", "2026-06-26", "2026-07-02", "2026-07-07"],
 }
-
-GROUP_ROUNDS    = {"Matchday " + str(i) for i in range(1, 18)}
-KNOCKOUT_ROUNDS = {"Round of 32", "Round of 16", "Quarter-final",
-                   "Semi-final", "Match for third place", "Final"}
 
 
 # ── API ────────────────────────────────────────────────────────────────────────
@@ -232,70 +229,23 @@ def git_commit(message):
 
 # ── Baseline ───────────────────────────────────────────────────────────────────
 
-def fetch_match_counts():
+def get_match_counts():
     """
-    Fetch the 2026 World Cup schedule from openfootball (public domain, no API key).
-    Returns per-city counts of:
-      - total:  all matches scheduled at that venue
-      - played: matches where a score is present in the JSON (updated as tournament progresses)
-
-    Falls back to hardcoded totals (played=0) if the fetch fails.
+    Static schedule lookup: for each city, count matches scheduled and matches
+    played (scheduled date strictly before today). No network call required.
     """
-    # Hardcoded scheduled totals — correct as of schedule published June 2026.
-    # played always starts at 0 in fallback; real counts come from the live JSON.
-    fallback = {
-        "New York / New Jersey": {"total": 8,  "played": 0},
-        "Los Angeles":           {"total": 8,  "played": 0},
-        "Dallas":                {"total": 9,  "played": 0},
-        "Mexico City":           {"total": 5,  "played": 0},
-        "Miami":                 {"total": 7,  "played": 0},
-        "Atlanta":               {"total": 8,  "played": 0},
-        "San Francisco":         {"total": 6,  "played": 0},
-        "Seattle":               {"total": 6,  "played": 0},
-        "Toronto":               {"total": 6,  "played": 0},
-        "Boston":                {"total": 7,  "played": 0},
-        "Guadalajara":           {"total": 4,  "played": 0},
-        "Houston":               {"total": 7,  "played": 0},
-        "Philadelphia":          {"total": 6,  "played": 0},
-        "Vancouver":             {"total": 7,  "played": 0},
-        "Monterrey":             {"total": 4,  "played": 0},
-        "Kansas City":           {"total": 6,  "played": 0},
-    }
-    try:
-        req = urllib.request.Request(SCHEDULE_URL, headers={"User-Agent": WIKI_AGENT})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.loads(r.read())
+    today_str = date.today().strftime("%Y-%m-%d")
+    counts = {}
+    for city, dates in CITY_MATCH_DATES.items():
+        total  = len(dates)
+        played = sum(1 for d in dates if d < today_str)
+        counts[city] = {"total": total, "played": played}
 
-        matches = data.get("matches", [])
-        counts  = {city: {"total": 0, "played": 0} for city in GROUND_MAP.values()}
-
-        for m in matches:
-            city = GROUND_MAP.get(m.get("ground", ""))
-            if not city:
-                continue
-            rnd = m.get("round", "")
-            if rnd not in GROUP_ROUNDS and rnd not in KNOCKOUT_ROUNDS:
-                continue
-
-            counts[city]["total"] += 1
-
-            # A match is played when score1 and score2 are both present in the JSON.
-            # openfootball populates these fields once a result is confirmed.
-            score1 = m.get("score1")
-            score2 = m.get("score2")
-            if score1 is not None and score2 is not None:
-                counts[city]["played"] += 1
-
-        total_scheduled = sum(c["total"]  for c in counts.values())
-        total_played    = sum(c["played"] for c in counts.values())
-        print("  Schedule fetched: " + str(total_scheduled) + " scheduled, "
-              + str(total_played) + " played")
-        return counts
-
-    except Exception as e:
-        print("  Schedule fetch failed (" + str(e) + ") - using hardcoded fallback")
-        return fallback
-
+    total_scheduled = sum(c["total"]  for c in counts.values())
+    total_played    = sum(c["played"] for c in counts.values())
+    print("  Schedule (static): " + str(total_scheduled) + " scheduled, "
+          + str(total_played) + " played (as of " + today_str + ")")
+    return counts
 
 def baseline_dates(start_date, end_date, year):
     """Return equivalent window in a prior year (same calendar dates)."""
@@ -504,8 +454,8 @@ def main():
         baselines = fetch_baselines(l7_start, l7_end, cached_bl or {})
 
     # Fetch match schedule counts
-    print("\nFetching match schedule from openfootball...")
-    match_counts = fetch_match_counts()
+    print("\nLooking up match schedule...")
+    match_counts = get_match_counts()
 
     # Fetch current week
     current = fetch_current_week(l7_start, l7_end, baselines)
