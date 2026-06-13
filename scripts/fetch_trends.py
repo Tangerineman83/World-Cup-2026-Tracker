@@ -82,6 +82,102 @@ CITIES = [
      "wikiUrl": "https://en.wikipedia.org/wiki/Arrowhead_Stadium"},
 ]
 
+# Clean baseline years — no Copa America, Club WC, or COVID in Jun-Jul window
+BASELINE_YEARS       = [2019, 2022, 2023]
+BASELINE_DESCRIPTION = "Same 7-day window averaged across 2019, 2022, 2023"
+
+# Weights (city Wikipedia removed — added noise, not signal)
+STADIUM_WEIGHT    = 0.50
+WIKIVOYAGE_WEIGHT = 0.50
+
+# Wikivoyage noise controls (as index values: 100 = 1x, 1000 = 10x)
+WIKIVOYAGE_FLOOR    = 100.0   # 1.0x minimum
+WIKIVOYAGE_CAP      = 1000.0  # 10.0x maximum
+WIKIVOYAGE_LOW_CONF = 150     # avg views/week below this = flag as low confidence
+
+WIKI_AGENT = "WC2026UpliftTracker/1.0 (public research; github.com/tracker)"
+
+
+# ── API ───────────────────────────────────────────────────────────────────────
+
+def get_pageviews(project, article, start_date, end_date, retries=4):
+    """
+    Fetch total pageviews from Wikimedia for any project (wikipedia or wikivoyage).
+    project: e.g. 'en.wikipedia' or 'en.wikivoyage'
+    """
+    start = start_date.replace("-", "")
+    end   = end_date.replace("-", "")
+    url = (
+        "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/"
+        + project + "/all-access/all-agents/"
+        + article + "/daily/" + start + "/" + end
+    )
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": WIKI_AGENT})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = json.loads(r.read())
+                return sum(item["views"] for item in data.get("items", []))
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait = 5 * (2 ** attempt)
+                print("    429 rate limit - waiting " + str(wait) + "s...")
+                time.sleep(wait)
+            elif e.code == 404:
+                print("    404 not found: " + article)
+                return 0
+            else:
+                print("    HTTP " + str(e.code) + ": " + article)
+                return 0
+        except Exception as e:
+            print("    Error (" + article + "): " + str(e))
+            return 0
+    print("    All retries failed: " + article)
+    return 0
+
+
+def wiki(article, start, end):
+    """Shorthand for English Wikipedia."""
+    return get_pageviews("en.wikipedia", article, start, end)
+
+
+def voyage(article, start, end):
+    """Shorthand for English Wikivoyage."""
+    return get_pageviews("en.wikivoyage", article, start, end)
+
+
+# ── Uplift calculation ──────────────────────────────────────────────────────────
+
+def uplift(views, avg_weekly, week_fraction=1.0):
+    """Raw uplift index (100 = 1.0x). Returns 0.0 if baseline missing."""
+    if avg_weekly <= 0:
+        return 0.0
+    return round((views / week_fraction) / avg_weekly * 100, 1)
+
+
+def clamp_wikivoyage(raw, low_conf=False):
+    """
+    Apply floor and cap to Wikivoyage uplift.
+    Floor: 100 (1.0x) — prevents noisy below-baseline weeks dragging score down.
+    Cap:  1000 (10.0x) — prevents outlier spikes on small samples inflating score.
+    Low-confidence baseline (<150 views/week): cap reduced to 500 (5x).
+    """
+    cap = 500.0 if low_conf else WIKIVOYAGE_CAP
+    return round(max(WIKIVOYAGE_FLOOR, min(cap, raw)), 1)
+
+
+def combined(stadium_u, wikivoyage_u):
+    """Weighted combination of the two uplift signals (50/50)."""
+    return round(stadium_u * STADIUM_WEIGHT + wikivoyage_u * WIKIVOYAGE_WEIGHT, 1)
+
+
+def to_points(scores):
+    """1st=10pts ... 10th=1pt, 11th-16th=0pts. No points if all zero."""
+    if not scores or max(scores.values()) == 0:
+        return {n: 0 for n in scores}
+    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return {name: max(0, 10 - i) for i, (name, _) in enumerate(ranked)}
+
 
 # ── GDP Impact estimates (static — modelled, not fetched) ────────────────────────
 # Scope: direct incremental tourist/visitor spend only.
@@ -178,3 +274,290 @@ def get_match_counts():
     print("  Schedule (static): " + str(total_scheduled) + " scheduled, "
           + str(total_played) + " played (as of " + now.strftime("%Y-%m-%d %H:%M UTC") + ")")
     return counts
+
+
+# ── Git helper ──────────────────────────────────────────────────────────────
+
+def git_commit(message):
+    """Commit and push data.json. Non-fatal if git not configured."""
+    try:
+        subprocess.run(["git", "add", "data/data.json"], check=True)
+        result = subprocess.run(["git", "diff", "--cached", "--quiet"])
+        if result.returncode != 0:  # there are changes to commit
+            subprocess.run(["git", "commit", "-m", message], check=True)
+            subprocess.run(["git", "push"], check=True)
+            print("    Committed: " + message)
+        else:
+            print("    No changes to commit.")
+    except subprocess.CalledProcessError as e:
+        print("    Git commit failed (non-fatal): " + str(e))
+
+
+# ── Baseline ────────────────────────────────────────────────────────────────
+
+def baseline_dates(start_date, end_date, year):
+    """Return equivalent window in a prior year (same calendar dates)."""
+    s = date.fromisoformat(start_date)
+    e = date.fromisoformat(end_date)
+    return s.replace(year=year).strftime("%Y-%m-%d"), e.replace(year=year).strftime("%Y-%m-%d")
+
+
+def fetch_baselines(l7_start, l7_end, existing_baselines):
+    """
+    Fetch same-period baseline for the last-7-days window across BASELINE_YEARS.
+    Saves and commits after each city so progress is never lost.
+    Resumes from partial progress if a prior run was interrupted.
+    """
+    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
+    wf   = days / 7.0
+    n_years = len(BASELINE_YEARS)
+
+    print("\n=== Fetching baselines (" + l7_start + " to " + l7_end + " in " + str(BASELINE_YEARS) + ") ===")
+
+    baselines = existing_baselines.copy() if existing_baselines else {}
+    already_done = set(baselines.keys())
+    if already_done:
+        print("  Resuming: " + str(len(already_done)) + "/16 cities already done")
+
+    for i, city in enumerate(CITIES):
+        n = city["name"]
+        if n in already_done:
+            print("  [" + str(i+1) + "/16] Skipping " + n + " (cached)")
+            continue
+
+        print("  [" + str(i+1) + "/16] " + n)
+        s_total = v_total = 0
+
+        for year in BASELINE_YEARS:
+            bs, be = baseline_dates(l7_start, l7_end, year)
+            sv = wiki(city["stadium_article"],       bs, be); time.sleep(1.0)
+            vv = voyage(city["wikivoyage_article"],  bs, be); time.sleep(1.0)
+            s_total += sv; v_total += vv
+
+        s_avg = round((s_total / n_years) / wf, 1)
+        v_avg = round((v_total / n_years) / wf, 1)
+        v_low = v_avg < WIKIVOYAGE_LOW_CONF
+
+        baselines[n] = {
+            "stadium_avg_weekly":    s_avg,
+            "wikivoyage_avg_weekly": v_avg,
+            "stadium_total":         s_total,
+            "wikivoyage_total":      v_total,
+            "wikivoyage_low_conf":   v_low,
+        }
+        print("    stadium=" + str(s_avg) + "/wk  voyage=" + str(v_avg) + "/wk"
+              + (" [LOW CONF]" if v_low else ""))
+
+        # Save and commit after every city
+        save_baselines_progress(baselines, l7_start, l7_end)
+        git_commit("chore: baseline progress (" + str(len(baselines)) + "/16 cities)")
+
+    return baselines
+
+
+def save_baselines_progress(baselines, l7_start, l7_end):
+    """Write baselines to data.json immediately (preserves any existing city data)."""
+    os.makedirs("data", exist_ok=True)
+    existing = {}
+    if os.path.exists("data/data.json"):
+        try:
+            with open("data/data.json") as f:
+                existing = json.load(f)
+        except Exception:
+            pass
+    existing["baselines"]           = baselines
+    existing["baselineWindow"]      = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
+    existing["_baselineInProgress"] = True
+    with open("data/data.json", "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
+
+
+def load_baselines(existing_data, l7_start, l7_end):
+    """
+    Load cached baselines from data.json if they cover the same window.
+    Returns (baselines_dict_or_None, is_complete).
+    """
+    if not existing_data:
+        return None, False
+
+    bl = existing_data.get("baselines", {})
+    cached_window = existing_data.get("baselineWindow", "")
+    in_progress   = existing_data.get("_baselineInProgress", False)
+    expected_window = l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")"
+
+    if not bl:
+        print("  No baselines in data.json - fetching fresh.")
+        return None, False
+
+    if cached_window != expected_window:
+        print("  Baseline window changed (" + cached_window + ") - fetching fresh.")
+        return None, False
+
+    if in_progress:
+        n_done = len(bl)
+        print("  Partial baselines found (" + str(n_done) + "/16) - will resume.")
+        return bl, False
+
+    if len(bl) < len(CITIES):
+        print("  Incomplete baselines (" + str(len(bl)) + "/16) - will resume.")
+        return bl, False
+
+    print("  Baselines complete and current - reusing.")
+    return bl, True
+
+
+# ── Current week fetch ────────────────────────────────────────────────────────
+
+def fetch_current_week(l7_start, l7_end, baselines):
+    """Fetch actual last-7-days views and compute uplift + points."""
+    days = (date.fromisoformat(l7_end) - date.fromisoformat(l7_start)).days + 1
+    wf   = days / 7.0
+
+    print("\n=== Fetching last 7 days (" + l7_start + " to " + l7_end + ") ===")
+    print("    Signals: stadium Wikipedia (50%) + Wikivoyage (50%)")
+
+    stadium_u = {}; voyage_u = {}; combined_u = {}
+
+    for city in CITIES:
+        n  = city["name"]
+        bl = baselines.get(n, {})
+
+        sv = wiki(city["stadium_article"],     l7_start, l7_end); time.sleep(1.5)
+        vv = voyage(city["wikivoyage_article"], l7_start, l7_end); time.sleep(1.5)
+
+        if sv == 0 and bl.get("stadium_avg_weekly", 0) > 0:
+            print("    Zero views for " + n + " stadium (baseline=" + str(bl.get("stadium_avg_weekly")) + ") - retrying in 20s...")
+            time.sleep(20)
+            sv = wiki(city["stadium_article"], l7_start, l7_end)
+            if sv > 0:
+                print("    Retry succeeded: " + str(sv) + " views")
+
+        if vv == 0 and bl.get("wikivoyage_avg_weekly", 0) > 0:
+            print("    Zero views for " + n + " wikivoyage (baseline=" + str(bl.get("wikivoyage_avg_weekly")) + ") - retrying in 20s...")
+            time.sleep(20)
+            vv = voyage(city["wikivoyage_article"], l7_start, l7_end)
+            if vv > 0:
+                print("    Retry succeeded: " + str(vv) + " views")
+
+        su     = uplift(sv, bl.get("stadium_avg_weekly",    0), wf)
+        vu_raw = uplift(vv, bl.get("wikivoyage_avg_weekly", 0), wf)
+        vu     = clamp_wikivoyage(vu_raw, bl.get("wikivoyage_low_conf", False))
+
+        # Floor stadium uplift at 1.0x - prevents transient API failures from
+        # collapsing a city's ranking to zero.
+        su = max(su, 100.0) if su > 0 else 100.0
+
+        wu = combined(su, vu)
+
+        stadium_u[n] = su; voyage_u[n] = vu; combined_u[n] = wu
+
+        print("  " + n.ljust(25) + " stadium=" + str(su/100) + "x"
+              + "  voyage=" + str(vu/100) + "x"
+              + "  combined=" + str(wu/100) + "x")
+
+    pts = to_points(combined_u)
+    return {"stadium": stadium_u, "voyage": voyage_u,
+            "combined": combined_u, "points": pts}
+
+
+# ── Main ────────────────────────────────────────────────────────────────────
+
+def main():
+    print("Wikipedia + Wikivoyage Uplift Tracker — Last 7 Days")
+    print("Weights: stadium=50%  wikivoyage=50%  (city Wikipedia removed)")
+    print("Baseline: same window in " + str(BASELINE_YEARS))
+
+    today    = date.today()
+    l7_end   = today.strftime("%Y-%m-%d")
+    l7_start = (today - timedelta(days=6)).strftime("%Y-%m-%d")
+
+    # Load existing data
+    existing_data = None
+    if os.path.exists("data/data.json"):
+        try:
+            with open("data/data.json") as f:
+                existing_data = json.load(f)
+        except Exception:
+            pass
+
+    # Baselines: reuse if current, otherwise fetch (with per-city saves)
+    cached_bl, is_complete = load_baselines(existing_data, l7_start, l7_end)
+
+    if is_complete:
+        baselines = cached_bl
+    else:
+        baselines = fetch_baselines(l7_start, l7_end, cached_bl or {})
+
+    # Match schedule (static lookup, no API call)
+    print("\nLooking up match schedule...")
+    match_counts = get_match_counts()
+
+    # Fetch current week
+    current = fetch_current_week(l7_start, l7_end, baselines)
+
+    # Build results
+    results = []
+    for city in CITIES:
+        n  = city["name"]
+        bl = baselines.get(n, {})
+        mc = match_counts.get(n, {"total": 0, "played": 0})
+        g  = GDP_IMPACT.get(n, {})
+
+        results.append({
+            "name":    n, "country": city["country"],
+            "flag":    city["flag"], "region":  city["region"],
+            "stadium": city["stadium"], "wikiUrl": city["wikiUrl"],
+            "baselineStadiumAvgWeekly":  bl.get("stadium_avg_weekly",    0),
+            "baselineVoyageAvgWeekly":   bl.get("wikivoyage_avg_weekly", 0),
+            "wikivoyageLowConf":         bl.get("wikivoyage_low_conf",   False),
+            "lastWeekCombined":  current["combined"][n],
+            "lastWeekStadium":   current["stadium"][n],
+            "lastWeekVoyage":    current["voyage"][n],
+            "lastWeekPts":       current["points"][n],
+            "matchesTotal":      mc["total"],
+            "matchesPlayed":     mc["played"],
+            "gdpImpactUsdM":     g.get("impact_usd_m", 0),
+            "gdpPctAnnual":      g.get("pct_annual_gdp", 0),
+            "metroGdpUsdBn":     g.get("metro_gdp_usd_bn", 0),
+            "displacementTier":  g.get("tier", ""),
+            "displacementPct":   g.get("displacement_pct", 25),
+            "multiplier":        g.get("multiplier", 1.75),
+            "beerPriceUsd":      g.get("beer_usd", 0),
+            "hotelRateUsd":      g.get("hotel_rate_usd", 0),
+            "hotelPremiumPct":   g.get("hotel_premium_pct", 0),
+        })
+
+    results.sort(key=lambda x: x["lastWeekCombined"], reverse=True)
+
+    print("\n=== Final Standings ===")
+    for i, city in enumerate(results):
+        print("  " + city["name"].ljust(25)
+              + "  combined=" + str(city["lastWeekCombined"]) + "x"
+              + "  pts=" + str(city["lastWeekPts"]))
+
+    now = datetime.now(timezone.utc)
+    existing_data2 = {}
+    if os.path.exists("data/data.json"):
+        try:
+            with open("data/data.json") as f:
+                existing_data2 = json.load(f)
+        except Exception:
+            pass
+
+    os.makedirs("data", exist_ok=True)
+    with open("data/data.json", "w", encoding="utf-8") as f:
+        json.dump({
+            "updated":          now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "updatedDisplay":   now.strftime("%d %b %Y, %H:%Mz"),
+            "metric":           "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | GDP impact: modelled visitor spend estimate | Matches: static kickoff-time schedule",
+            "baselineYears":    BASELINE_YEARS,
+            "baselineWindow":   l7_start + " to " + l7_end + " (equiv. in " + str(BASELINE_YEARS) + ")",
+            "baselines":        baselines,
+            "cities":           results,
+        }, f, ensure_ascii=False, indent=2)
+
+    print("\nDone. Top city: " + results[0]["name"]
+          + " (" + str(results[0]["lastWeekCombined"]/100) + "x)")
+
+
+main()
