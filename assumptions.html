@@ -49,6 +49,9 @@
     .step-title { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
     .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
     .step-source { font-size: 11px; color: #3a4258; margin-top: 8px; }
+    .check-in { display: flex; gap: 8px; align-items: flex-start; background: rgba(96,165,250,.07); border: 1px solid rgba(96,165,250,.18); border-radius: 4px; padding: 10px 12px; margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .check-in .ci-icon { flex-shrink: 0; font-size: 13px; }
+    .check-in strong { color: #60a5fa; }
 
     .assume-grid { display: grid; gap: 10px; margin: 16px 0; }
     .assume-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 12px 16px; align-items: start; }
@@ -179,13 +182,13 @@
 
     </div>
 
-    <p class="explainer">Imagine a fan flying from South Korea to watch their team play in Kansas City. They book a hotel for four nights, eat at local restaurants, take taxis, buy souvenirs and spend at the stadium. Every dollar they spend goes into the local economy — paying wages for hotel workers, restaurant staff, and taxi drivers, who then spend some of that money locally too. Our model counts up all that extra spending, across millions of fans and 104 matches, to arrive at a total economic impact for each city.</p>
-    <p class="explainer">The key word is <em>extra</em>. Not all World Cup visitors are truly additional — some replace regular tourists who decided to avoid the city during the tournament. We account for this carefully, and it makes a big difference to the final numbers.</p>
+    <p class="explainer">Imagine a fan flying from South Korea to watch their team play in Kansas City. They book a hotel, eat at local restaurants, take taxis, buy souvenirs. That spending pays wages for hotel staff, restaurant workers and drivers, who then spend some of it locally too. Our model adds this up across millions of fans and 104 matches.</p>
+    <p class="explainer">The key word is <em>extra</em>. Not every visitor is truly additional — some replace regular tourists who avoided the city during the tournament. We account for this carefully, and it makes a big difference to the final numbers.</p>
 
     <!-- SENSITIVITY RANGE -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:18px 22px;margin-top:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">How sensitive is this number?</div>
-      <p class="explainer" style="font-size:13px;margin-bottom:14px;">No model like this produces an exact figure — it depends on assumptions about stadium occupancy, how many regular tourists stay away, and how much money circulates locally. Here's how the total changes if we nudge those assumptions up or down within a realistic range.</p>
+      <p class="explainer" style="font-size:13px;margin-bottom:14px;">No model produces an exact figure. Here's how $5.7bn moves if we nudge occupancy, displacement and the multiplier within a realistic range.</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
         <div style="padding:14px 8px;border-radius:4px;background:#090e1a;">
           <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#60a5fa;margin-bottom:6px;">Low estimate</div>
@@ -216,37 +219,38 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <div class="step-title">How many fans visit?</div>
-          <div class="step-desc">We start with each stadium's official FIFA capacity and assume <strong>95% of seats are filled</strong> — FIFA's own attendance projection. Of those fans, we count <strong>25% as international visitors</strong> (people who flew in from another country) and <strong>35% as domestic away fans</strong> (people who travelled from elsewhere in the same country). The remaining 40% are locals from the host city itself — their spending is mostly money they would have spent anyway, so we leave it out.<br><br>
-          This means bigger stadiums generate more economic impact. Dallas's AT&T Stadium holds 94,000 people, so 9 matches there produces far more visitor spending than Toronto's BMO Field, which holds only 45,000.</div>
-          <div class="step-source">&#128203; Sources: FIFA official stadium capacities (confirmed October 2025). FIFA 2022 World Cup attendance surveys for the 25%/35% visitor splits.</div>
+          <div class="step-desc">We start with each stadium's official FIFA capacity and assume <strong>95% of seats are filled</strong> — FIFA's own attendance projection. Of those fans, <strong>25% are international visitors</strong> and <strong>35% are domestic away fans</strong>; the remaining 40% are locals, whose spending we leave out since they'd spend that money locally anyway.<br><br>
+          Bigger stadiums mean bigger impact: Dallas's AT&T Stadium (94,000) hosting 9 matches generates far more visitor spending than Toronto's BMO Field (45,000).</div>
+          <div class="check-in"><span class="ci-icon">&#9989;</span><div><strong>Checking in:</strong> the first matches back this up. Estadio Azteca drew over 80,000 fans into its ~83,000-seat bowl, and Guadalajara's opener officially hit 44,985 of 45,664 — both at or above our 95% assumption.</div></div>
+          <div class="step-source">&#128203; Sources: FIFA official stadium capacities (Oct 2025). FIFA 2022 attendance surveys for the 25%/35% splits.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">How much does each fan spend?</div>
-          <div class="step-desc">International fans spend <strong>$285–$437 per day</strong> depending on which city they're in — because a restaurant meal in Guadalajara costs far less than the same meal in San Francisco. We adjust each city's spending using <strong>Numbeo's Restaurant Price Index</strong>, which measures eating-out costs city by city (New York = 100).<br><br>
-          On top of that, we add a <strong>20% World Cup premium</strong> — prices for food, drink and entertainment are inflated during major sporting events. Domestic fans spend about <strong>35% of what international fans spend</strong>, because they don't pay for international flights and tend to know better where to find good value.<br><br>
-          We also separately count the extra hotel spend on match nights — some cities see hotel prices double on game days (Monterrey: +104%, Boston: +42%), while others barely move (Atlanta: +2%, Dallas: +3%).<br><br>
-          <strong>One thing we deliberately leave out: match ticket prices.</strong> Most of what fans pay for tickets goes to FIFA centrally, not into the host city's local economy — so including it would overstate the local impact. Our $285–$437/day figures cover everything <em>except</em> the ticket itself: hotels, food, drink, local transport, and entertainment. This makes our estimate more conservative, not less.</div>
-          <div class="step-source">&#128203; Sources: LendingTree 2026 World Cup Fan Cost Analysis. Numbeo Cost of Living Index by City (June 2026). GiveMeSport/SeatPick stadium beer prices. Lighthouse Hospitality hotel rate and match-day premium data.</div>
+          <div class="step-desc">International fans spend <strong>$285–$437 per day</strong> depending on the city's cost of living, using <strong>Numbeo's Restaurant Price Index</strong> (New York = 100) to adjust for local prices. We add a <strong>20% World Cup premium</strong> on top, since food, drink and entertainment prices rise during major events. Domestic fans spend about <strong>35% of the international rate</strong> — no flights, and more local know-how.<br><br>
+          We separately add hotel match-night premiums — some cities see prices double (Monterrey +104%, Boston +42%), others barely move (Atlanta +2%, Dallas +3%).<br><br>
+          <strong>Deliberately excluded: match tickets.</strong> Most ticket revenue goes to FIFA centrally, not the local economy — so leaving it out makes our estimate more conservative, not less.</div>
+          <div class="check-in"><span class="ci-icon">&#9888;</span><div><strong>Checking in:</strong> this is where real data most challenges us. CoStar tracking shows hotel booking rates of just 57% (New York, June 13), 60% (Monterrey), 61% (Mexico City) and 73% (Guadalajara) for match dates — well below the near-full occupancy our hotel premiums assume. An AHLA survey found ~80% of hotel operators running below forecast, partly because FIFA cancelled ~70% of its reserved room blocks in Boston, Dallas, LA, Philadelphia and Seattle. If this holds, our hotel premiums may be overstated — pushing $5.7bn further toward the high side of our range. Based on 2 of 104 matches so far.</div></div>
+          <div class="step-source">&#128203; Sources: LendingTree Fan Cost Analysis. Numbeo (June 2026). GiveMeSport/SeatPick beer prices. Lighthouse hotel rate data. CoStar/Front Office Sports and AHLA booking data (June 2026).</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Subtract the visitors who would have come anyway</div>
-          <div class="step-desc">This is the most important step — and what most optimistic economic forecasts get wrong by ignoring it. In a city like New York or Miami that already draws millions of international tourists every year, some World Cup fans simply replace regular tourists who chose to stay away. The city is busy either way, so the World Cup isn't truly creating new economic activity for every visitor.<br><br>
-          We call this <em>displacement</em>, and we vary the deduction by city type. Cities like Kansas City or Guadalajara that rarely see international tourists get almost full credit for every World Cup visitor — they're genuinely additional. Cities like New York or Los Angeles that are always packed with tourists lose more credit.</div>
-          <div class="step-source">&#128203; Sources: Zimbalist &amp; Matheson NFL Super Bowl studies (20–40% displacement for major US cities). FIFA 2014 Brazil secondary city research (~15%). UK Sport/DCMS mega-event evaluation framework (10–35%).</div>
+          <div class="step-desc">This is the step most optimistic forecasts skip. In cities like New York or Miami that already draw millions of tourists, some World Cup fans simply replace regular tourists who stayed away — the city is busy either way.<br><br>
+          We call this <em>displacement</em> and vary the deduction by city type: low-tourism cities like Kansas City or Guadalajara get near-full credit for every visitor, while perennially-busy cities like New York or LA lose more.</div>
+          <div class="step-source">&#128203; Sources: Zimbalist &amp; Matheson NFL Super Bowl studies (20–40% for major US cities). FIFA 2014 Brazil secondary city research (~15%). UK Sport/DCMS framework (10–35%).</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Apply the economic multiplier</div>
-          <div class="step-desc">When a fan spends $100 at a hotel, that doesn't just benefit the hotel. The hotel pays wages to housekeepers and receptionists. Those workers spend their wages at local shops and restaurants. Those shops buy supplies from local wholesalers. The original $100 circulates through the local economy, creating more economic activity than the initial amount.<br><br>
-          We use a <strong>city-specific multiplier</strong> — larger, more self-sufficient cities like New York (1.85×) generate more local circulation, while smaller or more import-dependent cities like Vancouver (1.10×) see more money leak out to suppliers in other cities or countries. The Canadian cities use a lower multiplier anchored to Deloitte Canada's published research finding of $1.09 generated per dollar spent.</div>
+          <div class="step-desc">When a fan spends $100 at a hotel, that money pays staff wages, which get spent at local shops, which buy from local suppliers — circulating through the economy and creating more activity than the initial spend.<br><br>
+          We use a <strong>city-specific multiplier</strong>: larger, self-sufficient cities like New York (1.85×) see more local circulation, while smaller or import-dependent cities like Vancouver (1.10×) see more money leak out. Canadian cities use a lower multiplier anchored to Deloitte Canada's published finding of $1.09 generated per dollar spent.</div>
           <div class="step-source">&#128203; Sources: Deloitte Canada Sport Business Advisory (2024). Tourism Economics/Oxford Economics multiplier literature. World Bank tourism guidance for Latin American economies.</div>
         </div>
       </div>
@@ -254,9 +258,9 @@
         <div class="step-num">5</div>
         <div class="step-body">
           <div class="step-title">Show it as a % of each city's economy</div>
-          <div class="step-desc">A $500m impact sounds huge — but it means something very different for Kansas City (annual economy: $180bn) versus New York (annual economy: $2,100bn). For Kansas City it's 0.23% of their whole annual economy. For New York it's barely a rounding error at 0.03%.<br><br>
-          By expressing impact as a <strong>percentage of annual GDP</strong> we put every city on an equal footing. This reveals the real story: smaller cities with lower international tourism see a proportionally <em>far bigger</em> World Cup effect than the big-name cities that dominate the headlines.</div>
-          <div class="step-source">&#128203; Sources: US Bureau of Economic Analysis (BEA) Metropolitan Statistical Area GDP data. Statistics Canada CMA GDP. Mexico INEGI metropolitan area GDP. All figures converted to USD.</div>
+          <div class="step-desc">A $500m impact means very different things for Kansas City (annual economy: $180bn — 0.23%) versus New York ($2,100bn — a rounding error at 0.03%).<br><br>
+          Expressing impact as a <strong>percentage of annual GDP</strong> puts every city on equal footing — revealing that smaller, lower-tourism cities feel a proportionally <em>far bigger</em> effect than the big names that dominate headlines.</div>
+          <div class="step-source">&#128203; Sources: US BEA Metropolitan Statistical Area GDP. Statistics Canada CMA GDP. Mexico INEGI metropolitan area GDP. All converted to USD.</div>
         </div>
       </div>
     </div>
@@ -369,8 +373,7 @@
   <!-- DISPLACEMENT TIERS -->
   <div class="section">
     <div class="section-title">Why Displacement Varies by City</div>
-    <p class="explainer">Think about two extremes. New York City welcomes 9 million international visitors every year — it's one of the most visited cities on earth. When the World Cup is in town, some of those regular tourists simply don't come: they avoid the crowds, the high prices, and the disruption. The World Cup replaces some normal tourism rather than adding to it.<br><br>
-    Kansas City, by contrast, gets around 120,000 international visitors in a normal year. When 18,000 international fans show up for a single match, those people are genuinely new to the city. There's almost nobody being replaced.</p>
+    <p class="explainer">New York welcomes 9 million international visitors a year — when the World Cup comes, some regular tourists simply stay away to avoid the crowds and prices. Kansas City gets around 120,000 a year; when 18,000 international fans show up for one match, almost all of them are genuinely new.</p>
     <div class="tier-grid">
       <div class="tier-card" style="border-top:3px solid #f0c040">
         <div class="tier-name" style="color:#f0c040">Global Gateway</div>
@@ -401,7 +404,6 @@
         <div class="tier-why">These cities see very little international tourism in normal years. Almost every World Cup visitor is genuinely new economic activity — there's no pool of regular tourists being displaced.</div>
       </div>
     </div>
-    <p class="explainer" style="font-size:13px;margin-top:16px;">These tiers are calibrated against published academic research. NFL Super Bowl studies by economists Zimbalist and Matheson find 20–40% displacement for major US cities. FIFA's own Brazil 2014 research found around 15% for secondary cities. Our 8–35% range sits comfortably within these established findings.</p>
   </div>
 
   <!-- PER CITY RESULTS -->
@@ -634,38 +636,9 @@
       </div>
     </div>
 
-    <p class="explainer" style="font-size:14px;">Our <strong>$5.7bn</strong> is actually very close to FIFA's own estimate of tourist spending alone (~$7.5bn globally, ~$5–6bn across the three host countries). The extra ~$16bn in FIFA's headline figure comes from counting their own operational spending, government investment in infrastructure, and complex ripple effects through the wider economy — all legitimate, but not the same thing as fans arriving in cities and spending money.</p>
+    <p class="explainer" style="font-size:14px;">Our <strong>$5.7bn</strong> is close to FIFA's own estimate of tourist spending alone (~$5–6bn across the three host countries). The extra ~$16bn in FIFA's headline figure comes from their own operational spending, government infrastructure investment, and wider supply-chain ripple effects — all legitimate, but not the same as fans arriving and spending money.</p>
 
-    <p class="explainer" style="font-size:14px;">Independent economists are more sceptical of the headline numbers. Goldman Sachs (June 2026) studied every World Cup since 1982 and found the effect on national GDP is "marginally positive but statistically insignificant" in the long run. Professor Victor Matheson, who specialises in sports economics, said the US impact is "likely a fraction of what was being advertised." We think our conservative, footfall-focused approach gives a more honest picture of what actually lands in host-city economies.</p>
-  </div>
-
-  <!-- REAL-WORLD CHECK-IN -->
-  <div class="section">
-    <div class="section-title">Real-World Check-In</div>
-    <p class="explainer">Our model is built on assumptions made before the tournament started. Now that matches are underway, we can start checking those assumptions against what's actually happening — like checking your weather forecast against what's really going on outside.</p>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;">
-
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #34d399;">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#34d399;margin-bottom:8px;">Stadium attendance — on track</div>
-        <div style="font-size:13px;color:var(--sub);line-height:1.6;">Our 95% occupancy assumption is holding up well for the first matches. The opening game at Estadio Azteca drew over 80,000 fans into an ~83,000-capacity stadium, and Guadalajara's opener had an announced attendance of 44,985 against a 45,664 capacity — both close to or above our 95% figure.</div>
-      </div>
-
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #60a5fa;">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#60a5fa;margin-bottom:8px;">Hotel demand — softer than modelled</div>
-        <div style="font-size:13px;color:var(--sub);line-height:1.6;">This is the area where real data most challenges our assumptions. Hotel data tracker CoStar found New York's hotel booking rate for June 13 sat at 57%, with Monterrey at 60%, Mexico City at 61% and Guadalajara at 73% for their respective match dates — all well below the near-full occupancy our model assumes for match nights.</div>
-      </div>
-
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #f0c040;">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Why hotels are running below forecast</div>
-        <div style="font-size:13px;color:var(--sub);line-height:1.6;">A survey by the American Hotel and Lodging Association found close to 80% of hotel operators reported bookings tracking below initial forecasts. Part of the explanation: FIFA itself cancelled roughly 70% of the room blocks it had reserved in Boston, Dallas, Los Angeles, Philadelphia and Seattle, which had been inflating early demand expectations that never fully materialised.</div>
-      </div>
-
-    </div>
-
-    <p class="explainer" style="font-size:13px;">What does this mean for our $5.7bn estimate? The stadium-driven part of our model — visitor counts based on 95% occupancy — looks well-supported by the first matches. The hotel-driven part is the area showing the clearest gap: our hotel match-night premiums (Step 2) were based on pre-tournament data, and real bookings suggest those premiums may not fully materialise for every match day in every city. Combined with the price cuts already discussed below, this points the same direction as everything else we've found: if our estimate is wrong, it's more likely to be wrong on the high side than the low side.</p>
-
-    <p class="explainer" style="font-size:13px;margin-top:10px;">One important caveat: this is based on just 2 of 104 matches. Hotel booking patterns can shift quickly as a tournament progresses — host nations advancing, marquee fixtures approaching, and last-minute bookings can all change the picture. We'll keep watching as more data comes in, and may revisit our hotel premium assumptions for the Week 2 methodology update if the pattern holds.</p>
+    <p class="explainer" style="font-size:14px;">Independent economists are more sceptical still. Goldman Sachs (June 2026) found the GDP effect across past World Cups "marginally positive but statistically insignificant" long-term, and sports economist Victor Matheson said the US impact is "likely a fraction of what was being advertised." We think our conservative, footfall-focused approach gives a more honest picture.</p>
   </div>
 
   <!-- WHAT WE DON'T KNOW -->
@@ -675,13 +648,12 @@
     <div class="limits">
       <div class="limits-title">&#9888; The limitations of this model</div>
       <ul>
-        <li><strong>These are estimates, not measurements.</strong> We don't have access to real hotel booking data, actual visitor spending, or live attendance figures. Everything is modelled from published research and reasonable assumptions.</li>
-        <li><strong>We treat every match the same.</strong> In reality, a USA vs Mexico group game will draw very differently from a match between two smaller nations, and knockout matches likely attract a higher share of international fans than early group games. High-profile matches will generate more international visitors; lower-profile ones fewer. Weighting visitor mix by match importance is a planned refinement.</li>
-        <li><strong>Real-world demand has come in softer than early hype suggested — and that's a point in favour of our conservative approach.</strong> Dallas, Atlanta, Miami and Philadelphia all cut hotel prices by up to a third in the months before the tournament as bookings ran below initial projections, and early in-tournament hotel data tells a similar story (see "Real-World Check-In" above). Our hotel premium figures come from pre-tournament published data and may still overstate the actual accommodation premium in some cities — meaning our $5.7bn estimate, if anything, has more room to be too high than too low.</li>
-        <li><strong>The displacement rates are judgement calls.</strong> We've calibrated them carefully against published research, but we can't directly observe how many regular tourists stayed away. They could be higher or lower than our estimates.</li>
-        <li><strong>We don't separately model local residents changing their spending.</strong> Some local residents will avoid restaurants and venues during the World Cup due to crowds and disruption, spending money elsewhere instead — a small offsetting effect we don't capture. Conversely, some locals will spend more (eating out to watch matches, buying merchandise) — also not captured. We treat these as roughly cancelling out, but neither is measured directly.</li>
-        <li><strong>Multi-city trips aren't modelled.</strong> Many international fans will visit two or three host cities during their trip. We count each city's incremental visitors independently, which is reasonable — but we don't adjust each city's average spend downward to reflect that the same fan's total trip budget is being split across multiple stops.</li>
-        <li><strong>Canadian and Mexican figures are less precise.</strong> The US Bureau of Economic Analysis publishes detailed city-level GDP data. Statistics Canada and Mexico's INEGI are less granular, and both require currency conversion at exchange rates that fluctuate.</li>
+        <li><strong>Most of this is still modelled, not measured.</strong> Early attendance and hotel data is starting to come in (see Steps 1 and 2), but visitor spending, trip length, and visitor mix are still estimates based on published research.</li>
+        <li><strong>We treat every match the same.</strong> A USA vs Mexico game draws differently from a match between two smaller nations, and knockout rounds likely skew more international than early group games. Weighting visitor mix by match importance is a planned refinement.</li>
+        <li><strong>The displacement rates are judgement calls.</strong> Calibrated against published research, but we can't directly observe how many regular tourists stayed away — the true figures could be higher or lower.</li>
+        <li><strong>Local resident spending shifts aren't modelled.</strong> Some locals avoid venues during the World Cup; others spend more watching matches and buying merchandise. We treat these as roughly cancelling out.</li>
+        <li><strong>Multi-city trips aren't modelled.</strong> Fans visiting several host cities are counted as incremental in each — reasonable, but we don't reduce per-city spend to reflect a shared trip budget.</li>
+        <li><strong>Canadian and Mexican GDP figures are less precise</strong>, with less granular data than the US BEA and currency conversion adding uncertainty.</li>
       </ul>
     </div>
   </div>
