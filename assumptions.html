@@ -639,6 +639,35 @@
     <p class="explainer" style="font-size:14px;">Independent economists are more sceptical of the headline numbers. Goldman Sachs (June 2026) studied every World Cup since 1982 and found the effect on national GDP is "marginally positive but statistically insignificant" in the long run. Professor Victor Matheson, who specialises in sports economics, said the US impact is "likely a fraction of what was being advertised." We think our conservative, footfall-focused approach gives a more honest picture of what actually lands in host-city economies.</p>
   </div>
 
+  <!-- REAL-WORLD CHECK-IN -->
+  <div class="section">
+    <div class="section-title">Real-World Check-In</div>
+    <p class="explainer">Our model is built on assumptions made before the tournament started. Now that matches are underway, we can start checking those assumptions against what's actually happening — like checking your weather forecast against what's really going on outside.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;">
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #34d399;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#34d399;margin-bottom:8px;">Stadium attendance — on track</div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.6;">Our 95% occupancy assumption is holding up well for the first matches. The opening game at Estadio Azteca drew over 80,000 fans into an ~83,000-capacity stadium, and Guadalajara's opener had an announced attendance of 44,985 against a 45,664 capacity — both close to or above our 95% figure.</div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #60a5fa;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#60a5fa;margin-bottom:8px;">Hotel demand — softer than modelled</div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.6;">This is the area where real data most challenges our assumptions. Hotel data tracker CoStar found New York's hotel booking rate for June 13 sat at 57%, with Monterrey at 60%, Mexico City at 61% and Guadalajara at 73% for their respective match dates — all well below the near-full occupancy our model assumes for match nights.</div>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;border-top:3px solid #f0c040;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Why hotels are running below forecast</div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.6;">A survey by the American Hotel and Lodging Association found close to 80% of hotel operators reported bookings tracking below initial forecasts. Part of the explanation: FIFA itself cancelled roughly 70% of the room blocks it had reserved in Boston, Dallas, Los Angeles, Philadelphia and Seattle, which had been inflating early demand expectations that never fully materialised.</div>
+      </div>
+
+    </div>
+
+    <p class="explainer" style="font-size:13px;">What does this mean for our $5.7bn estimate? The stadium-driven part of our model — visitor counts based on 95% occupancy — looks well-supported by the first matches. The hotel-driven part is the area showing the clearest gap: our hotel match-night premiums (Step 2) were based on pre-tournament data, and real bookings suggest those premiums may not fully materialise for every match day in every city. Combined with the price cuts already discussed below, this points the same direction as everything else we've found: if our estimate is wrong, it's more likely to be wrong on the high side than the low side.</p>
+
+    <p class="explainer" style="font-size:13px;margin-top:10px;">One important caveat: this is based on just 2 of 104 matches. Hotel booking patterns can shift quickly as a tournament progresses — host nations advancing, marquee fixtures approaching, and last-minute bookings can all change the picture. We'll keep watching as more data comes in, and may revisit our hotel premium assumptions for the Week 2 methodology update if the pattern holds.</p>
+  </div>
+
   <!-- WHAT WE DON'T KNOW -->
   <div class="section">
     <div class="section-title">What We Don't Know</div>
@@ -648,7 +677,7 @@
       <ul>
         <li><strong>These are estimates, not measurements.</strong> We don't have access to real hotel booking data, actual visitor spending, or live attendance figures. Everything is modelled from published research and reasonable assumptions.</li>
         <li><strong>We treat every match the same.</strong> In reality, a USA vs Mexico group game will draw very differently from a match between two smaller nations, and knockout matches likely attract a higher share of international fans than early group games. High-profile matches will generate more international visitors; lower-profile ones fewer. Weighting visitor mix by match importance is a planned refinement.</li>
-        <li><strong>Real-world demand has come in softer than early hype suggested — and that's a point in favour of our conservative approach.</strong> Dallas, Atlanta, Miami and Philadelphia all cut hotel prices by up to a third in the months before the tournament as bookings ran below initial projections. Our hotel premium figures come from pre-tournament published data and may still overstate the actual accommodation premium in some cities — meaning our $5.7bn estimate, if anything, has more room to be too high than too low.</li>
+        <li><strong>Real-world demand has come in softer than early hype suggested — and that's a point in favour of our conservative approach.</strong> Dallas, Atlanta, Miami and Philadelphia all cut hotel prices by up to a third in the months before the tournament as bookings ran below initial projections, and early in-tournament hotel data tells a similar story (see "Real-World Check-In" above). Our hotel premium figures come from pre-tournament published data and may still overstate the actual accommodation premium in some cities — meaning our $5.7bn estimate, if anything, has more room to be too high than too low.</li>
         <li><strong>The displacement rates are judgement calls.</strong> We've calibrated them carefully against published research, but we can't directly observe how many regular tourists stayed away. They could be higher or lower than our estimates.</li>
         <li><strong>We don't separately model local residents changing their spending.</strong> Some local residents will avoid restaurants and venues during the World Cup due to crowds and disruption, spending money elsewhere instead — a small offsetting effect we don't capture. Conversely, some locals will spend more (eating out to watch matches, buying merchandise) — also not captured. We treat these as roughly cancelling out, but neither is measured directly.</li>
         <li><strong>Multi-city trips aren't modelled.</strong> Many international fans will visit two or three host cities during their trip. We count each city's incremental visitors independently, which is reasonable — but we don't adjust each city's average spend downward to reflect that the same fan's total trip budget is being split across multiple stops.</li>
@@ -673,6 +702,9 @@
       <li><strong>Deloitte Canada</strong>Sport Business Advisory Practice report (2024): $1.09 GDP contribution per Canadian dollar spent at the World Cup. Anchor for Canadian city multipliers.</li>
       <li><strong>Academic research</strong>Methodology informed by: Zimbalist &amp; Matheson (NFL Super Bowl displacement research); Oxford Economics mega-event multiplier studies; FIFA 2014 Brazil host city impact analysis; Goldman Sachs World Cup and Economics research note (June 2026); UK Sport/DCMS mega-event evaluation framework.</li>
       <li><strong>FIFA official match schedule</strong>All 104 kickoff times (UTC) and venues, confirmed through to the Final on 19 July 2026, via kickoffclock.com. The "Matches" column counts a match as played 2.5 hours after kickoff. The tracker runs twice daily (morning and late evening UTC) so this is usually accurate within about 9 hours of full time.</li>
+      <li><strong>CoStar / Front Office Sports</strong>Hotel booking rate data by host city and match date (June 2026), used in our "Real-World Check-In" section. <a href="https://frontofficesports.com/u-s-hotels-still-struggling-to-fill-rooms-as-world-cup-approaches/" target="_blank">frontofficesports.com &#8599;</a></li>
+      <li><strong>American Hotel &amp; Lodging Association (AHLA)</strong>April 2026 survey of hotel operators across host cities on booking pace versus forecast. <a href="https://www.newsweek.com/hotels-world-cup-cities-football-11976653" target="_blank">newsweek.com &#8599;</a></li>
+      <li><strong>FIFA / Associated Press / NBC News</strong>Official attendance figures for opening matches at Estadio Azteca and Estadio Akron (June 2026). <a href="https://www.nbcnews.com/sports/soccer/empty-seats-world-cups-opening-day-renew-ticket-price-concerns-rcna349748" target="_blank">nbcnews.com &#8599;</a></li>
     </ul>
   </div>
 
