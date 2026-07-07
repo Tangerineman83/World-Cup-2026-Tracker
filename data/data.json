@@ -1,6 +1,6 @@
 {
-  "updated": "2026-07-07T09:40:52Z",
-  "updatedDisplay": "07 Jul 2026, 09:40z",
+  "updated": "2026-07-07T23:39:51Z",
+  "updatedDisplay": "07 Jul 2026, 23:39z",
   "metric": "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | GDP impact: modelled visitor spend estimate | Matches: static kickoff-time schedule",
   "baselineYears": [
     2019,
@@ -424,7 +424,7 @@
       "lastWeekVoyage": 577.0,
       "lastWeekPts": 0,
       "matchesTotal": 8,
-      "matchesPlayed": 6,
+      "matchesPlayed": 7,
       "gdpImpactUsdM": 469,
       "gdpPctAnnual": 0.104,
       "metroGdpUsdBn": 450,
@@ -450,7 +450,7 @@
       "lastWeekVoyage": 807.0,
       "lastWeekPts": 0,
       "matchesTotal": 7,
-      "matchesPlayed": 6,
+      "matchesPlayed": 7,
       "gdpImpactUsdM": 239,
       "gdpPctAnnual": 0.184,
       "metroGdpUsdBn": 130,
