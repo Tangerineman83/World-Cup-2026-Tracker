@@ -85,6 +85,13 @@
       "stadium_total": 3489,
       "wikivoyage_total": 657,
       "wikivoyage_low_conf": false
+    },
+    "Houston": {
+      "stadium_avg_weekly": 3703.0,
+      "wikivoyage_avg_weekly": 62.3,
+      "stadium_total": 11109,
+      "wikivoyage_total": 187,
+      "wikivoyage_low_conf": true
     }
   },
   "cities": [
