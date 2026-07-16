@@ -36,6 +36,13 @@
       "stadium_total": 13374,
       "wikivoyage_total": 1534,
       "wikivoyage_low_conf": false
+    },
+    "Miami": {
+      "stadium_avg_weekly": 4138.0,
+      "wikivoyage_avg_weekly": 226.0,
+      "stadium_total": 12414,
+      "wikivoyage_total": 678,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
