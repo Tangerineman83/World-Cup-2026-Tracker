@@ -92,6 +92,13 @@
       "stadium_total": 20174,
       "wikivoyage_total": 324,
       "wikivoyage_low_conf": true
+    },
+    "Philadelphia": {
+      "stadium_avg_weekly": 5044.3,
+      "wikivoyage_avg_weekly": 349.3,
+      "stadium_total": 15133,
+      "wikivoyage_total": 1048,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
