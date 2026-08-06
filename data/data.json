@@ -99,6 +99,13 @@
       "stadium_total": 14048,
       "wikivoyage_total": 745,
       "wikivoyage_low_conf": false
+    },
+    "Vancouver": {
+      "stadium_avg_weekly": 1619.3,
+      "wikivoyage_avg_weekly": 196.0,
+      "stadium_total": 4858,
+      "wikivoyage_total": 588,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
