@@ -7,118 +7,13 @@
     2022,
     2023
   ],
-  "baselineWindow": "2026-08-07 to 2026-08-13 (equiv. in [2019, 2022, 2023])",
+  "baselineWindow": "2026-08-08 to 2026-08-14 (equiv. in [2019, 2022, 2023])",
   "baselines": {
     "New York / New Jersey": {
-      "stadium_avg_weekly": 9898.3,
-      "wikivoyage_avg_weekly": 794.0,
-      "stadium_total": 29695,
-      "wikivoyage_total": 2382,
-      "wikivoyage_low_conf": false
-    },
-    "Los Angeles": {
-      "stadium_avg_weekly": 18168.0,
-      "wikivoyage_avg_weekly": 484.3,
-      "stadium_total": 54504,
-      "wikivoyage_total": 1453,
-      "wikivoyage_low_conf": false
-    },
-    "Dallas": {
-      "stadium_avg_weekly": 5842.0,
-      "wikivoyage_avg_weekly": 168.7,
-      "stadium_total": 17526,
-      "wikivoyage_total": 506,
-      "wikivoyage_low_conf": false
-    },
-    "Mexico City": {
-      "stadium_avg_weekly": 3381.0,
-      "wikivoyage_avg_weekly": 183.7,
-      "stadium_total": 10143,
-      "wikivoyage_total": 551,
-      "wikivoyage_low_conf": false
-    },
-    "Miami": {
-      "stadium_avg_weekly": 6995.0,
-      "wikivoyage_avg_weekly": 278.7,
-      "stadium_total": 20985,
-      "wikivoyage_total": 836,
-      "wikivoyage_low_conf": false
-    },
-    "Atlanta": {
-      "stadium_avg_weekly": 9135.0,
-      "wikivoyage_avg_weekly": 169.7,
-      "stadium_total": 27405,
-      "wikivoyage_total": 509,
-      "wikivoyage_low_conf": false
-    },
-    "San Francisco": {
-      "stadium_avg_weekly": 4781.7,
-      "wikivoyage_avg_weekly": 142.7,
-      "stadium_total": 14345,
-      "wikivoyage_total": 428,
-      "wikivoyage_low_conf": true
-    },
-    "Seattle": {
-      "stadium_avg_weekly": 4954.7,
-      "wikivoyage_avg_weekly": 317.7,
-      "stadium_total": 14864,
-      "wikivoyage_total": 953,
-      "wikivoyage_low_conf": false
-    },
-    "Toronto": {
-      "stadium_avg_weekly": 2916.0,
-      "wikivoyage_avg_weekly": 483.0,
-      "stadium_total": 8748,
-      "wikivoyage_total": 1449,
-      "wikivoyage_low_conf": false
-    },
-    "Boston": {
-      "stadium_avg_weekly": 6010.3,
-      "wikivoyage_avg_weekly": 397.0,
-      "stadium_total": 18031,
-      "wikivoyage_total": 1191,
-      "wikivoyage_low_conf": false
-    },
-    "Guadalajara": {
-      "stadium_avg_weekly": 753.0,
-      "wikivoyage_avg_weekly": 186.0,
-      "stadium_total": 2259,
-      "wikivoyage_total": 558,
-      "wikivoyage_low_conf": false
-    },
-    "Houston": {
-      "stadium_avg_weekly": 3775.0,
-      "wikivoyage_avg_weekly": 167.7,
-      "stadium_total": 11325,
-      "wikivoyage_total": 503,
-      "wikivoyage_low_conf": false
-    },
-    "Philadelphia": {
-      "stadium_avg_weekly": 4963.0,
-      "wikivoyage_avg_weekly": 77.0,
-      "stadium_total": 14889,
-      "wikivoyage_total": 231,
-      "wikivoyage_low_conf": true
-    },
-    "Vancouver": {
-      "stadium_avg_weekly": 3529.3,
-      "wikivoyage_avg_weekly": 246.0,
-      "stadium_total": 10588,
-      "wikivoyage_total": 738,
-      "wikivoyage_low_conf": false
-    },
-    "Monterrey": {
-      "stadium_avg_weekly": 1532.3,
-      "wikivoyage_avg_weekly": 137.3,
-      "stadium_total": 4597,
-      "wikivoyage_total": 412,
-      "wikivoyage_low_conf": true
-    },
-    "Kansas City": {
-      "stadium_avg_weekly": 3691.7,
-      "wikivoyage_avg_weekly": 331.0,
-      "stadium_total": 11075,
-      "wikivoyage_total": 993,
+      "stadium_avg_weekly": 13384.3,
+      "wikivoyage_avg_weekly": 773.3,
+      "stadium_total": 40153,
+      "wikivoyage_total": 2320,
       "wikivoyage_low_conf": false
     }
   },
@@ -539,5 +434,6 @@
       "hotelRateUsd": 538,
       "hotelPremiumPct": 104
     }
-  ]
+  ],
+  "_baselineInProgress": true
 }
