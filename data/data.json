@@ -57,6 +57,13 @@
       "stadium_total": 15284,
       "wikivoyage_total": 1349,
       "wikivoyage_low_conf": false
+    },
+    "Seattle": {
+      "stadium_avg_weekly": 4786.0,
+      "wikivoyage_avg_weekly": 367.3,
+      "stadium_total": 14358,
+      "wikivoyage_total": 1102,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
