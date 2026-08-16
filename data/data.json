@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-16T08:59:55Z",
-  "updatedDisplay": "16 Aug 2026, 08:59z",
+  "updated": "2026-08-16T23:38:57Z",
+  "updatedDisplay": "16 Aug 2026, 23:38z",
   "metric": "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | GDP impact: modelled visitor spend estimate | Matches: static kickoff-time schedule",
   "baselineYears": [
     2019,
@@ -410,6 +410,32 @@
       "hotelPremiumPct": 104
     },
     {
+      "name": "Philadelphia",
+      "country": "USA",
+      "flag": "US",
+      "region": "East",
+      "stadium": "Lincoln Financial Field",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
+      "baselineStadiumAvgWeekly": 4074.3,
+      "baselineVoyageAvgWeekly": 267.3,
+      "wikivoyageLowConf": false,
+      "lastWeekCombined": 271.6,
+      "lastWeekStadium": 100.0,
+      "lastWeekVoyage": 443.3,
+      "lastWeekPts": 0,
+      "matchesTotal": 6,
+      "matchesPlayed": 6,
+      "gdpImpactUsdM": 311,
+      "gdpPctAnnual": 0.063,
+      "metroGdpUsdBn": 490,
+      "displacementTier": "Mid-tier Host",
+      "displacementPct": 15,
+      "multiplier": 1.65,
+      "beerPriceUsd": 10.65,
+      "hotelRateUsd": 376,
+      "hotelPremiumPct": 6
+    },
+    {
       "name": "Los Angeles",
       "country": "USA",
       "flag": "US",
@@ -512,32 +538,6 @@
       "beerPriceUsd": 13.25,
       "hotelRateUsd": 279,
       "hotelPremiumPct": 10
-    },
-    {
-      "name": "Philadelphia",
-      "country": "USA",
-      "flag": "US",
-      "region": "East",
-      "stadium": "Lincoln Financial Field",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Lincoln_Financial_Field",
-      "baselineStadiumAvgWeekly": 4074.3,
-      "baselineVoyageAvgWeekly": 267.3,
-      "wikivoyageLowConf": false,
-      "lastWeekCombined": 100.0,
-      "lastWeekStadium": 100.0,
-      "lastWeekVoyage": 100.0,
-      "lastWeekPts": 0,
-      "matchesTotal": 6,
-      "matchesPlayed": 6,
-      "gdpImpactUsdM": 311,
-      "gdpPctAnnual": 0.063,
-      "metroGdpUsdBn": 490,
-      "displacementTier": "Mid-tier Host",
-      "displacementPct": 15,
-      "multiplier": 1.65,
-      "beerPriceUsd": 10.65,
-      "hotelRateUsd": 376,
-      "hotelPremiumPct": 6
     }
   ]
 }
