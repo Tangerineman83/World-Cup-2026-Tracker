@@ -78,6 +78,13 @@
       "stadium_total": 17989,
       "wikivoyage_total": 1260,
       "wikivoyage_low_conf": false
+    },
+    "Guadalajara": {
+      "stadium_avg_weekly": 1210.7,
+      "wikivoyage_avg_weekly": 208.3,
+      "stadium_total": 3632,
+      "wikivoyage_total": 625,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
