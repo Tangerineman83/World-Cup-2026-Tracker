@@ -29,6 +29,13 @@
       "stadium_total": 39444,
       "wikivoyage_total": 556,
       "wikivoyage_low_conf": false
+    },
+    "Mexico City": {
+      "stadium_avg_weekly": 4883.7,
+      "wikivoyage_avg_weekly": 566.7,
+      "stadium_total": 14651,
+      "wikivoyage_total": 1700,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
