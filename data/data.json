@@ -43,6 +43,13 @@
       "stadium_total": 45332,
       "wikivoyage_total": 765,
       "wikivoyage_low_conf": false
+    },
+    "Atlanta": {
+      "stadium_avg_weekly": 9569.7,
+      "wikivoyage_avg_weekly": 195.0,
+      "stadium_total": 28709,
+      "wikivoyage_total": 585,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
