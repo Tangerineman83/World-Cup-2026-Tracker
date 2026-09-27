@@ -64,6 +64,13 @@
       "stadium_total": 18923,
       "wikivoyage_total": 867,
       "wikivoyage_low_conf": false
+    },
+    "Toronto": {
+      "stadium_avg_weekly": 2620.0,
+      "wikivoyage_avg_weekly": 430.3,
+      "stadium_total": 7860,
+      "wikivoyage_total": 1291,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
