@@ -113,6 +113,13 @@
       "stadium_total": 4631,
       "wikivoyage_total": 507,
       "wikivoyage_low_conf": false
+    },
+    "Kansas City": {
+      "stadium_avg_weekly": 6689.7,
+      "wikivoyage_avg_weekly": 163.0,
+      "stadium_total": 20069,
+      "wikivoyage_total": 489,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
