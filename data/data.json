@@ -50,6 +50,13 @@
       "stadium_total": 25239,
       "wikivoyage_total": 611,
       "wikivoyage_low_conf": false
+    },
+    "San Francisco": {
+      "stadium_avg_weekly": 11253.0,
+      "wikivoyage_avg_weekly": 303.7,
+      "stadium_total": 33759,
+      "wikivoyage_total": 911,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
