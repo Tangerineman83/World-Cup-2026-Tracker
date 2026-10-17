@@ -71,6 +71,13 @@
       "stadium_total": 9168,
       "wikivoyage_total": 1414,
       "wikivoyage_low_conf": false
+    },
+    "Boston": {
+      "stadium_avg_weekly": 8656.7,
+      "wikivoyage_avg_weekly": 432.3,
+      "stadium_total": 25970,
+      "wikivoyage_total": 1297,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
