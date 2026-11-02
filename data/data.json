@@ -15,6 +15,13 @@
       "stadium_total": 45817,
       "wikivoyage_total": 2055,
       "wikivoyage_low_conf": false
+    },
+    "Los Angeles": {
+      "stadium_avg_weekly": 15064.7,
+      "wikivoyage_avg_weekly": 988.3,
+      "stadium_total": 45194,
+      "wikivoyage_total": 2965,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
