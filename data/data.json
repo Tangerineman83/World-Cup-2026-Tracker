@@ -1,6 +1,6 @@
 {
-  "updated": "2026-11-05T03:42:07Z",
-  "updatedDisplay": "05 Nov 2026, 03:42z",
+  "updated": "2026-11-05T16:33:01Z",
+  "updatedDisplay": "05 Nov 2026, 16:33z",
   "metric": "50% stadium Wikipedia + 50% Wikivoyage vs same-period baseline (2019/2022/2023) | GDP impact: modelled visitor spend estimate | Matches: static kickoff-time schedule",
   "baselineYears": [
     2019,
@@ -159,8 +159,8 @@
       "baselineStadiumAvgWeekly": 7095.3,
       "baselineVoyageAvgWeekly": 387.3,
       "wikivoyageLowConf": false,
-      "lastWeekCombined": 550.8,
-      "lastWeekStadium": 101.6,
+      "lastWeekCombined": 556.4,
+      "lastWeekStadium": 112.7,
       "lastWeekVoyage": 1000.0,
       "lastWeekPts": 9,
       "matchesTotal": 6,
