@@ -22,6 +22,13 @@
       "stadium_total": 98963,
       "wikivoyage_total": 2348,
       "wikivoyage_low_conf": false
+    },
+    "Dallas": {
+      "stadium_avg_weekly": 19198.3,
+      "wikivoyage_avg_weekly": 150.7,
+      "stadium_total": 57595,
+      "wikivoyage_total": 452,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
