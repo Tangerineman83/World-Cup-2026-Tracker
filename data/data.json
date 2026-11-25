@@ -106,6 +106,13 @@
       "stadium_total": 17669,
       "wikivoyage_total": 912,
       "wikivoyage_low_conf": false
+    },
+    "Monterrey": {
+      "stadium_avg_weekly": 2772.3,
+      "wikivoyage_avg_weekly": 184.7,
+      "stadium_total": 8317,
+      "wikivoyage_total": 554,
+      "wikivoyage_low_conf": false
     }
   },
   "cities": [
